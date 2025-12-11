@@ -3,24 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>關東之旅 | 櫻花吉伊卡哇 V15</title>
+    <title>關東之旅 | 櫻花吉伊卡哇 V16</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
-
-    <script>
-        window.onerror = function(msg, url, line, col, error) {
-            var extra = !col ? '' : '\ncolumn: ' + col;
-            extra += !error ? '' : '\nerror: ' + error;
-            alert("網頁發生錯誤，請截圖給開發者：\nError: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-            // 強制移除 Loading
-            const loader = document.getElementById('loading-screen');
-            if(loader) loader.style.display = 'none';
-            return true;
-        };
-    </script>
 
     <script>
         tailwind.config = {
@@ -38,11 +26,9 @@
                     animation: {
                         'float': 'float 3s ease-in-out infinite',
                         'bounce-slow': 'bounce 3s infinite',
-                        'wiggle': 'wiggle 2s linear infinite',
                     },
                     keyframes: {
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } },
-                        wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
                     }
                 }
             }
@@ -60,31 +46,32 @@
         .banner-container { height: 240px; background-image: url('./banner.jpg'); background-size: cover; background-position: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; position: relative; box-shadow: 0 4px 20px rgba(255, 183, 178, 0.4); margin-bottom: 20px; }
         .banner-fallback { background: linear-gradient(135deg, #FFD1DC 0%, #A2D2FF 100%); }
 
-        /* UI Components */
+        /* UI Elements */
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 4px 15px rgba(255, 209, 220, 0.2); backdrop-filter: blur(5px); transition: all 0.2s; }
         .app-icon { width: 65px; height: 65px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; box-shadow: 0 6px 15px rgba(255, 183, 178, 0.3); margin-bottom: 6px; transition: transform 0.1s; }
         .app-icon:active { transform: scale(0.9); }
         .app-label { font-size: 12px; font-weight: bold; color: #5D5D5D; text-align: center; }
-        .card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 4px 15px rgba(255, 209, 220, 0.2); backdrop-filter: blur(5px); transition: all 0.2s; }
-        .weather-card { background: linear-gradient(120deg, #A2D2FF 0%, #FFD1DC 100%); color: white; }
+        
+        /* 擬真插畫濾鏡 */
+        .illustrate-img { filter: saturate(1.4) contrast(1.1) brightness(1.05); }
 
         /* Buttons */
-        .fab-main { position: fixed; bottom: 30px; right: 20px; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; z-index: 50; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: transform 0.1s; }
+        .fab-main { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; z-index: 50; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: transform 0.1s; }
         .fab-main:active { transform: scale(0.9); }
         .vjw-btn { position: fixed; bottom: 100px; right: 20px; background: linear-gradient(45deg, #FF9A9E 0%, #FECFEF 99%); color: white; padding: 10px 16px; border-radius: 50px; font-weight: bold; font-size: 14px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); animation: float 3s infinite; }
-        .coupon-btn { position: fixed; bottom: 160px; right: 20px; background: linear-gradient(45deg, #f6d365 0%, #fda085 100%); color: white; padding: 8px 14px; border-radius: 50px; font-weight: bold; font-size: 13px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); animation: wiggle 3s infinite; }
+        .coupon-btn { position: fixed; bottom: 160px; right: 20px; background: linear-gradient(45deg, #f6d365 0%, #fda085 100%); color: white; padding: 8px 14px; border-radius: 50px; font-weight: bold; font-size: 13px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); }
         
-        /* 吉伊卡哇選單頭像 */
-        .chii-select-card { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; height: 100%; }
+        /* Avatars */
+        .chii-select-card { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; height: 100%; border: 2px solid white; }
         .chii-select-card:active { transform: scale(0.95); }
         .chii-avatar-lg { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 8px; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .chii-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s; background: white; }
-        .chii-avatar.active { border-color: #FFD1DC; transform: scale(1.1); box-shadow: 0 0 15px #FFD1DC; }
-
-        /* Search & Camera */
-        .floating-search { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 40; }
+        
+        /* Camera */
         .camera-frame { position: fixed; inset: 0; background: black; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .scan-line { width: 100%; height: 2px; background: #00ff00; position: absolute; top: 50%; animation: scan 2s linear infinite; box-shadow: 0 0 10px #00ff00; }
-        @keyframes scan { 0% { top: 30%; opacity: 0; } 50% { opacity: 1; } 100% { top: 70%; opacity: 0; } }
+        .scan-box { width: 250px; height: 250px; border: 4px solid #00ff00; position: absolute; box-shadow: 0 0 20px #00ff00, inset 0 0 20px #00ff00; }
+
+        /* Search */
+        .floating-search { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 40; }
 
         [v-cloak] { display: none; }
     </style>
@@ -97,8 +84,7 @@
     
     <div id="loading-screen" v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
         <i class="fa-solid fa-spinner fa-spin text-4xl text-chii-pink mb-4"></i>
-        <div class="text-chii-text font-bold mt-2">載入美好旅程 V15...</div>
-        <div class="text-xs text-gray-400 mt-2">若持續卡住請重新整理</div>
+        <div class="text-chii-text font-bold">載入美好旅程 V16...</div>
     </div>
 
     <div v-if="isMounted" v-cloak class="min-h-screen pb-24 relative z-10">
@@ -118,14 +104,13 @@
             <div class="banner-container" :class="{'banner-fallback': !hasBanner}">
                 <div class="absolute inset-0 bg-gradient-to-l from-pink-900/10 to-transparent rounded-b-[30px]"></div>
                 <div class="absolute bottom-6 right-6 text-white text-right drop-shadow-md">
-                    <div class="text-xs opacity-90 mb-1 tracking-widest">TOKYO TRIP</div>
                     <h1 class="text-3xl font-black">關東之旅 🌸</h1>
                     <div class="mt-2 text-sm bg-white/30 backdrop-blur-md px-3 py-1 rounded-full inline-block">
-                        <i class="fa-solid fa-car mr-1"></i>吉伊卡哇 V15
+                        <i class="fa-solid fa-car mr-1"></i>V16 究極版
                     </div>
                 </div>
                 <button @click="showSyncModal = true" class="absolute top-4 right-4 bg-white/40 backdrop-blur text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-sm border border-white/50">
-                    <i class="fa-solid fa-rotate mr-1"></i>同步
+                    <i class="fa-solid fa-rotate mr-1"></i>備份/同步
                 </button>
             </div>
 
@@ -162,12 +147,11 @@
                                 <span class="text-xs font-bold px-2 py-0.5 rounded text-white" :class="getCategoryColor(item.category)">{{ getCategoryName(item.category) }}</span>
                                 <span class="text-xs text-gray-400 font-mono"><i class="fa-regular fa-clock mr-1"></i>{{ item.hours }}</span>
                             </div>
-                            <h3 class="font-bold text-gray-800 text-lg">
-                                {{ item.name }}
-                                <a :href="getMapLink(item.mapKeyword)" target="_blank" @click.stop class="ml-1 text-blue-400 hover:text-blue-600"><i class="fa-solid fa-location-arrow"></i></a>
+                            <h3 class="font-bold text-gray-800 text-lg">{{ item.name }}
+                                <a :href="getMapLink(item.mapKeyword)" target="_blank" @click.stop class="ml-1 text-blue-400"><i class="fa-solid fa-location-arrow"></i></a>
                             </h3>
                             <p v-if="item.parking" class="text-xs mt-1 text-blue-500 font-bold bg-blue-50 p-1 rounded inline-block cursor-pointer hover:bg-blue-100" @click.stop="window.open(item.parking)">
-                                <i class="fa-solid fa-square-parking mr-1"></i>推薦停車場 (導航)
+                                <i class="fa-solid fa-square-parking mr-1"></i>推薦停車場
                             </p>
                             <p class="text-sm text-gray-500 mt-2 whitespace-pre-line">{{ item.note }}</p>
                         </div>
@@ -175,7 +159,7 @@
                     </div>
                 </div>
             </div>
-            <button @click="openAddModal" class="fab-main bg-chii-pink animate-bounce-slow hover:bg-pink-400"><i class="fa-solid fa-plus"></i></button>
+            <button @click="openAddModal" class="fab-main bg-chii-pink hover:bg-pink-400"><i class="fa-solid fa-plus"></i></button>
         </div>
 
         <div v-if="currentView === 'prep'" class="px-4">
@@ -188,12 +172,9 @@
                     <li>VJW QR Code 截圖</li>
                     <li>自駕：台灣駕照 + 日文譯本</li>
                 </ul>
-                <div class="mt-3 pt-3 border-t border-yellow-200">
-                    <h4 class="font-bold text-xs text-yellow-600 mb-2">租車推薦</h4>
-                    <div class="flex gap-2">
-                        <a href="https://rent.toyota.co.jp/zh-tw/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Toyota</a>
-                        <a href="https://www.nipponrentacar.co.jp/en/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Nippon</a>
-                    </div>
+                <div class="mt-3 pt-3 border-t border-yellow-200 flex gap-2">
+                    <a href="https://rent.toyota.co.jp/zh-tw/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Toyota租車</a>
+                    <a href="https://www.nipponrentacar.co.jp/en/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Nippon租車</a>
                 </div>
             </div>
 
@@ -202,8 +183,10 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div v-for="user in users" :key="user.id" class="chii-select-card" @click="selectPrepUser(user.id)" :style="{borderBottom: '4px solid ' + user.bg}">
                         <div class="chii-avatar-lg" :style="{backgroundColor: user.bg}">{{ user.icon }}</div>
-                        <span class="font-bold text-gray-600 mt-2">{{ user.name }}</span>
-                        <span class="text-xs text-gray-400">的行李清單</span>
+                        <div class="flex items-center gap-1 mt-2">
+                            <span class="font-bold text-gray-600">{{ user.name }}</span>
+                            <i class="fa-solid fa-pen text-xs text-gray-300" @click.stop="editUserName(user)"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -214,17 +197,15 @@
                         <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm" :style="{backgroundColor: getUserById(prepUser).bg}">{{ getUserById(prepUser).icon }}</span>
                         {{ getUserById(prepUser).name }} 的清單
                     </h3>
-                    <button @click="prepMode = 'select'" class="text-sm bg-white px-3 py-1 rounded-full shadow text-gray-500">
-                        <i class="fa-solid fa-users mr-1"></i>切換
-                    </button>
+                    <button @click="prepMode = 'select'" class="text-sm bg-white px-3 py-1 rounded-full shadow text-gray-500"><i class="fa-solid fa-users mr-1"></i>換人</button>
                 </div>
                 <div class="card p-5 min-h-[300px] mb-20 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-2" :style="{backgroundColor: getUserById(prepUser).bg}"></div>
                     <div class="space-y-2">
                         <div v-for="(item, idx) in currentPrepList" :key="idx" class="flex items-center gap-3 py-2 border-b border-dashed border-gray-100">
-                            <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-400 rounded cursor-pointer">
+                            <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-400 rounded">
                             <input v-model="item.text" class="flex-1 text-sm bg-transparent outline-none" :class="{'line-through text-gray-300': item.checked}">
-                            <button @click="currentPrepList.splice(idx, 1)" class="text-gray-300 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
+                            <button @click="currentPrepList.splice(idx, 1)" class="text-gray-300"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                     </div>
                     <button @click="addPrepItem" class="w-full mt-6 py-3 bg-gray-50 rounded-xl text-gray-400 font-bold border-2 border-dashed border-gray-200 hover:bg-white text-sm">+ 新增項目</button>
@@ -244,8 +225,10 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div v-for="user in users" :key="user.id" class="chii-select-card" @click="selectMoneyUser(user.id)" :style="{borderBottom: '4px solid ' + user.bg}">
                             <div class="chii-avatar-lg" :style="{backgroundColor: user.bg}">{{ user.icon }}</div>
-                            <span class="font-bold text-gray-600 mt-2">{{ user.name }}</span>
-                            <span class="text-xs text-gray-400">的錢包</span>
+                            <div class="flex items-center gap-1 mt-2">
+                                <span class="font-bold text-gray-600">{{ user.name }}</span>
+                                <i class="fa-solid fa-pen text-xs text-gray-300" @click.stop="editUserName(user)"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -269,10 +252,7 @@
                         <div v-for="exp in filteredExpenses" :key="exp.id" class="card p-3 flex justify-between items-center">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-lg shadow-inner">{{ getExpenseIcon(exp.category) }}</div>
-                                <div>
-                                    <div class="font-bold text-gray-700 text-sm">{{ exp.name }}</div>
-                                    <div class="text-xs text-gray-400">{{ exp.date }} · {{ exp.category }}</div>
-                                </div>
+                                <div><div class="font-bold text-gray-700 text-sm">{{ exp.name }}</div><div class="text-xs text-gray-400">{{ exp.date }} · {{ exp.category }}</div></div>
                             </div>
                             <div class="text-right">
                                 <div class="font-bold text-gray-800">¥{{ Number(exp.amount).toLocaleString() }}</div>
@@ -288,7 +268,7 @@
                 <div class="card p-6 border-l-4 border-chii-blue">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-gray-700"><i class="fa-solid fa-calculator text-blue-400"></i> 分帳建議</h3>
                     <div class="flex justify-center gap-3 mb-4">
-                        <div v-for="user in users" :key="user.id" class="flex flex-col items-center cursor-pointer" @click="editUserName(user)">
+                        <div v-for="user in users" :key="user.id" class="flex flex-col items-center">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs text-white" :style="{backgroundColor:user.bg}">{{ user.icon }}</div>
                             <span class="text-[10px] text-gray-400 mt-1">{{ user.name }}</span>
                         </div>
@@ -297,9 +277,7 @@
                     <div v-else class="space-y-3">
                         <div v-for="(s, idx) in settlements" :key="idx" class="flex items-center justify-between bg-blue-50 p-4 rounded-xl">
                             <div class="flex items-center gap-2 text-sm font-bold">
-                                <span class="text-red-500">{{ getUserById(s.from).name }}</span>
-                                <i class="fa-solid fa-arrow-right text-gray-300 text-xs"></i>
-                                <span class="text-green-600 bg-white px-2 py-0.5 rounded shadow-sm">給 {{ getUserById(s.to).name }}</span>
+                                <span class="text-red-500">{{ getUserById(s.from).name }}</span><i class="fa-solid fa-arrow-right text-gray-300 text-xs"></i><span class="text-green-600 bg-white px-2 py-0.5 rounded shadow-sm">給 {{ getUserById(s.to).name }}</span>
                             </div>
                             <div class="font-bold text-gray-800 text-lg">¥{{ s.amount.toLocaleString() }}</div>
                         </div>
@@ -311,10 +289,10 @@
         <div v-if="currentView === 'shopping'" class="px-4">
             <a href="https://www.google.com/search?q=日本旅遊優惠券2025" target="_blank" class="coupon-btn"><i class="fa-solid fa-ticket"></i> 找優惠券</a>
             <div class="grid grid-cols-2 gap-3 mb-6">
-                <a href="https://www.cosme.net/bestcosme/" target="_blank" class="bg-green-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                <a href="https://www.cosme.net/bestcosme/" target="_blank" class="bg-green-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm hover:scale-105 transition">
                     <i class="fa-solid fa-crown text-3xl text-green-600"></i><span class="font-bold text-green-800 text-sm">@cosme 大賞</span>
                 </a>
-                <a href="https://360life.shinyusha.co.jp/list/ldk" target="_blank" class="bg-purple-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
+                <a href="https://360life.shinyusha.co.jp/list/ldk" target="_blank" class="bg-purple-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm hover:scale-105 transition">
                     <i class="fa-solid fa-magazine text-3xl text-purple-600"></i><span class="font-bold text-purple-800 text-sm">LDK 評測</span>
                 </a>
             </div>
@@ -328,7 +306,7 @@
                 <div v-for="(item, idx) in shoppingList[shopCat]" :key="idx" class="card p-3 flex flex-col items-center relative group">
                     <button v-if="shopCat==='wish'" @click="shoppingList[shopCat].splice(idx, 1)" class="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full text-gray-400 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark"></i></button>
                     <div class="w-full h-32 bg-gray-50 rounded-xl mb-2 overflow-hidden flex items-center justify-center shadow-inner">
-                        <img :src="item.img" class="w-full h-full object-cover">
+                        <img :src="item.img" class="w-full h-full object-cover illustrate-img">
                     </div>
                     <div class="font-bold text-sm text-center w-full truncate text-gray-700">{{ item.name }}</div>
                 </div>
@@ -342,7 +320,7 @@
             </div>
             <div class="space-y-4 pb-24">
                 <div v-for="(food, idx) in foodList[foodLoc]" :key="idx" class="card p-4 flex gap-4 hover:shadow-md cursor-pointer relative" @click="window.open(food.link)">
-                    <div class="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 overflow-hidden shadow-sm"><img :src="food.img" class="w-full h-full object-cover"></div>
+                    <div class="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 overflow-hidden shadow-sm"><img :src="food.img" class="w-full h-full object-cover illustrate-img"></div>
                     <div class="flex-1">
                         <h3 class="font-bold text-gray-800">{{ food.name }}</h3>
                         <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ food.desc }}</p>
@@ -361,7 +339,7 @@
             <div class="grid grid-cols-1 gap-4 pb-24">
                 <div v-for="(spot, idx) in photoSpots[photoArea]" :key="idx" class="card p-0 overflow-hidden group relative shadow-md">
                     <a :href="spot.link" target="_blank" class="flex">
-                        <div class="w-32 h-28 bg-gray-200 relative flex-shrink-0"><img :src="spot.img" class="w-full h-full object-cover"></div>
+                        <div class="w-32 h-28 bg-gray-200 relative flex-shrink-0"><img :src="spot.img" class="w-full h-full object-cover illustrate-img"></div>
                         <div class="p-3 flex flex-col justify-center flex-1">
                             <h3 class="font-bold text-gray-800">{{ spot.name }}</h3>
                             <div class="mt-2 text-rose-400 text-xs font-bold"><i class="fa-solid fa-location-dot mr-1"></i>導航</div>
@@ -376,13 +354,14 @@
         <div v-if="currentView === 'japanese'" class="px-4">
             <div v-if="showCamera" class="camera-frame">
                 <video ref="videoRef" autoplay playsinline class="w-full h-full object-cover opacity-80"></video>
-                <div class="scan-line"></div>
+                <div class="scan-box"></div>
                 <div class="absolute bottom-10 text-white text-center w-full">
-                    <p class="mb-4 font-bold text-lg shadow-black drop-shadow-md">掃描中... (模擬)</p>
+                    <p class="mb-4 font-bold text-lg shadow-black drop-shadow-md">掃描中...</p>
                     <button @click="stopCamera" class="bg-red-500 text-white px-6 py-2 rounded-full font-bold">關閉相機</button>
                 </div>
             </div>
-            <button @click="startCamera" class="w-full mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-lg font-bold"><i class="fa-solid fa-camera"></i> 啟動即時掃描</button>
+            <button @click="startCamera" class="w-full mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-lg font-bold"><i class="fa-solid fa-camera"></i> 啟動相機 (模擬)</button>
+            
             <div class="space-y-3 pb-24">
                 <div v-for="(phrase, idx) in japanesePhrases" :key="idx" @click="speak(phrase.jp)" class="card p-4 flex items-center justify-between cursor-pointer active:scale-95 transition border-l-4 border-green-400 hover:bg-green-50 relative">
                     <div><div class="font-bold text-lg text-gray-800">{{ phrase.jp }}</div><div class="text-xs text-gray-400 font-mono mb-1">{{ phrase.tw }}</div></div>
@@ -425,7 +404,11 @@
         <div v-if="showCommonModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl">
                 <h3 class="font-bold text-lg mb-4 text-center">新增項目</h3>
-                <div v-if="commonType === 'jp'"><input v-model="newCommon.text1" placeholder="日文 (例: トイレ)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"><input v-model="newCommon.text2" placeholder="中文翻譯" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"></div>
+                <div v-if="commonType === 'jp'">
+                    <input v-model="newCommon.text1" @input="autoTranslate" placeholder="輸入中文 (例: 廁所)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none">
+                    <input v-model="newCommon.text2" placeholder="自動帶出日文" class="w-full p-3 bg-gray-100 text-blue-500 font-bold rounded-xl mb-3 outline-none" readonly>
+                    <p class="text-xs text-gray-400 mb-2">輸入中文後，系統會自動翻譯成日文</p>
+                </div>
                 <div v-else><input v-model="newCommon.text1" placeholder="名稱 (自動帶圖)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"><p class="text-xs text-gray-400 mb-3 text-center">輸入名稱後，系統將自動生成圖片與地圖連結</p></div>
                 <div class="flex gap-3"><button @click="showCommonModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button><button @click="saveCommonItem" class="flex-1 py-3 bg-blue-400 text-white rounded-xl font-bold">新增</button></div>
             </div>
@@ -458,8 +441,7 @@
 
     createApp({
         setup() {
-            // === Init State ===
-            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v15', searchQuery = ref(''), showCamera = ref(false), videoRef = ref(null);
+            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v16', searchQuery = ref(''), showCamera = ref(false), videoRef = ref(null);
             
             // Users
             const defaultUsers = [
@@ -531,7 +513,10 @@
             const photoSpots = ref({ 'Tokyo': [{name:'SHIBUYA SKY', img:'https://placehold.co/300x200/FFD1DC/555?text=Sky', link:searchMap('SHIBUYA SKY')}], 'Kamakura': [{name:'高校前平交道', img:'https://placehold.co/300x200/A2D2FF/555?text=Train', link:searchMap('Kamakura Kokomae')}], 'Fuji': [{name:'本町通', img:'https://placehold.co/300x200/FFF5BA/555?text=Street', link:searchMap('Honcho Street')}] });
             const photoArea = ref('Tokyo');
             const japanesePhrases = ref([{jp:'すみません', tw:'不好意思'}, {jp:'これをお願いします', tw:'我要這個'}, {jp:'お会計お願いします', tw:'結帳'}]);
-            const hotels = ref([{name:'錦糸町 Sumida City', days:'Day 1-2', link:searchMap('錦系町 Sumida City')}, {name:'Megu Fuji 2021', days:'Day 3-4', link:searchMap('Megu Fuji 2021')}, {name:'DOMO 飯店', days:'Day 5-7', link:searchMap('DOMO 飯店 東京')}]);
+            const hotels = ref([{name:'錦糸町 Sumida City', days:'Day 1-2', link:'https://maps.app.goo.gl/8o6Bxb1TM5MxuvFm8'}, {name:'Megu Fuji 2021', days:'Day 3-4', link:searchMap('Megu Fuji 2021')}, {name:'DOMO 飯店', days:'Day 5-7', link:searchMap('DOMO 飯店 東京')}]);
+
+            // Dictionary for Auto Translate
+            const transDict = { '廁所': 'トイレはどこですか', '水': 'お水ください', '結帳': 'お会計お願いします', '謝謝': 'ありがとう', '多少錢': 'いくらですか', '推薦': 'おすすめは？', '好': 'はい', '不要': 'いいえ' };
 
             const showModal=ref(false), showCommonModal=ref(false), showExpenseModal=ref(false), showSyncModal=ref(false), isEditing=ref(false), editIndex=ref(-1), editForm=ref({}), commonType = ref(''), newCommon = ref({text1:'', text2:''}), syncCode=ref(''), syncMsg=ref('');
 
@@ -557,7 +542,6 @@
                 return res;
             });
 
-            // --- Methods ---
             const goHome = () => { currentView.value = 'home'; prepMode.value = 'select'; moneyMode.value = 'select'; };
             const getPageTitle = (v) => apps.find(a=>a.view==v)?.name || '';
             const getMapLink = (k) => k ? searchMap(k) : '#';
@@ -578,8 +562,31 @@
             const openExpenseModal = () => { newExpense.value={name:'', amount:'', category:'食'}; showExpenseModal.value=true; };
             const addExpense = () => { if(newExpense.value.name && newExpense.value.amount) { expenses.value.push({id:Date.now(), user:currentUserId.value, ...newExpense.value, date:`${new Date().getMonth()+1}/${new Date().getDate()}`}); showExpenseModal.value=false; }};
             const deleteExpense = (id) => { if(confirm('刪除?')) expenses.value = expenses.value.filter(e=>e.id!==id); };
+            
             const openAddCommonModal = (type) => { commonType.value=type; newCommon.value={text1:'', text2:''}; showCommonModal.value=true; };
-            const saveCommonItem = () => { const t1 = newCommon.value.text1; if(commonType.value === 'jp') { japanesePhrases.value.push({jp:t1, tw:newCommon.value.text2}); } else if(commonType.value === 'shop') { shoppingList.value[shopCat.value].push({name:t1, img:`https://placehold.co/200x200/FFD1DC/555?text=${t1}`}); } else if(commonType.value === 'food') { foodList.value[foodLoc.value].push({name:t1, desc:'新增', img:`https://placehold.co/200x200/orange/white?text=${t1}`, link:searchMap(t1)}); } else if(commonType.value === 'photo') { photoSpots.value[photoArea.value].push({name:t1, img:`https://placehold.co/300x200/FFD1DC/555?text=${t1}`, link:searchMap(t1)}); } showCommonModal.value=false; };
+            
+            // Auto Translate Logic
+            const autoTranslate = () => {
+                const cn = newCommon.value.text1;
+                for (const k in transDict) {
+                    if(cn.includes(k)) { newCommon.value.text2 = transDict[k]; return; }
+                }
+            };
+
+            const saveCommonItem = () => { 
+                const t1 = newCommon.value.text1; 
+                if(commonType.value === 'jp') { 
+                    japanesePhrases.value.push({jp:newCommon.value.text2 || 'Translation Needed', tw:t1}); 
+                } else if(commonType.value === 'shop') { 
+                    shoppingList.value[shopCat.value].push({name:t1, img:`https://placehold.co/200x200/FFD1DC/555?text=${t1}`}); 
+                } else if(commonType.value === 'food') { 
+                    foodList.value[foodLoc.value].push({name:t1, desc:'新增', img:`https://placehold.co/200x200/orange/white?text=${t1}`, link:searchMap(t1)}); 
+                } else if(commonType.value === 'photo') { 
+                    photoSpots.value[photoArea.value].push({name:t1, img:`https://placehold.co/300x200/FFD1DC/555?text=${t1}`, link:searchMap(t1)}); 
+                } 
+                showCommonModal.value=false; 
+            };
+
             const doGoogleSearch = () => { if(searchQuery.value) window.open(searchMap(searchQuery.value)); };
             const speak = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; u.rate = 0.9; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); };
             const startCamera = async () => { showCamera.value = true; try { const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); if(videoRef.value) videoRef.value.srcObject = s; } catch(e) { alert('相機啟動失敗 (需HTTPS)'); showCamera.value=false; }};
@@ -601,26 +608,21 @@
                         photoSpots.value = d.photo || photoSpots.value;
                         japanesePhrases.value = d.jp || japanesePhrases.value;
                     } else {
-                        // New user init
                         users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false})));
                     }
                 } catch(e) {
                     console.error("Load Error:", e);
-                    // Fallback reset
                     users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false})));
                 }
 
-                // Init Weather
                 getW(35.6895, 139.6917, tokyoWeather); getW(35.3192, 139.5467, kamakuraWeather); getW(35.3606, 138.7274, fujiWeather);
                 
-                // Sakura
                 const sc = document.getElementById('sakura-container');
                 for(let i=0;i<15;i++){ const e=document.createElement('div'); e.className='sakura'; e.style.left=Math.random()*100+'vw'; e.style.animationDuration=Math.random()*3+4+'s'; sc.appendChild(e); }
                 
                 isMounted.value = true;
             });
 
-            // Auto Save
             watch([itineraryData, users, expenses, shoppingList, foodList, photoSpots, japanesePhrases], ()=>{
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({itinerary:itineraryData.value, users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, jp:japanesePhrases.value}));
             }, {deep:true});
@@ -630,12 +632,12 @@
                 tokyoWeather, kamakuraWeather, fujiWeather, foodList, shoppingList, photoSpots, japanesePhrases, hotels,
                 tripDays, selectedDayIndex, currentDayItinerary,
                 moneyTab, users, currentUserId, userTotalExpense, filteredExpenses, settlements, getUserById, editUserName,
-                prepUser, currentPrepList, addPrepItem,
+                prepUser, prepMode, selectPrepUser, selectMoneyUser, currentPrepList, addPrepItem,
                 openAddModal, editItem, saveItem, deleteItem, showModal, editForm, isEditing,
                 openExpenseModal, addExpense, showExpenseModal, newExpense, deleteExpense,
                 getBorderColor, getCategoryColor, getCategoryName, getMapLink, getExpenseIcon,
                 showCommonModal, commonType, newCommon, openAddCommonModal, saveCommonItem, shopCat, foodLoc, photoArea,
-                showCamera, videoRef, startCamera, stopCamera, speak,
+                showCamera, videoRef, startCamera, stopCamera, speak, autoTranslate,
                 showSyncModal, syncCode, syncMsg, generateSyncCode, pasteSyncCode, prepMode, selectPrepUser, moneyMode, selectMoneyUser
             };
         }
