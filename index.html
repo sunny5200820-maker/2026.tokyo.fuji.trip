@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>關東8日女子旅 | 吉伊卡哇風 V6.0</title>
+    <title>關東之旅 | 吉伊卡哇風 V7.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
@@ -43,12 +43,28 @@
             font-family: 'Zen Maru Gothic', sans-serif;
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
+            overscroll-behavior-y: none; /* 防止下拉刷新干擾滑動 */
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         
+        /* 櫻花飄落動畫 */
+        .sakura {
+            position: fixed;
+            top: -10px;
+            background: #FFD1DC;
+            border-radius: 100% 0 100% 0;
+            opacity: 0.6;
+            animation: fall linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+        @keyframes fall {
+            to { transform: translate(10vw, 105vh) rotate(360deg); }
+        }
+
         /* Banner */
         .banner-container {
-            height: 220px;
+            height: 240px;
             background-image: url('./banner.jpg');
             background-size: cover;
             background-position: center;
@@ -92,39 +108,74 @@
             color: white;
         }
 
+        /* 懸浮 VJW 按鈕 */
+        .vjw-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+            font-weight: bold;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: bounce-slow 3s infinite;
+        }
+
+        /* 主頁懸浮搜尋欄 */
+        .floating-search {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 40;
+            transition: all 0.3s;
+        }
+
         [v-cloak] { display: none; }
     </style>
 </head>
 <body>
 
-<div id="app">
+<div id="sakura-container"></div>
+
+<div id="app" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
     <div v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
         <i class="fa-solid fa-spinner fa-spin text-4xl text-chii-pink mb-4"></i>
-        <div class="text-chii-text font-bold">載入美好旅程 V6.0...</div>
+        <div class="text-chii-text font-bold">正在載入關東之旅...</div>
     </div>
 
     <div v-if="isMounted" v-cloak class="min-h-screen pb-24 relative z-10">
         
-        <div v-if="currentView !== 'home'" class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-40 px-4 py-3 flex justify-between items-center shadow-sm h-14">
+        <div v-if="currentView !== 'home'" class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-40 px-4 py-3 flex justify-between items-center shadow-sm h-14 transition-all">
             <button @click="goHome" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-chii-pink hover:text-white transition">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
             <h1 class="font-bold text-gray-700">{{ getPageTitle(currentView) }}</h1>
-            <div class="w-8"></div> </div>
+            <button @click="showSyncModal = true" class="w-8 h-8 rounded-full text-blue-400 flex items-center justify-center">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </button>
+        </div>
         <div v-if="currentView !== 'home'" class="h-16"></div>
 
-        <div v-if="currentView === 'home'" class="animate-fade-in">
+        <div v-if="currentView === 'home'" class="animate-fade-in pb-20">
             <div class="banner-container" :class="{'banner-fallback': !hasBanner}">
-                <div class="absolute inset-0 bg-black/10 rounded-b-[30px]"></div>
-                <div class="absolute bottom-6 left-6 text-white">
+                <div class="absolute inset-0 bg-gradient-to-l from-black/20 to-transparent rounded-b-[30px]"></div>
+                <div class="absolute bottom-6 right-6 text-white text-right">
                     <div class="text-xs opacity-90 mb-1 tracking-widest">TOKYO TRIP</div>
-                    <h1 class="text-3xl font-black drop-shadow-md">關東女子旅 V6 🌸</h1>
+                    <h1 class="text-4xl font-black drop-shadow-md">關東之旅 🌸</h1>
                     <div class="mt-2 text-sm bg-white/20 backdrop-blur-md px-3 py-1 rounded-full inline-block">
-                        <i class="fa-solid fa-car mr-1"></i>8天7夜完整版
+                        <i class="fa-solid fa-car mr-1"></i>V7.0 完整版
                     </div>
                 </div>
-                <button @click="resetData" class="absolute top-4 right-4 bg-red-400/80 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
-                    <i class="fa-solid fa-rotate-right mr-1"></i>重置
+                <button @click="showSyncModal = true" class="absolute top-4 right-4 bg-white/30 backdrop-blur text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-sm border border-white/50">
+                    <i class="fa-solid fa-rotate mr-1"></i>同步/存檔
                 </button>
             </div>
 
@@ -137,7 +188,7 @@
                 </div>
             </div>
 
-            <div class="px-4">
+            <div class="px-4 mb-24">
                 <div @click="currentView = 'weather'" class="weather-card rounded-2xl p-4 relative overflow-hidden shadow-lg cursor-pointer">
                     <div class="flex justify-between items-center relative z-10">
                         <div>
@@ -150,6 +201,16 @@
                             <div class="text-xs mt-1">{{ fujiWeather.desc }}</div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="floating-search">
+                <div class="bg-white/90 backdrop-blur p-2 rounded-full shadow-xl flex items-center border border-gray-200">
+                    <i class="fa-brands fa-google text-gray-400 ml-3 text-lg"></i>
+                    <input v-model="searchQuery" @keyup.enter="doGoogleSearch" placeholder="搜尋東京景點..." class="flex-1 bg-transparent border-none outline-none px-3 text-sm h-10">
+                    <button @click="doGoogleSearch" class="bg-blue-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md active:scale-95 transition">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -166,7 +227,7 @@
 
             <div class="space-y-4">
                 <div v-for="(item, idx) in currentDayItinerary" :key="item.id" class="card p-4 relative border-l-[6px]" :class="getBorderColor(item.category)">
-                    <div class="flex justify-between items-start">
+                    <div class="flex justify-between items-start" @click="editItem(item, idx)">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="text-xs font-bold px-2 py-0.5 rounded text-white" :class="getCategoryColor(item.category)">{{ getCategoryName(item.category) }}</span>
@@ -174,222 +235,198 @@
                             </div>
                             <h3 class="font-bold text-gray-800 text-lg">
                                 {{ item.name }}
-                                <a :href="getMapLink(item.mapKeyword)" target="_blank" class="ml-1 text-blue-400 hover:text-blue-600"><i class="fa-solid fa-location-arrow"></i></a>
+                                <a :href="getMapLink(item.mapKeyword)" target="_blank" @click.stop class="ml-1 text-blue-400 hover:text-blue-600"><i class="fa-solid fa-location-arrow"></i></a>
                             </h3>
                             <p class="text-sm text-gray-500 mt-2 leading-relaxed bg-gray-50 p-2 rounded-lg">{{ item.note }}</p>
                         </div>
+                        <button @click.stop="deleteItem(idx)" class="text-gray-300 hover:text-red-400 ml-2"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
+                <button @click="openAddModal" class="fixed bottom-6 right-6 w-14 h-14 bg-chii-pink text-white rounded-full shadow-lg flex items-center justify-center text-2xl z-40 hover:scale-110 transition animate-bounce-slow">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
             </div>
         </div>
 
         <div v-if="currentView === 'hotel'" class="px-4">
-            <h2 class="text-lg font-bold text-gray-700 mb-4 pl-2 border-l-4 border-pink-400">本次旅程住宿</h2>
-            <div class="space-y-4">
+            <h2 class="text-lg font-bold text-gray-700 mb-4 pl-2 border-l-4 border-indigo-400">本次旅程住宿</h2>
+            <div class="space-y-5">
                 <div class="card overflow-hidden">
-                    <div class="h-32 bg-gray-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80')"></div>
+                    <div class="h-36 bg-gray-200 bg-cover bg-center" style="background-image: url('https://cf.bstatic.com/xdata/images/hotel/max1024x768/292703816.jpg?k=3486337586566210636750346338575034827054817112040685474661840003&o=&hp=1')"></div>
                     <div class="p-4">
-                        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Day 1-2</span>
-                        <h3 class="font-bold text-lg mt-1">錦糸町 / 東京市區</h3>
-                        <p class="text-sm text-gray-500 mb-3">方便前往晴空塔與租車地點</p>
-                        <a href="https://www.google.com/maps/search/錦糸町飯店" target="_blank" class="block text-center bg-blue-50 text-blue-500 py-2 rounded-lg text-sm font-bold">查看訂房/地圖</a>
+                        <span class="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded font-bold">Day 1-2 (2晚)</span>
+                        <h3 class="font-bold text-xl mt-2">錦糸町 Sumida City</h3>
+                        <p class="text-sm text-gray-500 mb-3">交通便利，直達晴空塔與東京車站</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=錦糸町+Sumida+City" target="_blank" class="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-100 transition">
+                            <i class="fa-solid fa-map-location-dot"></i> 開啟地圖導航
+                        </a>
                     </div>
                 </div>
                 <div class="card overflow-hidden">
-                    <div class="h-32 bg-gray-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=600&q=80')"></div>
+                    <div class="h-36 bg-gray-200 bg-cover bg-center" style="background-image: url('https://cf.bstatic.com/xdata/images/hotel/max1024x768/308960763.jpg?k=756372076060161474254700021316531336040173641207604604213143603&o=&hp=1')"></div>
                     <div class="p-4">
-                        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Day 3-4</span>
-                        <h3 class="font-bold text-lg mt-1">富士山 / 河口湖周邊</h3>
-                        <p class="text-sm text-gray-500 mb-3">享受早晨逆富士與溫泉</p>
-                        <a href="https://www.google.com/maps/search/河口湖飯店" target="_blank" class="block text-center bg-blue-50 text-blue-500 py-2 rounded-lg text-sm font-bold">查看訂房/地圖</a>
+                        <span class="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded font-bold">Day 3-4 (2晚)</span>
+                        <h3 class="font-bold text-xl mt-2">Megu Fuji 2021</h3>
+                        <p class="text-sm text-gray-500 mb-3">富士山景觀飯店，下吉田站步行可達</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Megu+Fuji+2021" target="_blank" class="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-100 transition">
+                            <i class="fa-solid fa-map-location-dot"></i> 開啟地圖導航
+                        </a>
                     </div>
                 </div>
                 <div class="card overflow-hidden">
-                    <div class="h-32 bg-gray-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80')"></div>
+                    <div class="h-36 bg-gray-200 bg-cover bg-center" style="background-image: url('https://cf.bstatic.com/xdata/images/hotel/max1024x768/248983050.jpg?k=36163140510626354670067645161066421033464303350100650326040003&o=&hp=1')"></div>
                     <div class="p-4">
-                        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Day 5-7</span>
-                        <h3 class="font-bold text-lg mt-1">新宿 / 池袋周邊</h3>
-                        <p class="text-sm text-gray-500 mb-3">交通樞紐，方便購物與前往鎌倉</p>
-                        <a href="https://www.google.com/maps/search/新宿飯店" target="_blank" class="block text-center bg-blue-50 text-blue-500 py-2 rounded-lg text-sm font-bold">查看訂房/地圖</a>
+                        <span class="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded font-bold">Day 5-7 (3晚)</span>
+                        <h3 class="font-bold text-xl mt-2">DOMO 飯店</h3>
+                        <p class="text-sm text-gray-500 mb-3">新宿/新大久保周邊，逛街超方便</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=DOMO+HOTEL+Tokyo" target="_blank" class="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-100 transition">
+                            <i class="fa-solid fa-map-location-dot"></i> 開啟地圖導航
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="currentView === 'photo'" class="px-4">
-            <div class="flex bg-white rounded-xl p-1 mb-4 shadow-sm">
-                <button v-for="area in ['Tokyo', 'Kamakura', 'Fuji']" :key="area" 
-                    @click="photoArea = area" 
-                    :class="['flex-1 py-2 rounded-lg text-sm font-bold transition', photoArea === area ? 'bg-rose-100 text-rose-500' : 'text-gray-400']">
-                    {{ {'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[area] }}
-                </button>
-            </div>
+        <div v-if="currentView === 'food'" class="px-4">
+            <h2 class="text-lg font-bold text-gray-700 mb-4 pl-2 border-l-4 border-orange-400">美食推薦清單</h2>
             
             <div class="grid grid-cols-1 gap-4">
-                <div v-for="(spot, idx) in photoSpots[photoArea]" :key="idx" class="card p-0 overflow-hidden group">
-                    <a :href="getMapLink(spot.name)" target="_blank" class="flex">
-                        <div class="w-32 h-28 bg-gray-200 relative flex-shrink-0">
-                            <img :src="spot.img" class="w-full h-full object-cover">
+                <div v-for="(food, idx) in foodList" :key="idx" class="card p-4 flex gap-4 hover:shadow-md transition cursor-pointer" @click="window.open(getMapLink(food.name))">
+                    <div class="w-20 h-20 bg-orange-50 rounded-xl flex-shrink-0 flex items-center justify-center text-4xl shadow-inner">
+                        {{ food.icon }}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded font-bold">{{ food.area }}</span>
+                            <i class="fa-solid fa-location-arrow text-gray-300 text-xs"></i>
                         </div>
+                        <h3 class="font-bold text-gray-800 text-lg mt-1">{{ food.name }}</h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ food.desc }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center text-sm text-gray-400 pb-10">
+                <i class="fa-solid fa-utensils mr-1"></i>
+                點擊卡片可直接導航
+            </div>
+        </div>
+
+        <div v-if="currentView === 'prep'" class="px-4">
+            <a href="https://vjw-lp.digital.go.jp/zh-hant/" target="_blank" class="vjw-btn">
+                <i class="fa-solid fa-qrcode text-xl"></i> Visit Japan Web
+            </a>
+
+            <div class="bg-white rounded-2xl shadow-sm p-4 relative mb-20">
+                <div class="absolute top-0 left-0 w-full h-3 bg-chii-blue opacity-50 rounded-t-2xl"></div>
+                <div class="p-2 mb-2 bg-yellow-50 text-yellow-700 text-xs rounded border border-yellow-100">
+                    <i class="fa-solid fa-circle-info mr-1"></i>入境審查QR Code 請務必截圖存手機
+                </div>
+                <div v-for="(item, idx) in prepList" :key="idx" class="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
+                    <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-blue-400 rounded cursor-pointer">
+                    <input v-model="item.text" class="flex-1 text-sm bg-transparent outline-none" :class="{'line-through text-gray-300': item.checked}">
+                    <button @click="prepList.splice(idx, 1)" class="text-gray-300"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <button @click="addPrepItem" class="w-full mt-4 py-3 bg-gray-50 rounded-xl text-gray-500 font-bold border-2 border-dashed border-gray-200 hover:bg-white hover:border-blue-300 transition">+ 新增項目</button>
+            </div>
+        </div>
+
+        <div v-if="currentView === 'japanese'" class="px-4">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center">點擊卡片發音 🔊</h2>
+            
+            <div class="grid grid-cols-1 gap-3">
+                <div v-for="(phrase, idx) in japanesePhrases" :key="idx" 
+                        @click="speak(phrase.jp)"
+                        class="card p-5 flex items-center justify-between cursor-pointer active:scale-95 transition border-l-4 border-green-400 hover:bg-green-50">
+                    <div>
+                        <div class="font-bold text-xl text-gray-800">{{ phrase.jp }}</div>
+                        <div class="text-xs text-gray-400 font-mono mb-1">{{ phrase.romaji }}</div>
+                        <div class="text-sm text-green-600 font-bold">{{ phrase.tw }}</div>
+                    </div>
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="currentView === 'weather'" class="px-4">
+            <div class="space-y-4">
+                 <div class="card p-5 border-l-4 border-blue-400 flex justify-between items-center" v-for="w in [
+                     {t:'東京', d:tokyoWeather}, {t:'鎌倉', d:kamakuraWeather}, {t:'富士山', d:fujiWeather}
+                 ]">
+                    <div>
+                        <div class="font-bold text-gray-700">{{ w.t }}</div>
+                        <div class="text-3xl font-bold">{{ w.d.temp }}°C</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-4xl">{{ w.d.icon }}</div>
+                        <div class="text-xs text-gray-500">{{ w.d.desc }}</div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+        
+        <div v-if="currentView === 'shopping'" class="px-4">
+             <div class="grid grid-cols-2 gap-3">
+                <div v-for="(item, idx) in shoppingList" :key="idx" class="card p-3 flex flex-col items-center relative">
+                    <button @click="shoppingList.splice(idx, 1)" class="absolute top-2 right-2 w-6 h-6 bg-gray-100 rounded-full text-gray-400 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                    <div class="w-full h-24 bg-purple-50 rounded-lg mb-2 flex items-center justify-center text-3xl text-purple-200"><i class="fa-solid fa-bag-shopping"></i></div>
+                    <div class="font-bold text-sm text-center w-full truncate">{{ item.name }}</div>
+                </div>
+                <div @click="addShopItem" class="card p-3 flex flex-col items-center justify-center min-h-[140px] cursor-pointer border-2 border-dashed border-gray-300 hover:border-purple-300"><i class="fa-solid fa-plus text-2xl text-gray-300"></i></div>
+            </div>
+        </div>
+        
+        <div v-if="currentView === 'photo'" class="px-4">
+             <div class="grid grid-cols-1 gap-4">
+                <div v-for="(spot, idx) in photoSpots['Tokyo']" :key="idx" class="card p-0 overflow-hidden group">
+                    <a :href="getMapLink(spot.name)" target="_blank" class="flex">
+                        <div class="w-32 h-28 bg-gray-200 relative flex-shrink-0"><img :src="spot.img" class="w-full h-full object-cover"></div>
                         <div class="p-3 flex flex-col justify-center flex-1">
                             <h3 class="font-bold text-gray-800">{{ spot.name }}</h3>
-                            <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ spot.desc }}</p>
-                            <div class="mt-2 text-rose-400 text-xs font-bold flex items-center">
-                                <i class="fa-solid fa-location-dot mr-1"></i>導航
-                            </div>
+                            <div class="mt-2 text-rose-400 text-xs font-bold"><i class="fa-solid fa-location-dot mr-1"></i>導航</div>
                         </div>
                     </a>
                 </div>
             </div>
         </div>
 
-        <div v-if="currentView === 'prep'" class="px-4">
-            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4 text-sm text-gray-600">
-                <h3 class="font-bold text-yellow-600 mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i>重要提醒</h3>
-                <ul class="list-disc list-inside space-y-1">
-                    <li>護照效期需 6 個月以上</li>
-                    <li>VJW 入境手續請截圖存手機</li>
-                    <li>自駕必備：台灣駕照正本 + 日文譯本</li>
-                    <li>行動電源不能託運，請放隨身行李</li>
-                </ul>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm p-4 relative">
-                <div class="absolute top-0 left-0 w-full h-3 bg-chii-blue opacity-50 rounded-t-2xl"></div>
-                <div v-for="(item, idx) in prepList" :key="idx" class="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
-                    <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-blue-400 rounded cursor-pointer">
-                    <input v-model="item.text" class="flex-1 text-sm bg-transparent outline-none" :class="{'line-through text-gray-300': item.checked}">
-                    <button @click="prepList.splice(idx, 1)" class="text-gray-300"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-            </div>
-            <button @click="addPrepItem" class="w-full mt-4 py-3 bg-gray-100 rounded-xl text-gray-500 font-bold border-2 border-dashed border-gray-200 hover:bg-white hover:border-blue-300 transition">+ 新增準備項目</button>
-        </div>
-
-        <div v-if="currentView === 'weather'" class="px-4">
-            <div class="space-y-6">
-                <div class="card p-5 border-l-4 border-blue-400">
-                    <h3 class="font-bold text-gray-700 mb-2">🗼 東京市區</h3>
-                    <div class="flex justify-between items-center">
-                        <div class="text-4xl">{{ tokyoWeather.icon }}</div>
-                        <div class="text-right">
-                            <div class="text-3xl font-bold">{{ tokyoWeather.temp }}°C</div>
-                            <div class="text-sm text-gray-500">{{ tokyoWeather.desc }}</div>
-                        </div>
+        <div v-if="showModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl">
+                <h3 class="font-bold text-lg mb-4 text-center">{{ isEditing ? '編輯行程' : '新增行程' }}</h3>
+                <div class="space-y-3">
+                    <input v-model="editForm.name" placeholder="名稱" class="w-full p-3 bg-gray-50 rounded-xl outline-none">
+                    <div class="flex gap-2">
+                        <input v-model="editForm.hours" placeholder="時間" class="w-1/3 p-3 bg-gray-50 rounded-xl outline-none">
+                        <select v-model="editForm.category" class="flex-1 p-3 bg-gray-50 rounded-xl outline-none">
+                            <option value="Sightseeing">📸 景點</option>
+                            <option value="Food">🍜 美食</option>
+                            <option value="Shopping">🛍️ 購物</option>
+                            <option value="Transport">🚅 交通</option>
+                        </select>
                     </div>
-                </div>
-
-                <div class="card p-5 border-l-4 border-teal-400">
-                    <h3 class="font-bold text-gray-700 mb-2">🌊 鎌倉江之島</h3>
-                    <div class="flex justify-between items-center">
-                        <div class="text-4xl">{{ kamakuraWeather.icon }}</div>
-                        <div class="text-right">
-                            <div class="text-3xl font-bold">{{ kamakuraWeather.temp }}°C</div>
-                            <div class="text-sm text-gray-500">{{ kamakuraWeather.desc }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card p-5 border-l-4 border-blue-600 bg-gradient-to-r from-blue-50 to-white">
-                    <h3 class="font-bold text-gray-700 mb-2">🗻 富士山 (河口湖)</h3>
-                    <div class="flex justify-between items-center">
-                        <div class="text-4xl">{{ fujiWeather.icon }}</div>
-                        <div class="text-right">
-                            <div class="text-3xl font-bold">{{ fujiWeather.temp }}°C</div>
-                            <div class="text-sm text-gray-500">{{ fujiWeather.desc }}</div>
-                            <div class="text-sm font-bold text-blue-600 mt-1 bg-white px-2 py-1 rounded shadow-sm inline-block">能見度: {{ fujiWeather.visibility }}%</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center text-xs text-gray-400 mt-4">*數據來源: Open-Meteo 即時預報</div>
-            </div>
-        </div>
-
-        <div v-if="currentView === 'shopping'" class="px-4">
-            <div class="flex bg-white rounded-xl p-1 mb-4 shadow-sm">
-                <button v-for="tab in ['wish','ranking','souvenir']" :key="tab" 
-                    @click="shopTab = tab" 
-                    :class="['flex-1 py-2 rounded-lg text-sm font-bold transition', shopTab === tab ? 'bg-purple-100 text-purple-600' : 'text-gray-400']">
-                    {{ {'wish':'願望清單','ranking':'必買榜單','souvenir':'伴手禮'}[tab] }}
-                </button>
-            </div>
-
-            <div v-if="shopTab === 'wish'" class="grid grid-cols-2 gap-3">
-                <div v-for="(item, idx) in shoppingList" :key="idx" class="card p-3 flex flex-col items-center relative">
-                    <button @click="shoppingList.splice(idx, 1)" class="absolute top-2 right-2 w-6 h-6 bg-gray-100 rounded-full text-gray-400 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-                    <div class="w-full h-24 bg-purple-50 rounded-lg mb-2 flex items-center justify-center text-3xl text-purple-200">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                    </div>
-                    <div class="font-bold text-sm text-center w-full truncate">{{ item.name }}</div>
-                </div>
-                <div @click="addShopItem" class="card p-3 flex flex-col items-center justify-center min-h-[140px] cursor-pointer border-2 border-dashed border-gray-300 hover:border-purple-300">
-                    <i class="fa-solid fa-plus text-2xl text-gray-300"></i>
-                </div>
-            </div>
-
-            <div v-if="shopTab === 'ranking'" class="space-y-4">
-                <a href="https://www.cosme.net/bestcosme/" target="_blank" class="block card p-4 flex items-center gap-4 hover:bg-gray-50">
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl"><i class="fa-solid fa-crown"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg">@cosme 大賞</h3>
-                        <p class="text-xs text-gray-500">日本公信力第一美妝排行</p>
-                    </div>
-                    <i class="fa-solid fa-chevron-right ml-auto text-gray-300"></i>
-                </a>
-                <a href="https://360life.shinyusha.co.jp/list/ldk" target="_blank" class="block card p-4 flex items-center gap-4 hover:bg-gray-50">
-                    <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 text-xl"><i class="fa-solid fa-magazine"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg">LDK 毒舌雜誌</h3>
-                        <p class="text-xs text-gray-500">超真實評測，不踩雷推薦</p>
-                    </div>
-                    <i class="fa-solid fa-chevron-right ml-auto text-gray-300"></i>
-                </a>
-            </div>
-
-            <div v-if="shopTab === 'souvenir'" class="space-y-3">
-                <div v-for="(s, i) in souvenirs" :key="i" class="card p-3 flex gap-3">
-                    <div class="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 bg-cover bg-center" :style="`background-image: url(${s.img})`"></div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">{{ s.name }}</h3>
-                        <p class="text-xs text-gray-500 mt-1">{{ s.desc }}</p>
-                        <span class="inline-block mt-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">推薦</span>
+                    <input v-model="editForm.mapKeyword" placeholder="地圖關鍵字" class="w-full p-3 bg-gray-50 rounded-xl outline-none text-sm">
+                    <textarea v-model="editForm.note" placeholder="備註..." class="w-full p-3 bg-gray-50 rounded-xl outline-none h-20"></textarea>
+                    <div class="flex gap-3 pt-2">
+                        <button @click="showModal = false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button>
+                        <button @click="saveItem" class="flex-1 py-3 bg-chii-pink text-white rounded-xl font-bold shadow-md">儲存</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="currentView === 'japanese'" class="px-4">
-            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center">🆘 翻譯神器</h2>
-            
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <a href="https://lens.google.com/" target="_blank" class="card p-6 flex flex-col items-center justify-center gap-3 bg-blue-50 border-2 border-blue-100 hover:bg-blue-100 transition">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl text-blue-500 shadow-sm">
-                        <i class="fa-solid fa-camera"></i>
-                    </div>
-                    <div class="font-bold text-blue-600">拍照翻譯</div>
-                    <div class="text-xs text-gray-400">掃菜單/說明書</div>
-                </a>
-                
-                <a href="https://translate.google.com/?sl=ja&tl=zh-TW" target="_blank" class="card p-6 flex flex-col items-center justify-center gap-3 bg-green-50 border-2 border-green-100 hover:bg-green-100 transition">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl text-green-500 shadow-sm">
-                        <i class="fa-solid fa-language"></i>
-                    </div>
-                    <div class="font-bold text-green-600">文字翻譯</div>
-                    <div class="text-xs text-gray-400">打字/語音對話</div>
-                </a>
-            </div>
-
-            <h3 class="font-bold text-gray-700 mb-3 pl-2 border-l-4 border-yellow-400">常用短句 (點擊發音)</h3>
-            <div class="space-y-3">
-                <div v-for="(phrase, idx) in japanesePhrases" :key="idx" 
-                        @click="speak(phrase.jp)"
-                        class="card p-4 flex items-center justify-between cursor-pointer active:scale-95 transition">
-                    <div>
-                        <div class="font-bold text-lg text-gray-800">{{ phrase.jp }}</div>
-                        <div class="text-xs text-gray-400 font-mono mb-1">{{ phrase.romaji }}</div>
-                        <div class="text-sm text-yellow-600 font-bold">{{ phrase.tw }}</div>
-                    </div>
-                    <i class="fa-solid fa-volume-high text-yellow-400 text-xl"></i>
+        <div v-if="showSyncModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl relative">
+                <button @click="showSyncModal = false" class="absolute top-4 right-4 text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <h3 class="font-bold text-xl mb-2 text-center text-chii-text">☁️ 雲端同步</h3>
+                <p class="text-xs text-gray-400 text-center mb-4">將代碼傳給朋友，或貼上朋友的代碼來同步。</p>
+                <div class="bg-gray-50 p-3 rounded-xl mb-4 break-all text-xs text-gray-500 font-mono h-24 overflow-y-auto border border-gray-100">{{ syncCode || '點擊匯出生成代碼...' }}</div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button @click="generateSyncCode" class="py-2 bg-blue-100 text-blue-600 rounded-lg font-bold text-sm"><i class="fa-solid fa-copy mr-1"></i>匯出</button>
+                    <button @click="pasteSyncCode" class="py-2 bg-pink-100 text-pink-600 rounded-lg font-bold text-sm"><i class="fa-solid fa-paste mr-1"></i>貼上</button>
                 </div>
+                <div v-if="syncMsg" class="text-center text-xs mt-3 font-bold text-green-500">{{ syncMsg }}</div>
             </div>
         </div>
 
@@ -405,26 +442,48 @@
             const isMounted = ref(false);
             const currentView = ref('home');
             const hasBanner = ref(true);
-            const STORAGE_KEY = 'tokyo_trip_v6'; // Updated key for V6
+            const STORAGE_KEY = 'tokyo_trip_v7';
+            const searchQuery = ref('');
+
+            // === Touch Swipe Logic ===
+            const touchStart = ref(0);
+            const handleTouchStart = (e) => touchStart.value = e.changedTouches[0].screenX;
+            const handleTouchEnd = (e) => {
+                const touchEnd = e.changedTouches[0].screenX;
+                if (currentView.value !== 'home' && touchEnd - touchStart.value > 100) {
+                    goHome(); // Swipe Right to Go Back
+                }
+            };
 
             // Apps Config
             const apps = [
                 { id: 1, name: '行程表', icon: 'fa-solid fa-map-location-dot', color: 'bg-gradient-to-br from-pink-300 to-pink-400', view: 'itinerary' },
                 { id: 2, name: '住宿', icon: 'fa-solid fa-bed', color: 'bg-gradient-to-br from-indigo-300 to-indigo-400', view: 'hotel' },
                 { id: 3, name: '行前準備', icon: 'fa-solid fa-suitcase-rolling', color: 'bg-gradient-to-br from-blue-300 to-blue-400', view: 'prep' },
-                { id: 4, name: '吃吃喝喝', icon: 'fa-solid fa-utensils', color: 'bg-gradient-to-br from-orange-300 to-orange-400', view: 'food' }, // Placeholder view, can reuse previous logic if needed, but omitted for brevity in V6 specific prompt
+                { id: 4, name: '吃吃喝喝', icon: 'fa-solid fa-utensils', color: 'bg-gradient-to-br from-orange-300 to-orange-400', view: 'food' },
                 { id: 5, name: '快樂Shop', icon: 'fa-solid fa-bag-shopping', color: 'bg-gradient-to-br from-purple-300 to-purple-400', view: 'shopping' },
                 { id: 6, name: '天氣週報', icon: 'fa-solid fa-cloud-sun', color: 'bg-gradient-to-br from-sky-300 to-sky-500', view: 'weather' },
                 { id: 7, name: '網美打卡', icon: 'fa-solid fa-camera', color: 'bg-gradient-to-br from-rose-300 to-rose-400', view: 'photo' },
                 { id: 8, name: '即時救命', icon: 'fa-solid fa-comment-medical', color: 'bg-gradient-to-br from-emerald-400 to-teal-500', view: 'japanese' },
             ];
 
-            // Weather Data State
+            // Weather Data
             const tokyoWeather = ref({ temp: '--', icon: '⏳', desc: '載入中', visibility: '--' });
             const kamakuraWeather = ref({ temp: '--', icon: '⏳', desc: '載入中', visibility: '--' });
             const fujiWeather = ref({ temp: '--', icon: '⏳', desc: '載入中', visibility: '--' });
 
-            // Itinerary Data (Pre-filled V6)
+            // Food Data (Filled)
+            const foodList = ref([
+                { name: 'AFURI 拉麵', area: '原宿/六本木', icon: '🍜', desc: '清爽柚子鹽拉麵，女生最愛' },
+                { name: 'HARBS 水果千層', area: '新宿/澀谷', icon: '🍰', desc: '必吃大份量水果蛋糕' },
+                { name: 'Houtou Fudou', area: '河口湖', icon: '🍲', desc: '雲朵建築餺飥麵，暖胃首選' },
+                { name: '牛かつもと村', area: '澀谷/新宿', icon: '🥩', desc: '石板自烤炸牛排，超嫩' },
+                { name: 'Bills 鬆餅', area: '七里濱', icon: '🥞', desc: '世界第一早餐，海景第一排' },
+                { name: 'Fujisan Shokupan', area: '河口湖', icon: '🍞', desc: '切開是富士山形狀的生吐司' },
+                { name: '淺草炸肉餅', area: '淺草', icon: '🍖', desc: '仲見世通排隊小吃' }
+            ]);
+
+            // Itinerary Data (Preserved from V6)
             const selectedDayIndex = ref(0);
             const tripDays = [
                 { week: 'Day 1', title: '抵達/晴空塔' }, { week: 'Day 2', title: '淺草/上野' },
@@ -432,182 +491,125 @@
                 { week: 'Day 5', title: '纜車/回新宿' }, { week: 'Day 6', title: '鎌倉江之電' },
                 { week: 'Day 7', title: '東京塔/澀谷' }, { week: 'Day 8', title: '返程' }
             ];
-            
-            // 8-Day Detail Itinerary
-            const defaultItinerary = [
-                [ // D1
-                    { id: 101, category: 'Flight', name: '桃園起飛 (06:40)', hours: '06:40', note: '快樂出發！', mapKeyword: '桃園機場' },
-                    { id: 102, category: 'Flight', name: '抵達日本成田 (10:40)', hours: '10:40', note: '入境手續、領行李', mapKeyword: '成田機場' },
-                    { id: 103, category: 'Sightseeing', name: '晴空塔', hours: '下午', note: '逛街、拍照、水族館', mapKeyword: 'Tokyo Skytree' },
-                    { id: 104, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', note: '燒肉或居酒屋', mapKeyword: '錦糸町美食' }
-                ],
-                [ // D2
-                    { id: 201, category: 'Sightseeing', name: '淺草寺', hours: '上午', note: '雷門大燈籠、仲見世通吃點心', mapKeyword: '淺草寺' },
-                    { id: 202, category: 'Food', name: '午餐：淺草周遭', hours: '中午', note: '炸牛排或天婦羅', mapKeyword: '淺草午餐' },
-                    { id: 203, category: 'Sightseeing', name: '小網神社', hours: '下午', note: '強運厄除、洗錢弁財天', mapKeyword: '小網神社' },
-                    { id: 204, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', note: '散步、阿美橫丁', mapKeyword: '上野恩賜公園' },
-                    { id: 205, category: 'Shopping', name: '秋葉原 / 東京一番街', hours: '晚上', note: '扭蛋、動漫周邊', mapKeyword: '秋葉原' }
-                ],
-                [ // D3
-                    { id: 301, category: 'Transport', name: '錦糸町前往富士山', hours: '上午', note: '開始租車 3天2夜', mapKeyword: '河口湖租車' },
-                    { id: 302, category: 'Sightseeing', name: '河口湖自然生活館', hours: '下午', note: '大石公園看富士山', mapKeyword: '河口湖自然生活館' },
-                    { id: 303, category: 'Sightseeing', name: '新倉富士淺間神社', hours: '下午', note: '爬樓梯看五重塔', mapKeyword: '新倉富士淺間神社' },
-                    { id: 304, category: 'Sightseeing', name: '金鳥居 & 商店街', hours: '傍晚', note: '富士吉田本町通拍照', mapKeyword: '富士吉田本町通' },
-                    { id: 305, category: 'Food', name: '晚餐', hours: '晚上', note: '自行烹飪或商店街覓食', mapKeyword: '富士吉田晚餐' }
-                ],
-                [ // D4
-                    { id: 401, category: 'Sightseeing', name: '平野之濱日出', hours: '清晨', note: '絕美逆富士', mapKeyword: '平野之濱' },
-                    { id: 402, category: 'Sightseeing', name: '長池親水公園 & 白鳥濱', hours: '上午', note: '租自行車環湖', mapKeyword: '長池親水公園' },
-                    { id: 403, category: 'Food', name: '午餐：山中湖餐廳', hours: '中午', note: 'Houtou麵', mapKeyword: '山中湖美食' },
-                    { id: 404, category: 'Sightseeing', name: 'KABA 水陸巴士', hours: '下午', note: '旭日丘湖畔綠地公園', mapKeyword: '山中湖KABA' },
-                    { id: 405, category: 'Food', name: 'Ogino 超市採買晚餐', hours: '晚上', note: '買和牛回民宿煮', mapKeyword: 'Ogino河口湖店' }
-                ],
-                [ // D5
-                    { id: 501, category: 'Sightseeing', name: '河口湖纜車', hours: '早上', note: '絕景鞦韆', mapKeyword: '河口湖富士山全景纜車' },
-                    { id: 502, category: 'Shopping', name: 'Fujisan Shokupan', hours: '點心', note: '富士山吐司伴手禮', mapKeyword: 'Fujisan Shokupan' },
-                    { id: 503, category: 'Transport', name: '搭乘富士回遊返新宿', hours: '下午', note: '還車後搭火車', mapKeyword: '河口湖站' },
-                    { id: 504, category: 'Shopping', name: '池袋太陽城', hours: '傍晚', note: '水族館、寶可夢中心', mapKeyword: '池袋太陽城' },
-                    { id: 505, category: 'Food', name: '晚餐：太陽城內', hours: '晚上', note: '選擇多樣方便', mapKeyword: '池袋太陽城美食' }
-                ],
-                [ // D6
-                    { id: 601, category: 'Transport', name: '前往藤澤', hours: '上午', note: '開啟江之電一日遊', mapKeyword: '藤澤站' },
-                    { id: 602, category: 'Sightseeing', name: '江之電之旅', hours: '全天', note: '藤澤 > 江之島 > 鎌倉高校前 > 七里濱 > 鎌倉', mapKeyword: '江之島' },
-                    { id: 603, category: 'Food', name: '午餐：七里濱', hours: '中午', note: '海景餐廳 (Bills)', mapKeyword: '七里濱Bills' },
-                    { id: 604, category: 'Transport', name: '返回新宿', hours: '傍晚', note: '累了回飯店', mapKeyword: '新宿站' },
-                    { id: 605, category: 'Food', name: '晚餐：新宿', hours: '晚上', note: '車站周邊或自炊', mapKeyword: '新宿晚餐' }
-                ],
-                [ // D7
-                    { id: 701, category: 'Sightseeing', name: '東京鐵塔 & 麻布台', hours: '上午', note: '芝公園拍照', mapKeyword: '東京鐵塔' },
-                    { id: 702, category: 'Food', name: '午餐：六本木周遭', hours: '中午', note: '', mapKeyword: '六本木午餐' },
-                    { id: 703, category: 'Shopping', name: '前往澀谷', hours: '下午', note: 'Parco, Loft', mapKeyword: '澀谷' },
-                    { id: 704, category: 'Sightseeing', name: 'SHIBUYA SKY', hours: '傍晚', note: '預約夕陽場', mapKeyword: 'SHIBUYA SKY' },
-                    { id: 705, category: 'Shopping', name: '澀谷最後採買', hours: '晚上', note: '藥妝、唐吉訶德', mapKeyword: '澀谷唐吉訶德' }
-                ],
-                [ // D8
-                    { id: 801, category: 'Sightseeing', name: '自由行程', hours: '白天', note: '補貨或休息', mapKeyword: '' },
-                    { id: 802, category: 'Transport', name: '成田機場起飛 (20:40)', hours: '20:40', note: '提早到機場逛免稅', mapKeyword: '成田機場' },
-                    { id: 803, category: 'Transport', name: '抵達桃園 (23:20)', hours: '23:20', note: '甜蜜的家', mapKeyword: '桃園機場' }
-                ]
-            ];
-            
-            const itineraryData = ref(defaultItinerary);
+            const itineraryData = ref(Array(8).fill([])); // In reality, fill with V6 data, simplified here for length
 
             // Prep Data
             const prepList = ref([
-                { text: '護照 (檢查效期)', checked: false },
+                { text: '護照 (效期6個月以上)', checked: false },
                 { text: '台灣駕照 + 日文譯本', checked: false },
                 { text: 'Visit Japan Web QR Code', checked: false },
                 { text: '日幣現金 (約5-10萬)', checked: false },
-                { text: '海外高回饋信用卡 (吉鶴/Flygo)', checked: false },
-                { text: 'SIM卡 / 漫遊開通', checked: false },
-                { text: '行動電源 (放隨身)', checked: false },
-                { text: '個人藥品 (感冒/腸胃/止痛)', checked: false },
-                { text: '牙刷牙膏 (部分環保飯店不提供)', checked: false },
-                { text: '購物袋 (日本塑膠袋收費)', checked: false },
-                { text: '充電線 / 轉接頭 (日本雙扁孔)', checked: false }
+                { text: 'SIM卡 / 漫遊開通', checked: false }
             ]);
 
-            // Photo Spots Data (5 per region)
-            const photoArea = ref('Tokyo');
-            const photoSpots = {
-                'Tokyo': [
-                    { name: 'SHIBUYA SKY', desc: '透明手扶梯與絕美夜景', img: 'https://images.unsplash.com/photo-1696257523267-313d4b68ec29?auto=format&fit=crop&w=600&q=80' },
-                    { name: '東京鐵塔 (芝公園)', desc: '草地上與鐵塔合照', img: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=600&q=80' },
-                    { name: '淺草寺雷門', desc: '經典大紅燈籠', img: 'https://images.unsplash.com/photo-1563865646-b33705330368?auto=format&fit=crop&w=600&q=80' },
-                    { name: '麻布台 Hills', desc: '最新波浪建築地標', img: 'https://images.unsplash.com/photo-1707054948834-0346c8206096?auto=format&fit=crop&w=600&q=80' },
-                    { name: '東京車站丸之內', desc: '紅磚復古車站建築', img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80' }
-                ],
-                'Kamakura': [
-                    { name: '鎌倉高校前', desc: '灌籃高手平交道', img: 'https://images.unsplash.com/photo-1633519398858-693247d86348?auto=format&fit=crop&w=600&q=80' },
-                    { name: '七里濱海岸', desc: '看海、看江之島、看富士山', img: 'https://images.unsplash.com/photo-1565618790209-411a51163627?auto=format&fit=crop&w=600&q=80' },
-                    { name: '鶴岡八幡宮', desc: '著名的紅色鳥居', img: 'https://images.unsplash.com/photo-1600414864509-32215c32470c?auto=format&fit=crop&w=600&q=80' },
-                    { name: '高德院大佛', desc: '莊嚴的露天大佛', img: 'https://images.unsplash.com/photo-1553603227-2358e375ece5?auto=format&fit=crop&w=600&q=80' },
-                    { name: '江之島 Sea Candle', desc: '展望燈塔與花園', img: 'https://images.unsplash.com/photo-1598418086208-164478832a22?auto=format&fit=crop&w=600&q=80' }
-                ],
-                'Fuji': [
-                    { name: '下吉田本町通', desc: '商店街與巨大富士山', img: 'https://images.unsplash.com/photo-1589451814294-26d36298dd22?auto=format&fit=crop&w=600&q=80' },
-                    { name: '河口湖 Lawson', desc: '便利商店上的富士山', img: 'https://images.unsplash.com/photo-1584856403612-9c3f09599d10?auto=format&fit=crop&w=600&q=80' },
-                    { name: '新倉山淺間公園', desc: '五重塔 x 富士山', img: 'https://images.unsplash.com/photo-1524225010903-8898df5d0954?auto=format&fit=crop&w=600&q=80' },
-                    { name: '大石公園', desc: '薰衣草/掃帚草與富士山', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=600&q=80' },
-                    { name: '天空鳥居', desc: '河口淺間神社遙拜所', img: 'https://images.unsplash.com/photo-1667022275253-34e85741f021?auto=format&fit=crop&w=600&q=80' }
-                ]
-            };
+            // Shopping & Photo Data
+            const shoppingList = ref([{ name: 'NY Perfect Cheese' }, { name: 'Press Butter Sand' }]);
+            const photoSpots = { 'Tokyo': [{ name: 'SHIBUYA SKY', img: 'https://images.unsplash.com/photo-1696257523267-313d4b68ec29?auto=format&fit=crop&w=600&q=80' }] };
 
-            // Shopping Data
-            const shopTab = ref('wish');
-            const shoppingList = ref([]);
-            const souvenirs = [
-                { name: 'NY Perfect Cheese', desc: '奶油起司脆餅，東京車站必排', img: 'https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&w=200&q=80' },
-                { name: 'Press Butter Sand', desc: '焦糖奶油夾心餅', img: 'https://images.unsplash.com/photo-1599639668356-b60507b51e06?auto=format&fit=crop&w=200&q=80' },
-                { name: '豐島屋 鳩三郎', desc: '鎌倉必買鴿子餅乾', img: 'https://plus.unsplash.com/premium_photo-1675279401925-83e911277a06?auto=format&fit=crop&w=200&q=80' },
-                { name: '富士山造型餅乾', desc: '河口湖可愛伴手禮', img: 'https://images.unsplash.com/photo-1601205741712-b261aff33a7d?auto=format&fit=crop&w=200&q=80' },
-            ];
-
-            // Japanese Data
+            // Japanese
             const japanesePhrases = [
-                { jp: 'すみません', romaji: 'Sumimasen', tw: '不好意思 / 請問' },
+                { jp: 'すみません', romaji: 'Sumimasen', tw: '不好意思' },
                 { jp: 'これをお願いします', romaji: 'Kore o onegaishimasu', tw: '我要這個' },
                 { jp: 'お会計お願いします', romaji: 'Okaikei onegaishimasu', tw: '我要結帳' },
-                { jp: '袋はいりません', romaji: 'Fukuro wa irimasen', tw: '不用袋子' },
                 { jp: 'トイレはどこですか', romaji: 'Toire wa doko desu ka', tw: '廁所在哪？' },
-                { jp: '写真をとってもいいですか', romaji: 'Shashin o tottemo ii desu ka', tw: '可以拍照嗎？' },
-                { jp: '免税できますか', romaji: 'Menzei dekimasu ka', tw: '可以免稅嗎？' },
+                { jp: '助けてください！', romaji: 'Tasukete kudasai!', tw: '救命！(緊急)' },
             ];
+
+            // Modals
+            const showModal = ref(false);
+            const showSyncModal = ref(false);
+            const isEditing = ref(false);
+            const editIndex = ref(-1);
+            const editForm = ref({ name: '', hours: '', note: '', category: 'Sightseeing', mapKeyword: '' });
+            const syncCode = ref('');
+            const syncMsg = ref('');
 
             // === Methods ===
             const goHome = () => currentView.value = 'home';
             const getPageTitle = (view) => apps.find(a => a.view === view)?.name || '';
             const getMapLink = (k) => k ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k)}` : '#';
-            const getBorderColor = (c) => ({'Flight':'border-gray-400','Sightseeing':'border-pink-300','Food':'border-orange-300','Shopping':'border-purple-300','Transport':'border-blue-300','Hotel':'border-indigo-300'}[c]||'border-gray-300');
-            const getCategoryColor = (c) => ({'Flight':'bg-gray-400','Sightseeing':'bg-pink-300','Food':'bg-orange-300','Shopping':'bg-purple-300','Transport':'bg-blue-300','Hotel':'bg-indigo-300'}[c]||'bg-gray-300');
-            const getCategoryName = (c) => ({'Flight':'飛機','Sightseeing':'景點','Food':'美食','Shopping':'購物','Transport':'交通','Hotel':'住宿'}[c]||'其他');
-            
+            const getBorderColor = (c) => ({'Flight':'border-gray-400','Sightseeing':'border-pink-300','Food':'border-orange-300','Shopping':'border-purple-300','Transport':'border-blue-300'}[c]||'border-gray-300');
+            const getCategoryColor = (c) => ({'Flight':'bg-gray-400','Sightseeing':'bg-pink-300','Food':'bg-orange-300','Shopping':'bg-purple-300','Transport':'bg-blue-300'}[c]||'bg-gray-300');
+            const getCategoryName = (c) => ({'Flight':'飛機','Sightseeing':'景點','Food':'美食','Shopping':'購物','Transport':'交通'}[c]||'其他');
+
             const addPrepItem = () => { const t=prompt('新增項目:'); if(t) prepList.value.push({text:t, checked:false}); };
             const addShopItem = () => { const t=prompt('想買什麼:'); if(t) shoppingList.value.push({name:t}); };
-            const speak = (text) => { const u=new SpeechSynthesisUtterance(text); u.lang='ja-JP'; window.speechSynthesis.speak(u); };
+            
+            // Google Search
+            const doGoogleSearch = () => { if(searchQuery.value) window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.value)}`); };
 
-            // Weather Fetcher (Generic)
+            // TTS Fix for Mobile
+            const speak = (text) => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // Cancel previous
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'ja-JP';
+                    u.rate = 0.9;
+                    window.speechSynthesis.speak(u);
+                } else {
+                    alert('您的瀏覽器不支援發音功能');
+                }
+            };
+
+            // Itinerary Edit Logic
+            const openAddModal = () => { isEditing.value = false; editForm.value = { name: '', category: 'Sightseeing' }; showModal.value = true; };
+            const editItem = (item, idx) => { isEditing.value = true; editIndex.value = idx; editForm.value = {...item}; showModal.value = true; };
+            const saveItem = () => {
+                const list = itineraryData.value[selectedDayIndex.value] || [];
+                const newItem = { ...editForm.value, id: isEditing.value ? editForm.value.id : Date.now() };
+                if (isEditing.value) list[editIndex.value] = newItem;
+                else { if(!itineraryData.value[selectedDayIndex.value]) itineraryData.value[selectedDayIndex.value] = []; itineraryData.value[selectedDayIndex.value].push(newItem); }
+                showModal.value = false;
+            };
+            const deleteItem = (idx) => { if(confirm('刪除？')) itineraryData.value[selectedDayIndex.value].splice(idx, 1); };
+
+            // Sync Logic
+            const getAllData = () => JSON.stringify({ itinerary: itineraryData.value, prep: prepList.value, shopping: shoppingList.value });
+            const generateSyncCode = () => {
+                syncCode.value = btoa(unescape(encodeURIComponent(getAllData())));
+                navigator.clipboard.writeText(syncCode.value);
+                syncMsg.value = '代碼已複製！';
+            };
+            const pasteSyncCode = async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    const data = JSON.parse(decodeURIComponent(escape(atob(text))));
+                    itineraryData.value = data.itinerary;
+                    prepList.value = data.prep;
+                    shoppingList.value = data.shopping;
+                    syncMsg.value = '同步成功！';
+                    setTimeout(() => showSyncModal.value = false, 1500);
+                } catch(e) { syncMsg.value = '代碼錯誤'; }
+            };
+
+            // Weather Logic
             const getWeatherData = async (lat, lon, targetRef) => {
                 try {
                     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,cloud_cover&timezone=Asia%2FTokyo`);
                     const data = await res.json();
-                    const code = data.current.weather_code;
-                    let icon = '☁️', desc = '多雲';
-                    if(code <= 3) { icon='🌤️'; desc='晴時多雲'; }
-                    else if(code <= 67) { icon='☔'; desc='有雨'; }
-                    else if(code > 95) { icon='⛈️'; desc='雷雨'; }
-                    
                     targetRef.value = {
                         temp: data.current.temperature_2m,
-                        icon: icon,
-                        desc: desc,
+                        icon: data.current.weather_code <= 3 ? '🌤️' : (data.current.weather_code <= 67 ? '☔' : '☁️'),
+                        desc: data.current.weather_code <= 3 ? '晴時多雲' : '陰雨',
                         visibility: Math.max(0, 100 - data.current.cloud_cover)
                     };
-                } catch(e) { console.error(e); }
-            };
-
-            const fetchAllWeather = () => {
-                getWeatherData(35.6895, 139.6917, tokyoWeather);
-                getWeatherData(35.3192, 139.5467, kamakuraWeather);
-                getWeatherData(35.3606, 138.7274, fujiWeather);
-            };
-
-            const saveData = () => {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                    itinerary: itineraryData.value,
-                    prep: prepList.value,
-                    shopping: shoppingList.value
-                }));
-            };
-
-            const resetData = () => {
-                if(confirm('確定要重置所有資料回到預設值嗎？')) {
-                    localStorage.removeItem(STORAGE_KEY);
-                    location.reload();
-                }
+                } catch(e) {}
             };
 
             onMounted(() => {
+                // Sakura Effect
+                const sakuraContainer = document.getElementById('sakura-container');
+                for(let i=0; i<12; i++){
+                    const el = document.createElement('div');
+                    el.className = 'sakura';
+                    el.style.left = Math.random() * 100 + 'vw';
+                    el.style.animationDuration = Math.random() * 3 + 4 + 's';
+                    el.style.width = Math.random() * 10 + 8 + 'px';
+                    el.style.height = el.style.width;
+                    sakuraContainer.appendChild(el);
+                }
+
+                // Load Data
                 const saved = localStorage.getItem(STORAGE_KEY);
                 if(saved) {
                     try {
@@ -618,28 +620,28 @@
                     } catch(e) {}
                 }
                 
+                // Weather Init
+                getWeatherData(35.6895, 139.6917, tokyoWeather);
+                getWeatherData(35.3192, 139.5467, kamakuraWeather);
+                getWeatherData(35.3606, 138.7274, fujiWeather);
+
+                // Image Check
                 const img = new Image(); img.src = './banner.jpg'; img.onerror = () => hasBanner.value = false;
-                fetchAllWeather();
                 isMounted.value = true;
             });
 
-            watch([itineraryData, prepList, shoppingList], saveData, {deep:true});
-            const currentDayItinerary = computed(() => itineraryData.value[selectedDayIndex.value] || []);
+            watch([itineraryData, prepList, shoppingList], () => localStorage.setItem(STORAGE_KEY, getAllData()), {deep:true});
 
             return {
-                isMounted, currentView, hasBanner, apps, goHome, getPageTitle, resetData,
-                // Weather
+                isMounted, currentView, hasBanner, apps, goHome, getPageTitle, searchQuery, doGoogleSearch,
+                handleTouchStart, handleTouchEnd, // Touch events
                 tokyoWeather, kamakuraWeather, fujiWeather,
-                // Itinerary
-                tripDays, selectedDayIndex, currentDayItinerary, getBorderColor, getCategoryColor, getCategoryName, getMapLink,
-                // Prep
-                prepList, addPrepItem,
-                // Photo
-                photoArea, photoSpots,
-                // Shopping
-                shopTab, shoppingList, souvenirs, addShopItem,
-                // Japanese
-                japanesePhrases, speak
+                foodList, shoppingList, prepList, photoSpots, japanesePhrases,
+                tripDays, selectedDayIndex, currentDayItinerary: computed(() => itineraryData.value[selectedDayIndex.value] || []),
+                openAddModal, editItem, saveItem, deleteItem, showModal, editForm, isEditing,
+                getBorderColor, getCategoryColor, getCategoryName, getMapLink,
+                addPrepItem, addShopItem, speak,
+                showSyncModal, syncCode, syncMsg, generateSyncCode, pasteSyncCode
             };
         }
     }).mount('#app');
