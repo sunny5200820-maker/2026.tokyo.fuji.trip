@@ -3,12 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>關東之旅 | 櫻花吉伊卡哇 V14</title>
+    <title>關東之旅 | 櫻花吉伊卡哇 V15</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.onerror = function(msg, url, line, col, error) {
+            var extra = !col ? '' : '\ncolumn: ' + col;
+            extra += !error ? '' : '\nerror: ' + error;
+            alert("網頁發生錯誤，請截圖給開發者：\nError: " + msg + "\nurl: " + url + "\nline: " + line + extra);
+            // 強制移除 Loading
+            const loader = document.getElementById('loading-screen');
+            if(loader) loader.style.display = 'none';
+            return true;
+        };
+    </script>
 
     <script>
         tailwind.config = {
@@ -83,10 +95,10 @@
 
 <div id="app" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
     
-    <div v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
+    <div id="loading-screen" v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
         <i class="fa-solid fa-spinner fa-spin text-4xl text-chii-pink mb-4"></i>
-        <div class="text-chii-text font-bold mt-2">正在載入美好旅程 V14...</div>
-        <div class="text-xs text-gray-400 mt-2">如果卡住請重新整理</div>
+        <div class="text-chii-text font-bold mt-2">載入美好旅程 V15...</div>
+        <div class="text-xs text-gray-400 mt-2">若持續卡住請重新整理</div>
     </div>
 
     <div v-if="isMounted" v-cloak class="min-h-screen pb-24 relative z-10">
@@ -109,7 +121,7 @@
                     <div class="text-xs opacity-90 mb-1 tracking-widest">TOKYO TRIP</div>
                     <h1 class="text-3xl font-black">關東之旅 🌸</h1>
                     <div class="mt-2 text-sm bg-white/30 backdrop-blur-md px-3 py-1 rounded-full inline-block">
-                        <i class="fa-solid fa-car mr-1"></i>吉伊卡哇 V14
+                        <i class="fa-solid fa-car mr-1"></i>吉伊卡哇 V15
                     </div>
                 </div>
                 <button @click="showSyncModal = true" class="absolute top-4 right-4 bg-white/40 backdrop-blur text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-sm border border-white/50">
@@ -281,7 +293,7 @@
                             <span class="text-[10px] text-gray-400 mt-1">{{ user.name }}</span>
                         </div>
                     </div>
-                    <div v-if="settlements.length === 0" class="text-center text-gray-400 py-8 text-sm bg-gray-50 rounded-xl">目前平衡</div>
+                    <div v-if="settlements.length === 0" class="text-center text-gray-400 py-8 text-sm bg-gray-50 rounded-xl">目前收支平衡</div>
                     <div v-else class="space-y-3">
                         <div v-for="(s, idx) in settlements" :key="idx" class="flex items-center justify-between bg-blue-50 p-4 rounded-xl">
                             <div class="flex items-center gap-2 text-sm font-bold">
@@ -314,7 +326,7 @@
             </div>
             <div class="grid grid-cols-2 gap-3 pb-24">
                 <div v-for="(item, idx) in shoppingList[shopCat]" :key="idx" class="card p-3 flex flex-col items-center relative group">
-                    <button @click="shoppingList[shopCat].splice(idx, 1)" class="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full text-gray-400 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark"></i></button>
+                    <button v-if="shopCat==='wish'" @click="shoppingList[shopCat].splice(idx, 1)" class="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full text-gray-400 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark"></i></button>
                     <div class="w-full h-32 bg-gray-50 rounded-xl mb-2 overflow-hidden flex items-center justify-center shadow-inner">
                         <img :src="item.img" class="w-full h-full object-cover">
                     </div>
@@ -447,7 +459,7 @@
     createApp({
         setup() {
             // === Init State ===
-            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v14', searchQuery = ref(''), showCamera = ref(false), videoRef = ref(null);
+            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v15', searchQuery = ref(''), showCamera = ref(false), videoRef = ref(null);
             
             // Users
             const defaultUsers = [
@@ -490,7 +502,6 @@
                 { week: 'Day 5', title: '纜車/回新宿' }, { week: 'Day 6', title: '鎌倉江之電' }, { week: 'Day 7', title: '東京塔/澀谷' }, { week: 'Day 8', title: '返程' }
             ];
             
-            // Map Links Fixed
             const searchMap = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
             const defaultItinerary = [
                 [{ id: 1, category: 'Flight', name: '桃園起飛 (06:40)', hours: '06:40', mapKeyword: '桃園機場' }, { id: 2, category: 'Flight', name: '抵達成田 (10:40)', hours: '10:40', mapKeyword: '成田機場' }, { id: 3, category: 'Sightseeing', name: '晴空塔', hours: '下午', mapKeyword: 'Tokyo Skytree' }, { id: 4, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', mapKeyword: '錦糸町美食' }],
@@ -534,10 +545,19 @@
                 const bal = {}; users.value.forEach(u=>bal[u.id]=0); expenses.value.forEach(e=>{ if(bal[e.user]!=undefined) bal[e.user]+=Number(e.amount); });
                 const avg = expenses.value.reduce((s,e)=>s+Number(e.amount),0)/users.value.length;
                 const net = {}; users.value.forEach(u=>net[u.id]=bal[u.id]-avg);
-                const debt=[], cred=[]; for(let uid in net) { if(net[uid]<-1) debt.push({u:uid,a:-net[uid]}); else if(net[uid]>1) cred.push({u:uid,a:net[uid]}); }
-                const res=[]; let i=0,j=0; while(i<debt.length && j<cred.length){ let amt = Math.min(debt[i].a, cred[j].a); if(amt>0) res.push({from:debt[i].u, to:cred[j].u, amount:Math.round(amt)}); debt[i].a-=amt; cred[j].a-=amt; if(debt[i].a<1) i++; if(cred[j].a<1) j++; } return res;
+                const debt=[], cred=[]; 
+                for(let uid in net) { if(net[uid]<-1) debt.push({u:uid,a:-net[uid]}); else if(net[uid]>1) cred.push({u:uid,a:net[uid]}); }
+                const res=[]; let i=0,j=0; 
+                while(i<debt.length && j<cred.length){
+                    let amt = Math.min(debt[i].a, cred[j].a);
+                    if(amt>0) res.push({from:debt[i].u, to:cred[j].u, amount:Math.round(amt)});
+                    debt[i].a-=amt; cred[j].a-=amt;
+                    if(debt[i].a<1) i++; if(cred[j].a<1) j++;
+                }
+                return res;
             });
 
+            // --- Methods ---
             const goHome = () => { currentView.value = 'home'; prepMode.value = 'select'; moneyMode.value = 'select'; };
             const getPageTitle = (v) => apps.find(a=>a.view==v)?.name || '';
             const getMapLink = (k) => k ? searchMap(k) : '#';
@@ -580,17 +600,44 @@
                         foodList.value = d.food || foodList.value;
                         photoSpots.value = d.photo || photoSpots.value;
                         japanesePhrases.value = d.jp || japanesePhrases.value;
-                    } else { users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false}))); }
-                } catch(e) { users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false}))); }
-                
+                    } else {
+                        // New user init
+                        users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false})));
+                    }
+                } catch(e) {
+                    console.error("Load Error:", e);
+                    // Fallback reset
+                    users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false})));
+                }
+
+                // Init Weather
                 getW(35.6895, 139.6917, tokyoWeather); getW(35.3192, 139.5467, kamakuraWeather); getW(35.3606, 138.7274, fujiWeather);
-                const sc = document.getElementById('sakura-container'); for(let i=0;i<15;i++){ const e=document.createElement('div'); e.className='sakura'; e.style.left=Math.random()*100+'vw'; e.style.animationDuration=Math.random()*3+4+'s'; sc.appendChild(e); }
+                
+                // Sakura
+                const sc = document.getElementById('sakura-container');
+                for(let i=0;i<15;i++){ const e=document.createElement('div'); e.className='sakura'; e.style.left=Math.random()*100+'vw'; e.style.animationDuration=Math.random()*3+4+'s'; sc.appendChild(e); }
+                
                 isMounted.value = true;
             });
 
-            watch([itineraryData, users, expenses, shoppingList, foodList, photoSpots, japanesePhrases], ()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify({itinerary:itineraryData.value, users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, jp:japanesePhrases.value})); }, {deep:true});
+            // Auto Save
+            watch([itineraryData, users, expenses, shoppingList, foodList, photoSpots, japanesePhrases], ()=>{
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({itinerary:itineraryData.value, users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, jp:japanesePhrases.value}));
+            }, {deep:true});
 
-            return { isMounted, currentView, hasBanner, apps, goHome, getPageTitle, searchQuery, doGoogleSearch, handleTouchStart, handleTouchEnd, tokyoWeather, kamakuraWeather, fujiWeather, foodList, shoppingList, photoSpots, japanesePhrases, hotels, tripDays, selectedDayIndex, currentDayItinerary, moneyTab, moneyMode, users, currentUser, currentUserId, userTotalExpense, filteredExpenses, settlements, getUserById, editUserName, prepUser, prepMode, selectPrepUser, selectMoneyUser, currentPrepList, addPrepItem, openAddModal, editItem, saveItem, deleteItem, showModal, editForm, isEditing, openExpenseModal, addExpense, showExpenseModal, newExpense, deleteExpense, getBorderColor, getCategoryColor, getCategoryName, getMapLink, getExpenseIcon, showCommonModal, commonType, newCommon, openAddCommonModal, saveCommonItem, shopCat, foodLoc, photoArea, showCamera, videoRef, startCamera, stopCamera, speak, showSyncModal, syncCode, syncMsg, generateSyncCode, pasteSyncCode };
+            return {
+                isMounted, currentView, hasBanner, apps, goHome, getPageTitle, searchQuery, doGoogleSearch, handleTouchStart, handleTouchEnd,
+                tokyoWeather, kamakuraWeather, fujiWeather, foodList, shoppingList, photoSpots, japanesePhrases, hotels,
+                tripDays, selectedDayIndex, currentDayItinerary,
+                moneyTab, users, currentUserId, userTotalExpense, filteredExpenses, settlements, getUserById, editUserName,
+                prepUser, currentPrepList, addPrepItem,
+                openAddModal, editItem, saveItem, deleteItem, showModal, editForm, isEditing,
+                openExpenseModal, addExpense, showExpenseModal, newExpense, deleteExpense,
+                getBorderColor, getCategoryColor, getCategoryName, getMapLink, getExpenseIcon,
+                showCommonModal, commonType, newCommon, openAddCommonModal, saveCommonItem, shopCat, foodLoc, photoArea,
+                showCamera, videoRef, startCamera, stopCamera, speak,
+                showSyncModal, syncCode, syncMsg, generateSyncCode, pasteSyncCode, prepMode, selectPrepUser, moneyMode, selectMoneyUser
+            };
         }
     }).mount('#app');
 </script>
