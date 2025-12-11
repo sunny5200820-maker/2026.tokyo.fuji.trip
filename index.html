@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>關東之旅 | 櫻花吉伊卡哇 V13</title>
+    <title>關東之旅 | 櫻花吉伊卡哇 V14</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
@@ -16,7 +16,6 @@
                 extend: {
                     colors: {
                         'chii-pink': '#FFD1DC',
-                        'chii-dark-pink': '#FFB7B2',
                         'chii-blue': '#A2D2FF',
                         'chii-yellow': '#FFF5BA',
                         'chii-text': '#5D5D5D',
@@ -30,120 +29,47 @@
                         'wiggle': 'wiggle 2s linear infinite',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-5px)' },
-                        },
-                        wiggle: {
-                            '0%, 100%': { transform: 'rotate(-3deg)' },
-                            '50%': { transform: 'rotate(3deg)' },
-                        }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } },
+                        wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        body {
-            background-color: #FFF0F5; /* 櫻花粉 */
-            font-family: 'Zen Maru Gothic', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-            overscroll-behavior-y: none;
-            user-select: none;
-        }
+        body { background-color: #FFF0F5; font-family: 'Zen Maru Gothic', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; overscroll-behavior-y: none; user-select: none; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* 櫻花飄落 */
-        .sakura {
-            position: fixed; top: -10px; background: #FFD1DC;
-            border-radius: 100% 0 100% 0; opacity: 0.6;
-            animation: fall linear infinite; z-index: 0; pointer-events: none;
-        }
+        /* 櫻花特效 */
+        .sakura { position: fixed; top: -10px; background: #FFD1DC; border-radius: 100% 0 100% 0; opacity: 0.6; animation: fall linear infinite; z-index: 0; pointer-events: none; }
         @keyframes fall { to { transform: translate(10vw, 105vh) rotate(360deg); } }
 
         /* Banner */
-        .banner-container {
-            height: 240px;
-            background-image: url('./banner.jpg');
-            background-size: cover;
-            background-position: center;
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(255, 183, 178, 0.4);
-            margin-bottom: 20px;
-        }
+        .banner-container { height: 240px; background-image: url('./banner.jpg'); background-size: cover; background-position: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; position: relative; box-shadow: 0 4px 20px rgba(255, 183, 178, 0.4); margin-bottom: 20px; }
         .banner-fallback { background: linear-gradient(135deg, #FFD1DC 0%, #A2D2FF 100%); }
 
-        /* Icons & Cards */
-        .app-icon {
-            width: 65px; height: 65px; border-radius: 24px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; color: white;
-            box-shadow: 0 6px 15px rgba(255, 183, 178, 0.3);
-            margin-bottom: 6px; transition: transform 0.1s;
-        }
+        /* UI Components */
+        .app-icon { width: 65px; height: 65px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; box-shadow: 0 6px 15px rgba(255, 183, 178, 0.3); margin-bottom: 6px; transition: transform 0.1s; }
         .app-icon:active { transform: scale(0.9); }
         .app-label { font-size: 12px; font-weight: bold; color: #5D5D5D; text-align: center; }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(255, 209, 220, 0.2);
-            backdrop-filter: blur(5px);
-            transition: all 0.2s;
-        }
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 4px 15px rgba(255, 209, 220, 0.2); backdrop-filter: blur(5px); transition: all 0.2s; }
         .weather-card { background: linear-gradient(120deg, #A2D2FF 0%, #FFD1DC 100%); color: white; }
 
-        /* Floating Buttons */
-        .fab-main {
-            position: fixed; bottom: 30px; right: 20px; width: 56px; height: 56px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: white; z-index: 50;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: transform 0.1s;
-        }
+        /* Buttons */
+        .fab-main { position: fixed; bottom: 30px; right: 20px; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; z-index: 50; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: transform 0.1s; }
         .fab-main:active { transform: scale(0.9); }
-        
-        .vjw-btn {
-            position: fixed; bottom: 100px; right: 20px;
-            background: linear-gradient(45deg, #FF9A9E 0%, #FECFEF 99%);
-            color: white; padding: 10px 16px; border-radius: 50px;
-            font-weight: bold; font-size: 14px; z-index: 45;
-            display: flex; align-items: center; gap: 5px;
-            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); animation: float 3s infinite;
-        }
-        .coupon-btn {
-            position: fixed; bottom: 160px; right: 20px;
-            background: linear-gradient(45deg, #f6d365 0%, #fda085 100%);
-            color: white; padding: 8px 14px; border-radius: 50px;
-            font-weight: bold; font-size: 13px; z-index: 45;
-            display: flex; align-items: center; gap: 5px;
-            box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); animation: wiggle 3s infinite;
-        }
+        .vjw-btn { position: fixed; bottom: 100px; right: 20px; background: linear-gradient(45deg, #FF9A9E 0%, #FECFEF 99%); color: white; padding: 10px 16px; border-radius: 50px; font-weight: bold; font-size: 14px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); animation: float 3s infinite; }
+        .coupon-btn { position: fixed; bottom: 160px; right: 20px; background: linear-gradient(45deg, #f6d365 0%, #fda085 100%); color: white; padding: 8px 14px; border-radius: 50px; font-weight: bold; font-size: 13px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); animation: wiggle 3s infinite; }
         
         /* 吉伊卡哇選單頭像 */
-        .chii-select-card {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: white; border-radius: 20px; padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s;
-            cursor: pointer; height: 100%;
-        }
+        .chii-select-card { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; height: 100%; }
         .chii-select-card:active { transform: scale(0.95); }
-        .chii-avatar-lg {
-            width: 70px; height: 70px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 32px; margin-bottom: 8px; border: 3px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+        .chii-avatar-lg { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 8px; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .chii-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s; background: white; }
+        .chii-avatar.active { border-color: #FFD1DC; transform: scale(1.1); box-shadow: 0 0 15px #FFD1DC; }
 
-        /* 導航搜尋 */
-        .floating-search {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; z-index: 40;
-        }
-
-        /* 相機 */
+        /* Search & Camera */
+        .floating-search { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 40; }
         .camera-frame { position: fixed; inset: 0; background: black; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .scan-line { width: 100%; height: 2px; background: #00ff00; position: absolute; top: 50%; animation: scan 2s linear infinite; box-shadow: 0 0 10px #00ff00; }
         @keyframes scan { 0% { top: 30%; opacity: 0; } 50% { opacity: 1; } 100% { top: 70%; opacity: 0; } }
@@ -159,7 +85,8 @@
     
     <div v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
         <i class="fa-solid fa-spinner fa-spin text-4xl text-chii-pink mb-4"></i>
-        <div class="text-chii-text font-bold">載入櫻花季 V13...</div>
+        <div class="text-chii-text font-bold mt-2">正在載入美好旅程 V14...</div>
+        <div class="text-xs text-gray-400 mt-2">如果卡住請重新整理</div>
     </div>
 
     <div v-if="isMounted" v-cloak class="min-h-screen pb-24 relative z-10">
@@ -182,7 +109,7 @@
                     <div class="text-xs opacity-90 mb-1 tracking-widest">TOKYO TRIP</div>
                     <h1 class="text-3xl font-black">關東之旅 🌸</h1>
                     <div class="mt-2 text-sm bg-white/30 backdrop-blur-md px-3 py-1 rounded-full inline-block">
-                        <i class="fa-solid fa-car mr-1"></i>吉伊卡哇 V13
+                        <i class="fa-solid fa-car mr-1"></i>吉伊卡哇 V14
                     </div>
                 </div>
                 <button @click="showSyncModal = true" class="absolute top-4 right-4 bg-white/40 backdrop-blur text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-sm border border-white/50">
@@ -225,10 +152,10 @@
                             </div>
                             <h3 class="font-bold text-gray-800 text-lg">
                                 {{ item.name }}
-                                <a :href="getMapLink(item.mapKeyword)" target="_blank" @click.stop class="ml-1 text-blue-400"><i class="fa-solid fa-location-arrow"></i></a>
+                                <a :href="getMapLink(item.mapKeyword)" target="_blank" @click.stop class="ml-1 text-blue-400 hover:text-blue-600"><i class="fa-solid fa-location-arrow"></i></a>
                             </h3>
-                            <p v-if="item.parking" class="text-xs mt-1 text-blue-500 font-bold bg-blue-50 p-1 rounded inline-block cursor-pointer" @click.stop="window.open(item.parking)">
-                                <i class="fa-solid fa-square-parking mr-1"></i>推薦停車場
+                            <p v-if="item.parking" class="text-xs mt-1 text-blue-500 font-bold bg-blue-50 p-1 rounded inline-block cursor-pointer hover:bg-blue-100" @click.stop="window.open(item.parking)">
+                                <i class="fa-solid fa-square-parking mr-1"></i>推薦停車場 (導航)
                             </p>
                             <p class="text-sm text-gray-500 mt-2 whitespace-pre-line">{{ item.note }}</p>
                         </div>
@@ -276,17 +203,16 @@
                         {{ getUserById(prepUser).name }} 的清單
                     </h3>
                     <button @click="prepMode = 'select'" class="text-sm bg-white px-3 py-1 rounded-full shadow text-gray-500">
-                        <i class="fa-solid fa-users mr-1"></i>切換成員
+                        <i class="fa-solid fa-users mr-1"></i>切換
                     </button>
                 </div>
-
                 <div class="card p-5 min-h-[300px] mb-20 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-2" :style="{backgroundColor: getUserById(prepUser).bg}"></div>
                     <div class="space-y-2">
                         <div v-for="(item, idx) in currentPrepList" :key="idx" class="flex items-center gap-3 py-2 border-b border-dashed border-gray-100">
                             <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-400 rounded cursor-pointer">
                             <input v-model="item.text" class="flex-1 text-sm bg-transparent outline-none" :class="{'line-through text-gray-300': item.checked}">
-                            <button @click="currentPrepList.splice(idx, 1)" class="text-gray-300"><i class="fa-solid fa-xmark"></i></button>
+                            <button @click="currentPrepList.splice(idx, 1)" class="text-gray-300 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                     </div>
                     <button @click="addPrepItem" class="w-full mt-6 py-3 bg-gray-50 rounded-xl text-gray-400 font-bold border-2 border-dashed border-gray-200 hover:bg-white text-sm">+ 新增項目</button>
@@ -296,7 +222,7 @@
 
         <div v-if="currentView === 'money'" class="px-4">
             <div class="flex bg-white rounded-2xl p-1 mb-6 shadow-sm border border-pink-100">
-                <button @click="moneyTab = 'record'" :class="['flex-1 py-2 rounded-xl text-sm font-bold transition', moneyTab === 'record' ? 'bg-chii-yellow text-gray-700 shadow-sm' : 'text-gray-400']">個人記帳本</button>
+                <button @click="moneyTab = 'record'" :class="['flex-1 py-2 rounded-xl text-sm font-bold transition', moneyTab === 'record' ? 'bg-chii-yellow text-gray-700 shadow-sm' : 'text-gray-400']">個人記帳</button>
                 <button @click="moneyTab = 'split'" :class="['flex-1 py-2 rounded-xl text-sm font-bold transition', moneyTab === 'split' ? 'bg-chii-pink text-white shadow-sm' : 'text-gray-400']">分帳結算</button>
             </div>
 
@@ -320,7 +246,6 @@
                         </h3>
                         <button @click="moneyMode = 'select'" class="text-xs bg-white px-3 py-1 rounded-full shadow text-gray-500">切換</button>
                     </div>
-
                     <div class="card p-5 mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100 relative overflow-hidden">
                         <div class="relative z-10">
                             <div class="text-xs text-yellow-600 font-bold mb-1">總支出</div>
@@ -328,7 +253,6 @@
                         </div>
                         <i class="fa-solid fa-coins absolute -bottom-4 -right-4 text-7xl text-yellow-200 opacity-50"></i>
                     </div>
-                    
                     <div class="space-y-3 pb-24">
                         <div v-for="exp in filteredExpenses" :key="exp.id" class="card p-3 flex justify-between items-center">
                             <div class="flex items-center gap-3">
@@ -352,12 +276,12 @@
                 <div class="card p-6 border-l-4 border-chii-blue">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-gray-700"><i class="fa-solid fa-calculator text-blue-400"></i> 分帳建議</h3>
                     <div class="flex justify-center gap-3 mb-4">
-                        <div v-for="user in users" :key="user.id" class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs text-white cursor-pointer" :style="{backgroundColor:user.bg}" @click="editUserName(user)">{{ user.icon }}</div>
-                            <span class="text-[10px] text-gray-400 mt-1" @click="editUserName(user)">{{ user.name }}</span>
+                        <div v-for="user in users" :key="user.id" class="flex flex-col items-center cursor-pointer" @click="editUserName(user)">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs text-white" :style="{backgroundColor:user.bg}">{{ user.icon }}</div>
+                            <span class="text-[10px] text-gray-400 mt-1">{{ user.name }}</span>
                         </div>
                     </div>
-                    <div v-if="settlements.length === 0" class="text-center text-gray-400 py-8 text-sm bg-gray-50 rounded-xl">目前收支平衡</div>
+                    <div v-if="settlements.length === 0" class="text-center text-gray-400 py-8 text-sm bg-gray-50 rounded-xl">目前平衡</div>
                     <div v-else class="space-y-3">
                         <div v-for="(s, idx) in settlements" :key="idx" class="flex items-center justify-between bg-blue-50 p-4 rounded-xl">
                             <div class="flex items-center gap-2 text-sm font-bold">
@@ -374,26 +298,23 @@
 
         <div v-if="currentView === 'shopping'" class="px-4">
             <a href="https://www.google.com/search?q=日本旅遊優惠券2025" target="_blank" class="coupon-btn"><i class="fa-solid fa-ticket"></i> 找優惠券</a>
-            
             <div class="grid grid-cols-2 gap-3 mb-6">
-                <a href="https://www.cosme.net/bestcosme/" target="_blank" class="bg-green-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm hover:scale-105 transition">
+                <a href="https://www.cosme.net/bestcosme/" target="_blank" class="bg-green-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
                     <i class="fa-solid fa-crown text-3xl text-green-600"></i><span class="font-bold text-green-800 text-sm">@cosme 大賞</span>
                 </a>
-                <a href="https://360life.shinyusha.co.jp/list/ldk" target="_blank" class="bg-purple-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm hover:scale-105 transition">
+                <a href="https://360life.shinyusha.co.jp/list/ldk" target="_blank" class="bg-purple-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-sm">
                     <i class="fa-solid fa-magazine text-3xl text-purple-600"></i><span class="font-bold text-purple-800 text-sm">LDK 評測</span>
                 </a>
             </div>
-
             <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar pb-1">
                 <button v-for="cat in ['wish','cosme','ldk','souvenir']" :key="cat" @click="shopCat = cat" 
                     :class="['px-4 py-2 rounded-full text-sm font-bold transition whitespace-nowrap', shopCat === cat ? 'bg-chii-pink text-white shadow' : 'bg-white text-gray-400']">
                     {{ {'wish':'我的願望','cosme':'@Cosme','ldk':'LDK','souvenir':'必買伴手禮'}[cat] }}
                 </button>
             </div>
-
             <div class="grid grid-cols-2 gap-3 pb-24">
                 <div v-for="(item, idx) in shoppingList[shopCat]" :key="idx" class="card p-3 flex flex-col items-center relative group">
-                    <button v-if="shopCat==='wish'" @click="shoppingList[shopCat].splice(idx, 1)" class="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full text-gray-400 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark"></i></button>
+                    <button @click="shoppingList[shopCat].splice(idx, 1)" class="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full text-gray-400 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark"></i></button>
                     <div class="w-full h-32 bg-gray-50 rounded-xl mb-2 overflow-hidden flex items-center justify-center shadow-inner">
                         <img :src="item.img" class="w-full h-full object-cover">
                     </div>
@@ -492,8 +413,8 @@
         <div v-if="showCommonModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl">
                 <h3 class="font-bold text-lg mb-4 text-center">新增項目</h3>
-                <div v-if="commonType === 'jp'"><input v-model="newCommon.text1" placeholder="日文" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"><input v-model="newCommon.text2" placeholder="中文" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"></div>
-                <div v-else><input v-model="newCommon.text1" placeholder="名稱 (自動帶圖)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"></div>
+                <div v-if="commonType === 'jp'"><input v-model="newCommon.text1" placeholder="日文 (例: トイレ)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"><input v-model="newCommon.text2" placeholder="中文翻譯" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"></div>
+                <div v-else><input v-model="newCommon.text1" placeholder="名稱 (自動帶圖)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none"><p class="text-xs text-gray-400 mb-3 text-center">輸入名稱後，系統將自動生成圖片與地圖連結</p></div>
                 <div class="flex gap-3"><button @click="showCommonModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button><button @click="saveCommonItem" class="flex-1 py-3 bg-blue-400 text-white rounded-xl font-bold">新增</button></div>
             </div>
         </div>
@@ -525,29 +446,27 @@
 
     createApp({
         setup() {
-            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v13', searchQuery = ref(''), showCamera = ref(false), videoRef = ref(null);
+            // === Init State ===
+            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v14', searchQuery = ref(''), showCamera = ref(false), videoRef = ref(null);
             
             // Users
-            const users = ref([
+            const defaultUsers = [
                 {id: 1, name: '吉伊', bg: '#FFD1DC', icon:'🐹', list: []},
                 {id: 2, name: '小八', bg: '#A2D2FF', icon:'🐱', list: []},
                 {id: 3, name: '兔兔', bg: '#FFF5BA', icon:'🐰', list: []},
                 {id: 4, name: '小桃', bg: '#FFB7B2', icon:'🍑', list: []}
-            ]);
-            
-            // View Modes
-            const prepMode = ref('select'); // select | list
-            const moneyMode = ref('select'); // select | list
+            ];
+            const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
+            const prepMode = ref('select'), moneyMode = ref('select');
 
             // Touch Swipe
             const touchStart = ref(0);
             const handleTouchStart = (e) => touchStart.value = e.changedTouches[0].screenX;
             const handleTouchEnd = (e) => { 
                 if (currentView.value !== 'home' && e.changedTouches[0].screenX - touchStart.value > 100) {
-                    // Logic to handle nested views
-                    if(currentView.value === 'prep' && prepMode.value === 'list') { prepMode.value = 'select'; }
-                    else if(currentView.value === 'money' && moneyTab.value === 'record' && moneyMode.value === 'list') { moneyMode.value = 'select'; }
-                    else { goHome(); }
+                    if(currentView.value === 'prep' && prepMode.value === 'list') prepMode.value = 'select';
+                    else if(currentView.value === 'money' && moneyTab.value === 'record' && moneyMode.value === 'list') moneyMode.value = 'select';
+                    else goHome(); 
                 } 
             };
 
@@ -564,20 +483,31 @@
             ];
 
             const tokyoWeather = ref({ temp: '--', icon: '⏳', desc: '...', visibility: '--' }), kamakuraWeather = ref({ temp: '--', icon: '⏳', desc: '...', visibility: '--' }), fujiWeather = ref({ temp: '--', icon: '⏳', desc: '...', visibility: '--' });
-            const selectedDayIndex = ref(0), tripDays = [{ week: 'Day 1', title: '抵達/晴空塔' }, { week: 'Day 2', title: '淺草/上野' }, { week: 'Day 3', title: '租車/河口湖' }, { week: 'Day 4', title: '山中湖' }, { week: 'Day 5', title: '纜車/回新宿' }, { week: 'Day 6', title: '鎌倉江之電' }, { week: 'Day 7', title: '東京塔/澀谷' }, { week: 'Day 8', title: '返程' }];
+            
+            const selectedDayIndex = ref(0);
+            const tripDays = [
+                { week: 'Day 1', title: '抵達/晴空塔' }, { week: 'Day 2', title: '淺草/上野' }, { week: 'Day 3', title: '租車/河口湖' }, { week: 'Day 4', title: '山中湖' },
+                { week: 'Day 5', title: '纜車/回新宿' }, { week: 'Day 6', title: '鎌倉江之電' }, { week: 'Day 7', title: '東京塔/澀谷' }, { week: 'Day 8', title: '返程' }
+            ];
+            
+            // Map Links Fixed
+            const searchMap = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
             const defaultItinerary = [
-                [{ id: 1, category: 'Flight', name: '桃園起飛 (06:40)', hours: '06:40', mapKeyword: '桃園機場' }, { id: 2, category: 'Flight', name: '抵達成田 (10:40)', hours: '10:40', mapKeyword: '成田機場' }, { id: 3, category: 'Sightseeing', name: '晴空塔', hours: '下午', mapKeyword: 'Tokyo Skytree' }, { id: 4, category: 'Food', name: '晚餐：錦糸町', hours: '晚上', mapKeyword: '錦糸町美食' }],
-                [{ id: 5, category: 'Sightseeing', name: '淺草寺', hours: '上午', mapKeyword: '淺草寺' }, { id: 6, category: 'Food', name: '午餐：淺草', hours: '中午', mapKeyword: '淺草午餐' }, { id: 7, category: 'Sightseeing', name: '小網神社', hours: '下午', mapKeyword: '小網神社' }, { id: 8, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', mapKeyword: '上野恩賜公園' }, { id: 9, category: 'Shopping', name: '秋葉原/東京一番街', hours: '晚上', mapKeyword: '東京站一番街' }],
-                [{ id: 10, category: 'Transport', name: '錦糸町前往富士山(租車)', hours: '上午', mapKeyword: '河口湖租車' }, { id: 11, category: 'Sightseeing', name: '河口湖自然生活館', hours: '下午', mapKeyword: '河口湖自然生活館', parking:'https://www.google.com/maps/search/?api=1&query=河口湖自然生活館駐車場' }, { id: 12, category: 'Sightseeing', name: '新倉富士淺間神社', hours: '下午', mapKeyword: '新倉富士淺間神社', parking:'https://www.google.com/maps/search/?api=1&query=下吉田駅駐車場' }, { id: 13, category: 'Sightseeing', name: '金鳥居', hours: '傍晚', mapKeyword: '富士吉田本町通', parking:'https://www.google.com/maps/search/?api=1&query=富士吉田市本町二丁目駐車場' }, { id: 14, category: 'Food', name: '晚餐', hours: '晚上', mapKeyword: '富士吉田晚餐' }],
-                [{ id: 15, category: 'Sightseeing', name: '平野之濱日出', hours: '清晨', mapKeyword: '平野之濱' }, { id: 16, category: 'Sightseeing', name: '長池親水公園', hours: '上午', mapKeyword: '長池親水公園', parking:'https://www.google.com/maps/search/?api=1&query=長池親水公園駐車場' }, { id: 17, category: 'Food', name: '午餐', hours: '中午', mapKeyword: '山中湖美食' }, { id: 18, category: 'Sightseeing', name: 'KABA 水陸巴士', hours: '下午', mapKeyword: '山中湖KABA', parking:'https://www.google.com/maps/search/?api=1&query=山中湖旭日丘駐車場' }, { id: 19, category: 'Food', name: 'Ogino超市', hours: '晚上', mapKeyword: 'Ogino河口湖店', parking:'https://www.google.com/maps/search/?api=1&query=Ogino河口湖店駐車場' }],
-                [{ id: 20, category: 'Sightseeing', name: '河口湖纜車', hours: '早上', mapKeyword: '河口湖富士山全景纜車', parking:'https://www.google.com/maps/search/?api=1&query=河口湖畔県営無料駐車場' }, { id: 21, category: 'Shopping', name: 'Fujisan Shokupan', hours: '點心', mapKeyword: 'Fujisan Shokupan' }, { id: 22, category: 'Transport', name: '搭乘富士回遊返新宿', hours: '下午', mapKeyword: '河口湖站' }, { id: 23, category: 'Shopping', name: '池袋太陽城', hours: '傍晚', mapKeyword: '池袋太陽城' }, { id: 24, category: 'Food', name: '晚餐', hours: '晚上', mapKeyword: '池袋太陽城美食' }],
+                [{ id: 1, category: 'Flight', name: '桃園起飛 (06:40)', hours: '06:40', mapKeyword: '桃園機場' }, { id: 2, category: 'Flight', name: '抵達成田 (10:40)', hours: '10:40', mapKeyword: '成田機場' }, { id: 3, category: 'Sightseeing', name: '晴空塔', hours: '下午', mapKeyword: 'Tokyo Skytree' }, { id: 4, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', mapKeyword: '錦糸町美食' }],
+                [{ id: 5, category: 'Sightseeing', name: '淺草寺', hours: '上午', mapKeyword: '淺草寺' }, { id: 6, category: 'Food', name: '午餐：淺草周遭', hours: '中午', mapKeyword: '淺草午餐' }, { id: 7, category: 'Sightseeing', name: '小網神社', hours: '下午', mapKeyword: '小網神社' }, { id: 8, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', mapKeyword: '上野恩賜公園' }, { id: 9, category: 'Shopping', name: '秋葉原/東京一番街', hours: '晚上', mapKeyword: '東京站一番街' }],
+                [{ id: 10, category: 'Transport', name: '錦糸町前往富士山(租車)', hours: '上午', mapKeyword: '河口湖租車' }, { id: 11, category: 'Sightseeing', name: '河口湖自然生活館', hours: '下午', mapKeyword: '河口湖自然生活館', parking:searchMap('大石公園駐車場') }, { id: 12, category: 'Sightseeing', name: '新倉富士淺間神社', hours: '下午', mapKeyword: '新倉富士淺間神社', parking:searchMap('下吉田駅駐車場') }, { id: 13, category: 'Sightseeing', name: '金鳥居', hours: '傍晚', mapKeyword: '富士吉田本町通', parking:searchMap('本町二丁目駐車場') }, { id: 14, category: 'Food', name: '晚餐', hours: '晚上', mapKeyword: '富士吉田晚餐' }],
+                [{ id: 15, category: 'Sightseeing', name: '平野之濱日出', hours: '清晨', mapKeyword: '平野之濱' }, { id: 16, category: 'Sightseeing', name: '長池親水公園', hours: '上午', mapKeyword: '長池親水公園', parking:searchMap('長池親水公園駐車場') }, { id: 17, category: 'Food', name: '午餐', hours: '中午', mapKeyword: '山中湖美食' }, { id: 18, category: 'Sightseeing', name: 'KABA 水陸巴士', hours: '下午', mapKeyword: '山中湖KABA', parking:searchMap('山中湖旭日丘駐車場') }, { id: 19, category: 'Food', name: 'Ogino超市', hours: '晚上', mapKeyword: 'Ogino河口湖店', parking:searchMap('Ogino河口湖店駐車場') }],
+                [{ id: 20, category: 'Sightseeing', name: '河口湖纜車', hours: '早上', mapKeyword: '河口湖富士山全景纜車', parking:searchMap('河口湖畔県営無料駐車場') }, { id: 21, category: 'Shopping', name: 'Fujisan Shokupan', hours: '點心', mapKeyword: 'Fujisan Shokupan' }, { id: 22, category: 'Transport', name: '搭乘富士回遊返新宿', hours: '下午', mapKeyword: '河口湖站' }, { id: 23, category: 'Shopping', name: '池袋太陽城', hours: '傍晚', mapKeyword: '池袋太陽城' }, { id: 24, category: 'Food', name: '晚餐', hours: '晚上', mapKeyword: '池袋太陽城美食' }],
                 [{ id: 25, category: 'Transport', name: '前往藤澤', hours: '上午', mapKeyword: '藤澤站' }, { id: 26, category: 'Sightseeing', name: '江之島/鎌倉高校前', hours: '全天', mapKeyword: '江之島' }, { id: 27, category: 'Food', name: '午餐：七里濱', hours: '中午', mapKeyword: '七里濱Bills' }, { id: 28, category: 'Transport', name: '返回新宿', hours: '傍晚', mapKeyword: '新宿站' }],
                 [{ id: 29, category: 'Sightseeing', name: '東京鐵塔/麻布台', hours: '上午', mapKeyword: '東京鐵塔' }, { id: 30, category: 'Food', name: '午餐：六本木', hours: '中午', mapKeyword: '六本木午餐' }, { id: 31, category: 'Sightseeing', name: 'SHIBUYA SKY', hours: '傍晚', mapKeyword: 'SHIBUYA SKY' }, { id: 32, category: 'Shopping', name: '澀谷逛街', hours: '晚上', mapKeyword: '澀谷' }],
                 [{ id: 33, category: 'Sightseeing', name: '自由行程', hours: '白天', mapKeyword: '' }, { id: 34, category: 'Transport', name: '成田機場 (20:40)', hours: '20:40', mapKeyword: '成田機場' }, { id: 35, category: 'Transport', name: '抵達桃園 (23:20)', hours: '23:20', mapKeyword: '桃園機場' }]
             ];
             const itineraryData = ref(defaultItinerary);
 
+            // Lists Data
             const moneyTab = ref('record'), currentUserId = ref(1), expenses = ref([]), newExpense = ref({name:'', amount:'', category:'食'}), prepUser = ref(1);
+            const defaultPrep = ['護照', '日幣', '信用卡', 'SIM卡', '衣服'];
+            
             const shoppingList = ref({ 
                 'wish': [], 
                 'cosme': [{name:'Kate怪獸唇膏', img:'https://placehold.co/200x200/FFD1DC/555?text=Lip'}, {name:'Tirtir氣墊', img:'https://placehold.co/200x200/FFD1DC/555?text=Cushion'}, {name:'&Honey髮油', img:'https://placehold.co/200x200/FFD1DC/555?text=Oil'}],
@@ -585,13 +515,12 @@
                 'souvenir': [{name:'NY Perfect Cheese', img:'https://placehold.co/200x200/FFF5BA/555?text=Cheese'}, {name:'Press Butter Sand', img:'https://placehold.co/200x200/FFF5BA/555?text=Butter'}] 
             });
             const shopCat = ref('wish');
-            const foodList = ref({ 'Tokyo': [{name:'AFURI拉麵', desc:'柚子鹽拉麵', img:'https://placehold.co/200x200/orange/white?text=Ramen', link:'http://googleusercontent.com/maps.google.com/search?q=AFURI'}, {name:'HARBS', desc:'水果千層', img:'https://placehold.co/200x200/orange/white?text=Cake', link:'http://googleusercontent.com/maps.google.com/search?q=HARBS'}], 'Kamakura': [{name:'Bills', desc:'海景鬆餅', img:'https://placehold.co/200x200/teal/white?text=Pancake', link:'http://googleusercontent.com/maps.google.com/search?q=Bills+Shichirigahama'}], 'Fuji': [{name:'Houtou Fudou', desc:'餺飥麵', img:'https://placehold.co/200x200/blue/white?text=Noodle', link:'http://googleusercontent.com/maps.google.com/search?q=Houtou+Fudou'}] });
+            const foodList = ref({ 'Tokyo': [{name:'AFURI拉麵', desc:'柚子鹽拉麵', img:'https://placehold.co/200x200/orange/white?text=Ramen', link:searchMap('AFURI')}, {name:'HARBS', desc:'水果千層', img:'https://placehold.co/200x200/orange/white?text=Cake', link:searchMap('HARBS')}], 'Kamakura': [{name:'Bills', desc:'海景鬆餅', img:'https://placehold.co/200x200/teal/white?text=Pancake', link:searchMap('Bills Shichirigahama')}], 'Fuji': [{name:'Houtou Fudou', desc:'餺飥麵', img:'https://placehold.co/200x200/blue/white?text=Noodle', link:searchMap('Houtou Fudou')}] });
             const foodLoc = ref('Tokyo');
-            const photoSpots = ref({ 'Tokyo': [{name:'SHIBUYA SKY', img:'https://placehold.co/300x200/FFD1DC/555?text=Sky', link:'http://googleusercontent.com/maps.google.com/search?q=SHIBUYA+SKY'}], 'Kamakura': [{name:'高校前平交道', img:'https://placehold.co/300x200/A2D2FF/555?text=Train', link:'http://googleusercontent.com/maps.google.com/search?q=Kamakura+Kokomae'}], 'Fuji': [{name:'本町通', img:'https://placehold.co/300x200/FFF5BA/555?text=Street', link:'http://googleusercontent.com/maps.google.com/search?q=Honcho+Street'}] });
+            const photoSpots = ref({ 'Tokyo': [{name:'SHIBUYA SKY', img:'https://placehold.co/300x200/FFD1DC/555?text=Sky', link:searchMap('SHIBUYA SKY')}], 'Kamakura': [{name:'高校前平交道', img:'https://placehold.co/300x200/A2D2FF/555?text=Train', link:searchMap('Kamakura Kokomae')}], 'Fuji': [{name:'本町通', img:'https://placehold.co/300x200/FFF5BA/555?text=Street', link:searchMap('Honcho Street')}] });
             const photoArea = ref('Tokyo');
             const japanesePhrases = ref([{jp:'すみません', tw:'不好意思'}, {jp:'これをお願いします', tw:'我要這個'}, {jp:'お会計お願いします', tw:'結帳'}]);
-            const hotels = ref([{name:'錦糸町 Sumida City', days:'Day 1-2', link:'https://maps.app.goo.gl/8o6Bxb1TM5MxuvFm8'}, {name:'Megu Fuji 2021', days:'Day 3-4', link:'https://www.google.com/maps/search/?api=1&query=Megu+Fuji+2021'}, {name:'DOMO 飯店', days:'Day 5-7', link:'https://www.google.com/maps/search/?api=1&query=DOMO+HOTEL+Tokyo'}]);
-            const defaultPrep = ['護照', '日幣', '信用卡', 'SIM卡', '衣服'];
+            const hotels = ref([{name:'錦糸町 Sumida City', days:'Day 1-2', link:searchMap('錦系町 Sumida City')}, {name:'Megu Fuji 2021', days:'Day 3-4', link:searchMap('Megu Fuji 2021')}, {name:'DOMO 飯店', days:'Day 5-7', link:searchMap('DOMO 飯店 東京')}]);
 
             const showModal=ref(false), showCommonModal=ref(false), showExpenseModal=ref(false), showSyncModal=ref(false), isEditing=ref(false), editIndex=ref(-1), editForm=ref({}), commonType = ref(''), newCommon = ref({text1:'', text2:''}), syncCode=ref(''), syncMsg=ref('');
 
@@ -611,7 +540,7 @@
 
             const goHome = () => { currentView.value = 'home'; prepMode.value = 'select'; moneyMode.value = 'select'; };
             const getPageTitle = (v) => apps.find(a=>a.view==v)?.name || '';
-            const getMapLink = (k) => k ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k)}` : '#';
+            const getMapLink = (k) => k ? searchMap(k) : '#';
             const getBorderColor = (c) => ({'Flight':'border-gray-400','Sightseeing':'border-pink-300','Food':'border-orange-300','Shopping':'border-purple-300','Transport':'border-blue-300'}[c]||'border-gray-300');
             const getCategoryColor = (c) => ({'Flight':'bg-gray-400','Sightseeing':'bg-pink-300','Food':'bg-orange-300','Shopping':'bg-purple-300','Transport':'bg-blue-300'}[c]||'bg-gray-300');
             const getCategoryName = (c) => ({'Flight':'飛機','Sightseeing':'景點','Food':'美食','Shopping':'購物','Transport':'交通'}[c]||'其他');
@@ -630,8 +559,8 @@
             const addExpense = () => { if(newExpense.value.name && newExpense.value.amount) { expenses.value.push({id:Date.now(), user:currentUserId.value, ...newExpense.value, date:`${new Date().getMonth()+1}/${new Date().getDate()}`}); showExpenseModal.value=false; }};
             const deleteExpense = (id) => { if(confirm('刪除?')) expenses.value = expenses.value.filter(e=>e.id!==id); };
             const openAddCommonModal = (type) => { commonType.value=type; newCommon.value={text1:'', text2:''}; showCommonModal.value=true; };
-            const saveCommonItem = () => { const t1 = newCommon.value.text1; if(commonType.value === 'jp') { japanesePhrases.value.push({jp:t1, tw:newCommon.value.text2}); } else if(commonType.value === 'shop') { shoppingList.value[shopCat.value].push({name:t1, img:`https://placehold.co/200x200/FFD1DC/555?text=${t1}`}); } else if(commonType.value === 'food') { foodList.value[foodLoc.value].push({name:t1, desc:'新增', img:`https://placehold.co/200x200/orange/white?text=${t1}`, link:`http://googleusercontent.com/maps.google.com/search?q=${t1}`}); } else if(commonType.value === 'photo') { photoSpots.value[photoArea.value].push({name:t1, img:`https://placehold.co/300x200/FFD1DC/555?text=${t1}`, link:`http://googleusercontent.com/maps.google.com/search?q=${t1}`}); } showCommonModal.value=false; };
-            const doGoogleSearch = () => { if(searchQuery.value) window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery.value)}`); };
+            const saveCommonItem = () => { const t1 = newCommon.value.text1; if(commonType.value === 'jp') { japanesePhrases.value.push({jp:t1, tw:newCommon.value.text2}); } else if(commonType.value === 'shop') { shoppingList.value[shopCat.value].push({name:t1, img:`https://placehold.co/200x200/FFD1DC/555?text=${t1}`}); } else if(commonType.value === 'food') { foodList.value[foodLoc.value].push({name:t1, desc:'新增', img:`https://placehold.co/200x200/orange/white?text=${t1}`, link:searchMap(t1)}); } else if(commonType.value === 'photo') { photoSpots.value[photoArea.value].push({name:t1, img:`https://placehold.co/300x200/FFD1DC/555?text=${t1}`, link:searchMap(t1)}); } showCommonModal.value=false; };
+            const doGoogleSearch = () => { if(searchQuery.value) window.open(searchMap(searchQuery.value)); };
             const speak = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; u.rate = 0.9; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); };
             const startCamera = async () => { showCamera.value = true; try { const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); if(videoRef.value) videoRef.value.srcObject = s; } catch(e) { alert('相機啟動失敗 (需HTTPS)'); showCamera.value=false; }};
             const stopCamera = () => { if(videoRef.value && videoRef.value.srcObject) videoRef.value.srcObject.getTracks().forEach(t => t.stop()); showCamera.value = false; };
@@ -640,21 +569,20 @@
             const getW = async (lat,lon,refVal) => { try{ const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,cloud_cover&timezone=Asia%2FTokyo`); const d=await r.json(); refVal.value={temp:d.current.temperature_2m, icon:d.current.weather_code<=3?'🌤️':'🌧️', desc:d.current.weather_code<=3?'晴':'雨', visibility:Math.max(0,100-d.current.cloud_cover)}; }catch(e){} };
 
             onMounted(() => {
-                const s = localStorage.getItem(STORAGE_KEY);
-                if(s) { 
-                    try{ 
-                        const d=JSON.parse(s); 
-                        itineraryData.value=d.itinerary||defaultItinerary; 
-                        users.value=d.users||users.value; 
-                        expenses.value=d.expenses||[]; 
-                        shoppingList.value=d.shop||shoppingList.value;
-                        foodList.value=d.food||foodList.value;
-                        photoSpots.value=d.photo||photoSpots.value;
-                        japanesePhrases.value=d.jp||japanesePhrases.value;
-                    } catch(e){} 
-                } else {
-                    users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false})));
-                }
+                try {
+                    const s = localStorage.getItem(STORAGE_KEY);
+                    if(s) { 
+                        const d = JSON.parse(s); 
+                        itineraryData.value = d.itinerary || defaultItinerary;
+                        users.value = d.users || users.value;
+                        expenses.value = d.expenses || [];
+                        shoppingList.value = d.shop || shoppingList.value;
+                        foodList.value = d.food || foodList.value;
+                        photoSpots.value = d.photo || photoSpots.value;
+                        japanesePhrases.value = d.jp || japanesePhrases.value;
+                    } else { users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false}))); }
+                } catch(e) { users.value.forEach(u => u.list = defaultPrep.map(t => ({text:t, checked:false}))); }
+                
                 getW(35.6895, 139.6917, tokyoWeather); getW(35.3192, 139.5467, kamakuraWeather); getW(35.3606, 138.7274, fujiWeather);
                 const sc = document.getElementById('sakura-container'); for(let i=0;i<15;i++){ const e=document.createElement('div'); e.className='sakura'; e.style.left=Math.random()*100+'vw'; e.style.animationDuration=Math.random()*3+4+'s'; sc.appendChild(e); }
                 isMounted.value = true;
@@ -662,7 +590,7 @@
 
             watch([itineraryData, users, expenses, shoppingList, foodList, photoSpots, japanesePhrases], ()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify({itinerary:itineraryData.value, users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, jp:japanesePhrases.value})); }, {deep:true});
 
-            return { isMounted, currentView, hasBanner, apps, goHome, getPageTitle, searchQuery, doGoogleSearch, handleTouchStart, handleTouchEnd, tokyoWeather, kamakuraWeather, fujiWeather, foodList, shoppingList, photoSpots, japanesePhrases, hotels, tripDays, selectedDayIndex, currentDayItinerary, moneyTab, moneyMode, users, currentUser, currentUserId, userTotalExpense, filteredExpenses, settlements, editUserName, prepUser, prepMode, selectPrepUser, selectMoneyUser, currentPrepList, addPrepItem, openAddModal, editItem, saveItem, deleteItem, showModal, editForm, isEditing, openExpenseModal, addExpense, showExpenseModal, newExpense, deleteExpense, getBorderColor, getCategoryColor, getCategoryName, getMapLink, getExpenseIcon, getUserById, showCommonModal, commonType, newCommon, openAddCommonModal, saveCommonItem, shopCat, foodLoc, photoArea, showCamera, videoRef, startCamera, stopCamera, speak, showSyncModal, syncCode, syncMsg, generateSyncCode, pasteSyncCode };
+            return { isMounted, currentView, hasBanner, apps, goHome, getPageTitle, searchQuery, doGoogleSearch, handleTouchStart, handleTouchEnd, tokyoWeather, kamakuraWeather, fujiWeather, foodList, shoppingList, photoSpots, japanesePhrases, hotels, tripDays, selectedDayIndex, currentDayItinerary, moneyTab, moneyMode, users, currentUser, currentUserId, userTotalExpense, filteredExpenses, settlements, getUserById, editUserName, prepUser, prepMode, selectPrepUser, selectMoneyUser, currentPrepList, addPrepItem, openAddModal, editItem, saveItem, deleteItem, showModal, editForm, isEditing, openExpenseModal, addExpense, showExpenseModal, newExpense, deleteExpense, getBorderColor, getCategoryColor, getCategoryName, getMapLink, getExpenseIcon, showCommonModal, commonType, newCommon, openAddCommonModal, saveCommonItem, shopCat, foodLoc, photoArea, showCamera, videoRef, startCamera, stopCamera, speak, showSyncModal, syncCode, syncMsg, generateSyncCode, pasteSyncCode };
         }
     }).mount('#app');
 </script>
