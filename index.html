@@ -3,12 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>關東之旅 | 櫻花吉伊卡哇 V16</title>
+    <title>關東之旅 | 櫻花吉伊卡哇 V17</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.onerror = function(msg, url, line, col, error) {
+            document.getElementById('loading-text').innerText = "發生錯誤，請重整頁面";
+            alert("系統偵測到錯誤：\n" + msg);
+            return false;
+        };
+    </script>
 
     <script>
         tailwind.config = {
@@ -26,9 +34,11 @@
                     animation: {
                         'float': 'float 3s ease-in-out infinite',
                         'bounce-slow': 'bounce 3s infinite',
+                        'wiggle': 'wiggle 2s linear infinite',
                     },
                     keyframes: {
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } },
+                        wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } }
                     }
                 }
             }
@@ -52,24 +62,20 @@
         .app-icon:active { transform: scale(0.9); }
         .app-label { font-size: 12px; font-weight: bold; color: #5D5D5D; text-align: center; }
         
-        /* 擬真插畫濾鏡 */
-        .illustrate-img { filter: saturate(1.4) contrast(1.1) brightness(1.05); }
+        /* 擬真插畫濾鏡 (讓照片看起來像插畫) */
+        .illustrate-img { filter: saturate(1.3) contrast(1.1) brightness(1.05); }
 
         /* Buttons */
         .fab-main { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; z-index: 50; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: transform 0.1s; }
         .fab-main:active { transform: scale(0.9); }
         .vjw-btn { position: fixed; bottom: 100px; right: 20px; background: linear-gradient(45deg, #FF9A9E 0%, #FECFEF 99%); color: white; padding: 10px 16px; border-radius: 50px; font-weight: bold; font-size: 14px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); animation: float 3s infinite; }
-        .coupon-btn { position: fixed; bottom: 160px; right: 20px; background: linear-gradient(45deg, #f6d365 0%, #fda085 100%); color: white; padding: 8px 14px; border-radius: 50px; font-weight: bold; font-size: 13px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); }
+        .coupon-btn { position: fixed; bottom: 160px; right: 20px; background: linear-gradient(45deg, #f6d365 0%, #fda085 100%); color: white; padding: 8px 14px; border-radius: 50px; font-weight: bold; font-size: 13px; z-index: 45; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); animation: wiggle 3s infinite; }
         
-        /* Avatars */
+        /* 吉伊卡哇小圓圖 */
         .chii-select-card { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 20px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; height: 100%; border: 2px solid white; }
         .chii-select-card:active { transform: scale(0.95); }
         .chii-avatar-lg { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 8px; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* Camera */
-        .camera-frame { position: fixed; inset: 0; background: black; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .scan-box { width: 250px; height: 250px; border: 4px solid #00ff00; position: absolute; box-shadow: 0 0 20px #00ff00, inset 0 0 20px #00ff00; }
-
         /* Search */
         .floating-search { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 40; }
 
@@ -82,9 +88,9 @@
 
 <div id="app" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
     
-    <div id="loading-screen" v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
+    <div v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
         <i class="fa-solid fa-spinner fa-spin text-4xl text-chii-pink mb-4"></i>
-        <div class="text-chii-text font-bold">載入美好旅程 V16...</div>
+        <div id="loading-text" class="text-chii-text font-bold">載入櫻花季 V17...</div>
     </div>
 
     <div v-if="isMounted" v-cloak class="min-h-screen pb-24 relative z-10">
@@ -106,11 +112,11 @@
                 <div class="absolute bottom-6 right-6 text-white text-right drop-shadow-md">
                     <h1 class="text-3xl font-black">關東之旅 🌸</h1>
                     <div class="mt-2 text-sm bg-white/30 backdrop-blur-md px-3 py-1 rounded-full inline-block">
-                        <i class="fa-solid fa-car mr-1"></i>V16 究極版
+                        <i class="fa-solid fa-car mr-1"></i>吉伊卡哇 V17
                     </div>
                 </div>
                 <button @click="showSyncModal = true" class="absolute top-4 right-4 bg-white/40 backdrop-blur text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-sm border border-white/50">
-                    <i class="fa-solid fa-rotate mr-1"></i>備份/同步
+                    <i class="fa-solid fa-rotate mr-1"></i>備份
                 </button>
             </div>
 
@@ -147,11 +153,12 @@
                                 <span class="text-xs font-bold px-2 py-0.5 rounded text-white" :class="getCategoryColor(item.category)">{{ getCategoryName(item.category) }}</span>
                                 <span class="text-xs text-gray-400 font-mono"><i class="fa-regular fa-clock mr-1"></i>{{ item.hours }}</span>
                             </div>
-                            <h3 class="font-bold text-gray-800 text-lg">{{ item.name }}
-                                <a :href="getMapLink(item.mapKeyword)" target="_blank" @click.stop class="ml-1 text-blue-400"><i class="fa-solid fa-location-arrow"></i></a>
+                            <h3 class="font-bold text-gray-800 text-lg">
+                                {{ item.name }}
+                                <a :href="getMapLink(item.mapKeyword)" target="_blank" @click.stop class="ml-1 text-blue-400 hover:text-blue-600"><i class="fa-solid fa-location-arrow"></i></a>
                             </h3>
-                            <p v-if="item.parking" class="text-xs mt-1 text-blue-500 font-bold bg-blue-50 p-1 rounded inline-block cursor-pointer hover:bg-blue-100" @click.stop="window.open(item.parking)">
-                                <i class="fa-solid fa-square-parking mr-1"></i>推薦停車場
+                            <p v-if="item.parking" class="text-xs mt-1 text-blue-500 font-bold bg-blue-50 p-2 rounded inline-block cursor-pointer hover:bg-blue-100" @click.stop="window.open(item.parking)">
+                                <i class="fa-solid fa-square-parking mr-1"></i> 🅿️ 導航至停車場
                             </p>
                             <p class="text-sm text-gray-500 mt-2 whitespace-pre-line">{{ item.note }}</p>
                         </div>
@@ -159,7 +166,7 @@
                     </div>
                 </div>
             </div>
-            <button @click="openAddModal" class="fab-main bg-chii-pink hover:bg-pink-400"><i class="fa-solid fa-plus"></i></button>
+            <button @click="openAddModal" class="fab-main bg-chii-pink animate-bounce-slow hover:bg-pink-400"><i class="fa-solid fa-plus"></i></button>
         </div>
 
         <div v-if="currentView === 'prep'" class="px-4">
@@ -173,8 +180,8 @@
                     <li>自駕：台灣駕照 + 日文譯本</li>
                 </ul>
                 <div class="mt-3 pt-3 border-t border-yellow-200 flex gap-2">
-                    <a href="https://rent.toyota.co.jp/zh-tw/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Toyota租車</a>
-                    <a href="https://www.nipponrentacar.co.jp/en/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Nippon租車</a>
+                    <a href="https://rent.toyota.co.jp/zh-tw/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Toyota</a>
+                    <a href="https://www.nipponrentacar.co.jp/en/" target="_blank" class="bg-white text-yellow-600 px-3 py-1 rounded text-xs font-bold border border-yellow-200">Nippon</a>
                 </div>
             </div>
 
@@ -197,7 +204,7 @@
                         <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm" :style="{backgroundColor: getUserById(prepUser).bg}">{{ getUserById(prepUser).icon }}</span>
                         {{ getUserById(prepUser).name }} 的清單
                     </h3>
-                    <button @click="prepMode = 'select'" class="text-sm bg-white px-3 py-1 rounded-full shadow text-gray-500"><i class="fa-solid fa-users mr-1"></i>換人</button>
+                    <button @click="prepMode = 'select'" class="text-sm bg-white px-3 py-1 rounded-full shadow text-gray-500"><i class="fa-solid fa-users mr-1"></i>切換</button>
                 </div>
                 <div class="card p-5 min-h-[300px] mb-20 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-2" :style="{backgroundColor: getUserById(prepUser).bg}"></div>
@@ -252,7 +259,10 @@
                         <div v-for="exp in filteredExpenses" :key="exp.id" class="card p-3 flex justify-between items-center">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-lg shadow-inner">{{ getExpenseIcon(exp.category) }}</div>
-                                <div><div class="font-bold text-gray-700 text-sm">{{ exp.name }}</div><div class="text-xs text-gray-400">{{ exp.date }} · {{ exp.category }}</div></div>
+                                <div>
+                                    <div class="font-bold text-gray-700 text-sm">{{ exp.name }}</div>
+                                    <div class="text-xs text-gray-400">{{ exp.date }} · {{ exp.category }}</div>
+                                </div>
                             </div>
                             <div class="text-right">
                                 <div class="font-bold text-gray-800">¥{{ Number(exp.amount).toLocaleString() }}</div>
@@ -268,7 +278,7 @@
                 <div class="card p-6 border-l-4 border-chii-blue">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-gray-700"><i class="fa-solid fa-calculator text-blue-400"></i> 分帳建議</h3>
                     <div class="flex justify-center gap-3 mb-4">
-                        <div v-for="user in users" :key="user.id" class="flex flex-col items-center">
+                        <div v-for="user in users" :key="user.id" class="flex flex-col items-center cursor-pointer" @click="editUserName(user)">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs text-white" :style="{backgroundColor:user.bg}">{{ user.icon }}</div>
                             <span class="text-[10px] text-gray-400 mt-1">{{ user.name }}</span>
                         </div>
@@ -277,7 +287,9 @@
                     <div v-else class="space-y-3">
                         <div v-for="(s, idx) in settlements" :key="idx" class="flex items-center justify-between bg-blue-50 p-4 rounded-xl">
                             <div class="flex items-center gap-2 text-sm font-bold">
-                                <span class="text-red-500">{{ getUserById(s.from).name }}</span><i class="fa-solid fa-arrow-right text-gray-300 text-xs"></i><span class="text-green-600 bg-white px-2 py-0.5 rounded shadow-sm">給 {{ getUserById(s.to).name }}</span>
+                                <span class="text-red-500">{{ getUserById(s.from).name }}</span>
+                                <i class="fa-solid fa-arrow-right text-gray-300 text-xs"></i>
+                                <span class="text-green-600 bg-white px-2 py-0.5 rounded shadow-sm">給 {{ getUserById(s.to).name }}</span>
                             </div>
                             <div class="font-bold text-gray-800 text-lg">¥{{ s.amount.toLocaleString() }}</div>
                         </div>
@@ -352,17 +364,7 @@
         </div>
 
         <div v-if="currentView === 'japanese'" class="px-4">
-            <div v-if="showCamera" class="camera-frame">
-                <video ref="videoRef" autoplay playsinline class="w-full h-full object-cover opacity-80"></video>
-                <div class="scan-box"></div>
-                <div class="absolute bottom-10 text-white text-center w-full">
-                    <p class="mb-4 font-bold text-lg shadow-black drop-shadow-md">掃描中...</p>
-                    <button @click="stopCamera" class="bg-red-500 text-white px-6 py-2 rounded-full font-bold">關閉相機</button>
-                </div>
-            </div>
-            <button @click="startCamera" class="w-full mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-lg font-bold"><i class="fa-solid fa-camera"></i> 啟動相機 (模擬)</button>
-            
-            <div class="space-y-3 pb-24">
+            <div class="space-y-3 pb-24 mt-4">
                 <div v-for="(phrase, idx) in japanesePhrases" :key="idx" @click="speak(phrase.jp)" class="card p-4 flex items-center justify-between cursor-pointer active:scale-95 transition border-l-4 border-green-400 hover:bg-green-50 relative">
                     <div><div class="font-bold text-lg text-gray-800">{{ phrase.jp }}</div><div class="text-xs text-gray-400 font-mono mb-1">{{ phrase.tw }}</div></div>
                     <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600"><i class="fa-solid fa-volume-high"></i></div>
@@ -427,8 +429,9 @@
             <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl relative">
                 <button @click="showSyncModal=false" class="absolute top-4 right-4 text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
                 <h3 class="font-bold text-xl mb-2 text-center text-chii-text">☁️ 同步/存檔</h3>
+                <p class="text-xs text-gray-400 text-center mb-4">資料已自動儲存在此手機。<br>若要備份或換手機，請使用下方功能。</p>
                 <div class="bg-gray-50 p-3 rounded-xl mb-4 break-all text-xs text-gray-500 font-mono h-24 overflow-y-auto border">{{ syncCode || '點擊匯出...' }}</div>
-                <div class="grid grid-cols-2 gap-3"><button @click="generateSyncCode" class="py-2 bg-blue-100 text-blue-600 rounded-lg font-bold text-sm">匯出</button><button @click="pasteSyncCode" class="py-2 bg-pink-100 text-pink-600 rounded-lg font-bold text-sm">貼上</button></div>
+                <div class="grid grid-cols-2 gap-3"><button @click="generateSyncCode" class="py-2 bg-blue-100 text-blue-600 rounded-lg font-bold text-sm">匯出代碼</button><button @click="pasteSyncCode" class="py-2 bg-pink-100 text-pink-600 rounded-lg font-bold text-sm">貼上代碼</button></div>
                 <div v-if="syncMsg" class="text-center text-xs mt-3 font-bold text-green-500">{{ syncMsg }}</div>
             </div>
         </div>
@@ -441,7 +444,8 @@
 
     createApp({
         setup() {
-            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v16', searchQuery = ref(''), showCamera = ref(false), videoRef = ref(null);
+            // === Init State ===
+            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v17', searchQuery = ref('');
             
             // Users
             const defaultUsers = [
@@ -488,7 +492,7 @@
             const defaultItinerary = [
                 [{ id: 1, category: 'Flight', name: '桃園起飛 (06:40)', hours: '06:40', mapKeyword: '桃園機場' }, { id: 2, category: 'Flight', name: '抵達成田 (10:40)', hours: '10:40', mapKeyword: '成田機場' }, { id: 3, category: 'Sightseeing', name: '晴空塔', hours: '下午', mapKeyword: 'Tokyo Skytree' }, { id: 4, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', mapKeyword: '錦糸町美食' }],
                 [{ id: 5, category: 'Sightseeing', name: '淺草寺', hours: '上午', mapKeyword: '淺草寺' }, { id: 6, category: 'Food', name: '午餐：淺草周遭', hours: '中午', mapKeyword: '淺草午餐' }, { id: 7, category: 'Sightseeing', name: '小網神社', hours: '下午', mapKeyword: '小網神社' }, { id: 8, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', mapKeyword: '上野恩賜公園' }, { id: 9, category: 'Shopping', name: '秋葉原/東京一番街', hours: '晚上', mapKeyword: '東京站一番街' }],
-                [{ id: 10, category: 'Transport', name: '錦糸町前往富士山(租車)', hours: '上午', mapKeyword: '河口湖租車' }, { id: 11, category: 'Sightseeing', name: '河口湖自然生活館', hours: '下午', mapKeyword: '河口湖自然生活館', parking:searchMap('大石公園駐車場') }, { id: 12, category: 'Sightseeing', name: '新倉富士淺間神社', hours: '下午', mapKeyword: '新倉富士淺間神社', parking:searchMap('下吉田駅駐車場') }, { id: 13, category: 'Sightseeing', name: '金鳥居', hours: '傍晚', mapKeyword: '富士吉田本町通', parking:searchMap('本町二丁目駐車場') }, { id: 14, category: 'Food', name: '晚餐', hours: '晚上', mapKeyword: '富士吉田晚餐' }],
+                [{ id: 10, category: 'Transport', name: '錦糸町前往富士山(租車)', hours: '上午', mapKeyword: '河口湖租車' }, { id: 11, category: 'Sightseeing', name: '河口湖自然生活館', hours: '下午', mapKeyword: '河口湖自然生活館', parking:'http://googleusercontent.com/maps.google.com/search?q=大石公園駐車場' }, { id: 12, category: 'Sightseeing', name: '新倉富士淺間神社', hours: '下午', mapKeyword: '新倉富士淺間神社', parking:'http://googleusercontent.com/maps.google.com/search?q=下吉田駅駐車場' }, { id: 13, category: 'Sightseeing', name: '金鳥居', hours: '傍晚', mapKeyword: '富士吉田本町通', parking:'http://googleusercontent.com/maps.google.com/search?q=本町二丁目駐車場' }, { id: 14, category: 'Food', name: '晚餐', hours: '晚上', mapKeyword: '富士吉田晚餐' }],
                 [{ id: 15, category: 'Sightseeing', name: '平野之濱日出', hours: '清晨', mapKeyword: '平野之濱' }, { id: 16, category: 'Sightseeing', name: '長池親水公園', hours: '上午', mapKeyword: '長池親水公園', parking:searchMap('長池親水公園駐車場') }, { id: 17, category: 'Food', name: '午餐', hours: '中午', mapKeyword: '山中湖美食' }, { id: 18, category: 'Sightseeing', name: 'KABA 水陸巴士', hours: '下午', mapKeyword: '山中湖KABA', parking:searchMap('山中湖旭日丘駐車場') }, { id: 19, category: 'Food', name: 'Ogino超市', hours: '晚上', mapKeyword: 'Ogino河口湖店', parking:searchMap('Ogino河口湖店駐車場') }],
                 [{ id: 20, category: 'Sightseeing', name: '河口湖纜車', hours: '早上', mapKeyword: '河口湖富士山全景纜車', parking:searchMap('河口湖畔県営無料駐車場') }, { id: 21, category: 'Shopping', name: 'Fujisan Shokupan', hours: '點心', mapKeyword: 'Fujisan Shokupan' }, { id: 22, category: 'Transport', name: '搭乘富士回遊返新宿', hours: '下午', mapKeyword: '河口湖站' }, { id: 23, category: 'Shopping', name: '池袋太陽城', hours: '傍晚', mapKeyword: '池袋太陽城' }, { id: 24, category: 'Food', name: '晚餐', hours: '晚上', mapKeyword: '池袋太陽城美食' }],
                 [{ id: 25, category: 'Transport', name: '前往藤澤', hours: '上午', mapKeyword: '藤澤站' }, { id: 26, category: 'Sightseeing', name: '江之島/鎌倉高校前', hours: '全天', mapKeyword: '江之島' }, { id: 27, category: 'Food', name: '午餐：七里濱', hours: '中午', mapKeyword: '七里濱Bills' }, { id: 28, category: 'Transport', name: '返回新宿', hours: '傍晚', mapKeyword: '新宿站' }],
@@ -508,15 +512,15 @@
                 'souvenir': [{name:'NY Perfect Cheese', img:'https://placehold.co/200x200/FFF5BA/555?text=Cheese'}, {name:'Press Butter Sand', img:'https://placehold.co/200x200/FFF5BA/555?text=Butter'}] 
             });
             const shopCat = ref('wish');
-            const foodList = ref({ 'Tokyo': [{name:'AFURI拉麵', desc:'柚子鹽拉麵', img:'https://placehold.co/200x200/orange/white?text=Ramen', link:searchMap('AFURI')}, {name:'HARBS', desc:'水果千層', img:'https://placehold.co/200x200/orange/white?text=Cake', link:searchMap('HARBS')}], 'Kamakura': [{name:'Bills', desc:'海景鬆餅', img:'https://placehold.co/200x200/teal/white?text=Pancake', link:searchMap('Bills Shichirigahama')}], 'Fuji': [{name:'Houtou Fudou', desc:'餺飥麵', img:'https://placehold.co/200x200/blue/white?text=Noodle', link:searchMap('Houtou Fudou')}] });
+            const foodList = ref({ 'Tokyo': [{name:'AFURI拉麵', desc:'柚子鹽拉麵', img:'https://placehold.co/200x200/orange/white?text=Ramen', link:searchMap('AFURI')}, {name:'HARBS', desc:'水果千層', img:'https://placehold.co/200x200/orange/white?text=Cake', link:searchMap('HARBS')}, {name:'敘敘苑', desc:'燒肉', img:'https://placehold.co/200x200/orange/white?text=BBQ', link:searchMap('Jojoen')}, {name:'淺草炸肉餅', desc:'小吃', img:'https://placehold.co/200x200/orange/white?text=Meat', link:searchMap('Asakusa Menchi')}, {name:'牛かつもと村', desc:'炸牛排', img:'https://placehold.co/200x200/orange/white?text=Beef', link:searchMap('Motomura')}], 'Kamakura': [{name:'Bills', desc:'海景鬆餅', img:'https://placehold.co/200x200/teal/white?text=Pancake', link:searchMap('Bills Shichirigahama')}, {name:'Caraway', desc:'咖哩', img:'https://placehold.co/200x200/teal/white?text=Curry', link:searchMap('Caraway Kamakura')}, {name:'Pacific Drive In', desc:'咖啡', img:'https://placehold.co/200x200/teal/white?text=Cafe', link:searchMap('Pacific Drive In')}, {name:'豐島屋', desc:'鴿子餅乾', img:'https://placehold.co/200x200/teal/white?text=Cookie', link:searchMap('Toshimaya')}, {name:'鎌倉釜飯', desc:'吻仔魚', img:'https://placehold.co/200x200/teal/white?text=Rice', link:searchMap('Kamakura Kamameshi')}], 'Fuji': [{name:'Houtou Fudou', desc:'餺飥麵', img:'https://placehold.co/200x200/blue/white?text=Noodle', link:searchMap('Houtou Fudou')}, {name:'Fujisan Shokupan', desc:'吐司', img:'https://placehold.co/200x200/blue/white?text=Toast', link:searchMap('Fujisan Shokupan')}, {name:'Lake Bake', desc:'麵包', img:'https://placehold.co/200x200/blue/white?text=Bread', link:searchMap('Lake Bake')}, {name:'Sanrokuen', desc:'爐端燒', img:'https://placehold.co/200x200/blue/white?text=Grill', link:searchMap('Sanrokuen')}, {name:'Ogino', desc:'超市', img:'https://placehold.co/200x200/blue/white?text=Supermarket', link:searchMap('Ogino Kawaguchiko')}] });
             const foodLoc = ref('Tokyo');
-            const photoSpots = ref({ 'Tokyo': [{name:'SHIBUYA SKY', img:'https://placehold.co/300x200/FFD1DC/555?text=Sky', link:searchMap('SHIBUYA SKY')}], 'Kamakura': [{name:'高校前平交道', img:'https://placehold.co/300x200/A2D2FF/555?text=Train', link:searchMap('Kamakura Kokomae')}], 'Fuji': [{name:'本町通', img:'https://placehold.co/300x200/FFF5BA/555?text=Street', link:searchMap('Honcho Street')}] });
+            const photoSpots = ref({ 'Tokyo': [{name:'SHIBUYA SKY', img:'https://placehold.co/300x200/FFD1DC/555?text=Sky', link:searchMap('SHIBUYA SKY')}, {name:'東京鐵塔', img:'https://placehold.co/300x200/FFD1DC/555?text=Tower', link:searchMap('Tokyo Tower')}, {name:'淺草寺', img:'https://placehold.co/300x200/FFD1DC/555?text=Temple', link:searchMap('Sensoji')}, {name:'東京車站', img:'https://placehold.co/300x200/FFD1DC/555?text=Station', link:searchMap('Tokyo Station')}, {name:'麻布台Hills', img:'https://placehold.co/300x200/FFD1DC/555?text=Hills', link:searchMap('Azabudai Hills')}], 'Kamakura': [{name:'高校前平交道', img:'https://placehold.co/300x200/A2D2FF/555?text=Train', link:searchMap('Kamakura Kokomae')}, {name:'七里濱', img:'https://placehold.co/300x200/A2D2FF/555?text=Beach', link:searchMap('Shichirigahama')}, {name:'鶴岡八幡宮', img:'https://placehold.co/300x200/A2D2FF/555?text=Shrine', link:searchMap('Tsurugaoka Hachimangu')}, {name:'高德院大佛', img:'https://placehold.co/300x200/A2D2FF/555?text=Buddha', link:searchMap('Kotoku-in')}, {name:'江之島', img:'https://placehold.co/300x200/A2D2FF/555?text=Island', link:searchMap('Enoshima')}], 'Fuji': [{name:'本町通', img:'https://placehold.co/300x200/FFF5BA/555?text=Street', link:searchMap('Honcho Street')}, {name:'新倉山淺間', img:'https://placehold.co/300x200/FFF5BA/555?text=Pagoda', link:searchMap('Chureito Pagoda')}, {name:'河口湖Lawson', img:'https://placehold.co/300x200/FFF5BA/555?text=Lawson', link:searchMap('Lawson Kawaguchiko Station')}, {name:'大石公園', img:'https://placehold.co/300x200/FFF5BA/555?text=Park', link:searchMap('Oishi Park')}, {name:'天空鳥居', img:'https://placehold.co/300x200/FFF5BA/555?text=Torii', link:searchMap('Kawaguchi Asama Shrine')}] });
             const photoArea = ref('Tokyo');
             const japanesePhrases = ref([{jp:'すみません', tw:'不好意思'}, {jp:'これをお願いします', tw:'我要這個'}, {jp:'お会計お願いします', tw:'結帳'}]);
             const hotels = ref([{name:'錦糸町 Sumida City', days:'Day 1-2', link:'https://maps.app.goo.gl/8o6Bxb1TM5MxuvFm8'}, {name:'Megu Fuji 2021', days:'Day 3-4', link:searchMap('Megu Fuji 2021')}, {name:'DOMO 飯店', days:'Day 5-7', link:searchMap('DOMO 飯店 東京')}]);
 
             // Dictionary for Auto Translate
-            const transDict = { '廁所': 'トイレはどこですか', '水': 'お水ください', '結帳': 'お会計お願いします', '謝謝': 'ありがとう', '多少錢': 'いくらですか', '推薦': 'おすすめは？', '好': 'はい', '不要': 'いいえ' };
+            const transDict = { '廁所': 'トイレはどこですか', '水': 'お水ください', '結帳': 'お会計お願いします', '謝謝': 'ありがとう', '多少錢': 'いくらですか', '推薦': 'おすすめは？', '好': 'はい', '不要': 'いいえ', '袋子':'袋いります' };
 
             const showModal=ref(false), showCommonModal=ref(false), showExpenseModal=ref(false), showSyncModal=ref(false), isEditing=ref(false), editIndex=ref(-1), editForm=ref({}), commonType = ref(''), newCommon = ref({text1:'', text2:''}), syncCode=ref(''), syncMsg=ref('');
 
@@ -576,7 +580,7 @@
             const saveCommonItem = () => { 
                 const t1 = newCommon.value.text1; 
                 if(commonType.value === 'jp') { 
-                    japanesePhrases.value.push({jp:newCommon.value.text2 || 'Translation Needed', tw:t1}); 
+                    japanesePhrases.value.push({jp:newCommon.value.text2 || '請手動輸入', tw:t1}); 
                 } else if(commonType.value === 'shop') { 
                     shoppingList.value[shopCat.value].push({name:t1, img:`https://placehold.co/200x200/FFD1DC/555?text=${t1}`}); 
                 } else if(commonType.value === 'food') { 
@@ -589,8 +593,6 @@
 
             const doGoogleSearch = () => { if(searchQuery.value) window.open(searchMap(searchQuery.value)); };
             const speak = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; u.rate = 0.9; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); };
-            const startCamera = async () => { showCamera.value = true; try { const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); if(videoRef.value) videoRef.value.srcObject = s; } catch(e) { alert('相機啟動失敗 (需HTTPS)'); showCamera.value=false; }};
-            const stopCamera = () => { if(videoRef.value && videoRef.value.srcObject) videoRef.value.srcObject.getTracks().forEach(t => t.stop()); showCamera.value = false; };
             const generateSyncCode = () => { syncCode.value=btoa(unescape(encodeURIComponent(JSON.stringify({itinerary:itineraryData.value, users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, jp:japanesePhrases.value})))); navigator.clipboard.writeText(syncCode.value); syncMsg.value='已複製'; };
             const pasteSyncCode = async () => { try { const t=await navigator.clipboard.readText(); const d=JSON.parse(decodeURIComponent(escape(atob(t)))); itineraryData.value=d.itinerary||itineraryData.value; users.value=d.users||users.value; expenses.value=d.expenses||expenses.value; shoppingList.value=d.shop||shoppingList.value; foodList.value=d.food||foodList.value; photoSpots.value=d.photo||photoSpots.value; japanesePhrases.value=d.jp||japanesePhrases.value; syncMsg.value='成功'; setTimeout(()=>showSyncModal.value=false,1500); } catch(e){syncMsg.value='錯誤';}};
             const getW = async (lat,lon,refVal) => { try{ const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,cloud_cover&timezone=Asia%2FTokyo`); const d=await r.json(); refVal.value={temp:d.current.temperature_2m, icon:d.current.weather_code<=3?'🌤️':'🌧️', desc:d.current.weather_code<=3?'晴':'雨', visibility:Math.max(0,100-d.current.cloud_cover)}; }catch(e){} };
@@ -637,7 +639,7 @@
                 openExpenseModal, addExpense, showExpenseModal, newExpense, deleteExpense,
                 getBorderColor, getCategoryColor, getCategoryName, getMapLink, getExpenseIcon,
                 showCommonModal, commonType, newCommon, openAddCommonModal, saveCommonItem, shopCat, foodLoc, photoArea,
-                showCamera, videoRef, startCamera, stopCamera, speak, autoTranslate,
+                speak, autoTranslate,
                 showSyncModal, syncCode, syncMsg, generateSyncCode, pasteSyncCode, prepMode, selectPrepUser, moneyMode, selectMoneyUser
             };
         }
