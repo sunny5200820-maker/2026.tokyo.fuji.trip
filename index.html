@@ -3,151 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 關東8日女子旅 | 雲端同步版</title>
+    <title>2026 關東8日女子旅 | 吉伊卡哇櫻花特別版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 
     <style>
+        /* --- 全站主題設定 --- */
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
-            background-color: #fff5f7;
+            background-color: #fff0f5; /* 淺粉櫻色 */
+            color: #5d4037; /* 暖棕色文字 */
             overscroll-behavior-y: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 櫻花飄落 */
+        /* 櫻花飄落背景動畫 */
         .sakura-bg {
             background-image: url('https://placehold.co/100x100/FFC0CB/ffffff?text=❀&font=roboto');
-            background-size: 50px 50px;
-            opacity: 0.1;
+            background-size: 60px 60px;
+            opacity: 0.15;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: -1;
-            animation: moveBackground 30s linear infinite;
+            animation: moveBackground 25s linear infinite;
         }
         @keyframes moveBackground {
             from { background-position: 0 0; }
             to { background-position: 100% 100%; }
         }
 
-        /* 擬真水彩 */
-        .watercolor-img {
-            filter: contrast(1.1) brightness(1.05) saturate(1.2);
-            border-radius: 12px;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        /* 吉伊卡哇風格漂浮動畫 */
+        .chiikawa-float { animation: float 3s ease-in-out infinite; }
+        .chiikawa-float-delay { animation: float 3s ease-in-out infinite; animation-delay: 1.5s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
 
-        /* 頁面切換 */
-        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+        /* 擬真水彩圖片濾鏡 (核心技術) */
+        .watercolor-img {
+            filter: contrast(1.1) brightness(1.08) saturate(1.3) blur(0.2px);
+            mask-image: radial-gradient(circle, black 60%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle, black 80%, transparent 100%);
+            border-radius: 16px;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 10px rgba(255, 182, 193, 0.4);
+            background-color: white;
+            transition: transform 0.2s;
+        }
+        .watercolor-img:active { transform: scale(0.98); }
+
+        /* 頁面切換過渡 */
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.25s ease; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
 
-        /* 吉伊卡哇懸浮 */
-        .chiikawa-float { animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        /* 模擬相機介面 */
+        .camera-overlay {
+            background: rgba(0,0,0,0.85);
+            position: fixed; inset: 0; z-index: 60;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .scan-frame {
+            width: 70%; height: 40%;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
+        }
+        .scan-line {
+            width: 100%; height: 2px; background: #ff69b4;
+            box-shadow: 0 0 10px #ff69b4;
+            animation: scan 2s linear infinite;
+        }
+        @keyframes scan { 0% {transform: translateY(-200px);} 100% {transform: translateY(200px);} }
+
+        /* 自定義滾動條 */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ffb7b2; border-radius: 4px; }
     </style>
 </head>
-<body class="text-gray-700">
+<body>
 
-<div id="app">
+<div id="app" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
     <div class="sakura-bg"></div>
 
-    <header class="fixed top-0 left-0 w-full bg-pink-100/95 backdrop-blur shadow-sm z-50 h-14 flex items-center justify-between px-4">
-        <div class="flex items-center gap-2">
-            <button v-if="currentPage !== 'home'" @click="goHome" class="text-pink-600 font-bold hover:bg-pink-200 p-2 rounded-full transition">
-                <i class="fa-solid fa-chevron-left"></i>
+    <header class="fixed top-0 left-0 w-full bg-pink-100/95 backdrop-blur-md shadow-sm z-40 h-14 flex items-center justify-between px-4 border-b border-pink-200">
+        <div class="flex items-center gap-3">
+            <button v-if="currentPage !== 'home'" @click="goHome" class="text-pink-600 hover:bg-pink-200 p-2 rounded-full transition active:scale-90">
+                <i class="fa-solid fa-chevron-left text-lg"></i>
             </button>
-            <h1 class="text-lg font-bold text-pink-600 truncate">{{ pageTitle }}</h1>
+            <div class="flex flex-col">
+                <h1 class="text-base font-bold text-pink-600 tracking-wide">{{ pageTitle }}</h1>
+                <span v-if="editMode" class="text-[10px] text-pink-400 font-bold"><i class="fa-solid fa-pen"></i> 編輯模式</span>
+            </div>
         </div>
-        
         <div class="flex gap-2">
-            <button @click="generateShareLink" class="text-xs bg-pink-500 text-white px-3 py-1.5 rounded-full shadow hover:bg-pink-600 transition flex items-center gap-1">
-                <i class="fa-solid fa-link"></i> 同步/存檔
-            </button>
+            <div v-if="savedMessage" class="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full fade-enter-active">
+                <i class="fa-solid fa-check"></i> 已存檔
+            </div>
         </div>
     </header>
 
-    <div class="h-16"></div>
-
-    <transition name="fade" mode="out-in">
+    <div class="h-16"></div> <transition name="fade" mode="out-in">
         
         <div v-if="currentPage === 'home'" key="home" class="px-4 pb-24">
-            <div class="bg-white rounded-2xl p-6 shadow-lg mb-6 text-center border-2 border-pink-200 relative overflow-hidden">
-                <img src="https://placehold.co/600x200/FFEFF4/FF69B4?text=Tokyo+Trip+2026&font=playfair" class="w-full h-32 object-cover rounded-xl mb-4 watercolor-img">
-                <h2 class="text-2xl font-bold text-pink-600">關東8日女子旅</h2>
-                <p class="text-xs text-gray-500 mt-1">東京・鎌倉・富士山自駕</p>
-                <div class="absolute -bottom-2 right-2 chiikawa-float">
-                    <div class="bg-white/90 border border-pink-300 rounded-lg p-2 shadow text-center">
-                        <div class="text-[10px] text-pink-500">倒數</div>
-                        <div class="text-lg font-black text-pink-600">{{ countdownDays }} <span class="text-xs">天</span></div>
-                    </div>
+            
+            <div class="relative bg-white rounded-3xl p-6 shadow-xl mb-6 text-center border-4 border-pink-100 overflow-hidden group">
+                <div class="absolute -top-4 -left-4 w-16 h-16 bg-yellow-100 rounded-full opacity-50 blur-xl"></div>
+                <div class="absolute bottom-0 right-0 text-6xl opacity-10 rotate-12">🌸</div>
+                
+                <img src="https://placehold.co/600x250/FFEFF4/FF69B4?text=2026+Tokyo+Trip&font=playfair" class="w-full h-36 object-cover rounded-2xl mb-4 watercolor-img shadow-md">
+                
+                <h2 class="text-2xl font-black text-pink-600 mb-1 tracking-wider" style="text-shadow: 1px 1px 0px #fff;">關東8日女子旅</h2>
+                <div class="flex justify-center items-center gap-2 mb-2">
+                    <span class="px-2 py-1 bg-pink-100 text-pink-500 text-xs rounded-lg font-bold">東京</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-500 text-xs rounded-lg font-bold">富士山</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-500 text-xs rounded-lg font-bold">鎌倉</span>
+                </div>
+
+                <div class="chiikawa-float absolute top-2 right-2 bg-white/90 backdrop-blur border-2 border-pink-300 rounded-2xl p-2 shadow-lg z-10 transform rotate-6">
+                    <div class="text-[10px] text-pink-500 font-bold text-center leading-tight">倒數<br>出發</div>
+                    <div class="text-xl font-black text-pink-600 text-center">{{ countdownDays }}<span class="text-xs">天</span></div>
                 </div>
             </div>
 
-            <div v-if="showSyncTip" class="bg-blue-50 text-blue-700 text-xs p-3 rounded-lg mb-4 border border-blue-200 flex justify-between items-center">
-                <span><i class="fa-solid fa-circle-info"></i> 資料已從連結載入成功！</span>
-                <button @click="showSyncTip = false"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
             <div class="grid grid-cols-2 gap-4">
-                <button @click="navigate('itinerary')" class="btn-menu border-pink-200 text-pink-500">
-                    <i class="fa-solid fa-map-location-dot text-3xl mb-2"></i>行程表
+                <button @click="navigate('itinerary')" class="p-4 bg-white rounded-2xl shadow-md border-b-4 border-pink-200 active:border-b-0 active:translate-y-1 transition flex flex-col items-center gap-2 relative overflow-hidden group">
+                    <div class="bg-pink-50 p-3 rounded-full group-hover:bg-pink-100 transition"><i class="fa-solid fa-map-location-dot text-2xl text-pink-500"></i></div>
+                    <span class="font-bold text-gray-700">行程總覽</span>
                 </button>
-                <button @click="navigate('accounting')" class="btn-menu border-yellow-200 text-yellow-500">
-                    <i class="fa-solid fa-calculator text-3xl mb-2"></i>分帳趣
+                <button @click="navigate('accounting')" class="p-4 bg-white rounded-2xl shadow-md border-b-4 border-yellow-200 active:border-b-0 active:translate-y-1 transition flex flex-col items-center gap-2 group">
+                    <div class="bg-yellow-50 p-3 rounded-full group-hover:bg-yellow-100 transition"><i class="fa-solid fa-calculator text-2xl text-yellow-500"></i></div>
+                    <span class="font-bold text-gray-700">分帳計算</span>
                 </button>
-                <button @click="navigate('shopping')" class="btn-menu border-purple-200 text-purple-500">
-                    <i class="fa-solid fa-bag-shopping text-3xl mb-2"></i>必買榜
+                <button @click="navigate('shopping')" class="p-4 bg-white rounded-2xl shadow-md border-b-4 border-purple-200 active:border-b-0 active:translate-y-1 transition flex flex-col items-center gap-2 group">
+                    <div class="bg-purple-50 p-3 rounded-full group-hover:bg-purple-100 transition"><i class="fa-solid fa-bag-shopping text-2xl text-purple-500"></i></div>
+                    <span class="font-bold text-gray-700">必買清單</span>
                 </button>
-                <button @click="navigate('preparation')" class="btn-menu border-green-200 text-green-500">
-                    <i class="fa-solid fa-suitcase-rolling text-3xl mb-2"></i>行前 & 票
+                <button @click="navigate('weather')" class="p-4 bg-white rounded-2xl shadow-md border-b-4 border-blue-200 active:border-b-0 active:translate-y-1 transition flex flex-col items-center gap-2 group">
+                    <div class="bg-blue-50 p-3 rounded-full group-hover:bg-blue-100 transition"><i class="fa-solid fa-shirt text-2xl text-blue-400"></i></div>
+                    <span class="font-bold text-gray-700">氣象穿搭</span>
                 </button>
-                <button @click="navigate('weather')" class="btn-menu border-blue-200 text-blue-400">
-                    <i class="fa-solid fa-cloud-sun-rain text-3xl mb-2"></i>氣象穿搭
+                <button @click="navigate('preparation')" class="p-4 bg-white rounded-2xl shadow-md border-b-4 border-green-200 active:border-b-0 active:translate-y-1 transition flex flex-col items-center gap-2 group">
+                    <div class="bg-green-50 p-3 rounded-full group-hover:bg-green-100 transition"><i class="fa-solid fa-ticket text-2xl text-green-500"></i></div>
+                    <span class="font-bold text-gray-700">行前 & 票券</span>
                 </button>
-                <button @click="navigate('emergency')" class="btn-menu border-red-200 text-red-500 bg-red-50">
-                    <i class="fa-solid fa-kit-medical text-3xl mb-2"></i>急救站
+                <button @click="navigate('emergency')" class="p-4 bg-red-50 rounded-2xl shadow-md border-b-4 border-red-200 active:border-b-0 active:translate-y-1 transition flex flex-col items-center gap-2 group">
+                    <div class="bg-white p-3 rounded-full shadow-sm"><i class="fa-solid fa-truck-medical text-2xl text-red-500"></i></div>
+                    <span class="font-bold text-red-600">即時救命</span>
                 </button>
+            </div>
+            
+            <div class="mt-8 text-center text-xs text-gray-400">
+                <i class="fa-brands fa-github"></i> Data saves locally (GitHub Page Ready)
             </div>
         </div>
 
         <div v-else-if="currentPage === 'itinerary'" key="itinerary" class="px-4 pb-24">
-            <div class="flex justify-between items-center mb-4">
-                <div class="text-sm text-gray-500">點擊筆可編輯內容</div>
-                <button @click="toggleEdit" :class="editMode ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-600'" class="px-4 py-1 rounded-full text-sm font-bold transition shadow">
-                    <i class="fa-solid fa-pen"></i> {{ editMode ? '完成編輯' : '編輯模式' }}
+            <div class="flex justify-between items-center mb-4 sticky top-14 bg-pink-50/95 p-2 z-30 rounded-lg backdrop-blur">
+                <span class="text-xs text-gray-500 font-bold bg-white px-2 py-1 rounded-md shadow-sm">2026.03.28 - 04.04</span>
+                <button @click="toggleEdit" :class="editMode ? 'bg-pink-500 text-white shadow-lg' : 'bg-white text-pink-600 border border-pink-200'" class="text-xs px-3 py-1.5 rounded-full font-bold transition">
+                    {{ editMode ? '完成編輯' : '編輯行程' }}
                 </button>
             </div>
+            
+            <div class="space-y-6">
+                <div v-for="(day, index) in itinerary" :key="index" class="bg-white p-5 rounded-2xl shadow-sm border-2 border-pink-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-pink-200 w-16 h-16 rounded-bl-full opacity-20 z-0"></div>
+                    <div class="absolute top-2 right-2 font-black text-4xl text-pink-100 z-0">{{ index + 1 }}</div>
 
-            <div v-for="(day, index) in itinerary" :key="index" class="mb-6 bg-white p-4 rounded-xl shadow-sm border-l-4 border-pink-400 relative">
-                <div class="absolute -right-2 -top-2 text-4xl text-pink-50 opacity-40 font-black">{{ index + 1 }}</div>
-                <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
-                    <span class="bg-pink-500 text-white text-xs px-2 py-1 rounded">Day {{ index + 1 }}</span>
-                    {{ day.area }}
-                </h3>
-                
-                <div class="space-y-4 relative z-10">
-                    <div v-for="(item, i) in day.events" :key="i" class="flex gap-3 text-sm border-b border-gray-100 pb-2 last:border-0">
-                        <div v-if="!editMode" class="w-12 font-mono text-gray-400 font-bold pt-0.5">{{ item.time }}</div>
-                        <div v-else class="w-16">
-                            <input v-model="item.time" class="w-full border rounded px-1 bg-gray-50 text-xs">
-                        </div>
-
-                        <div class="flex-1">
-                            <template v-if="!editMode">
-                                <div class="font-bold text-gray-700 text-base">{{ item.title }}</div>
-                                <div v-if="item.note" class="text-gray-500 text-xs mt-1 bg-gray-50 inline-block px-2 py-0.5 rounded">
-                                    <i class="fa-regular fa-note-sticky text-pink-300"></i> {{ item.note }}
-                                </div>
-                            </template>
-                            <template v-else>
-                                <input v-model="item.title" class="w-full border rounded px-2 py-1 mb-1 bg-gray-50 font-bold">
-                                <textarea v-model="item.note" class="w-full border rounded px-2 py-1 text-xs bg-gray-50" rows="1" placeholder="備註"></textarea>
-                            </template>
+                    <h3 class="font-bold text-lg mb-4 text-pink-600 relative z-10 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-day"></i> {{ day.date }}
+                    </h3>
+                    
+                    <div class="space-y-4 relative z-10">
+                        <div v-for="(item, i) in day.events" :key="i" class="flex gap-3 text-sm group">
+                            <div class="w-14 flex-shrink-0 pt-1">
+                                <input v-if="editMode" v-model="item.time" class="w-full bg-gray-50 border rounded px-1 text-xs">
+                                <span v-else class="font-mono font-bold text-gray-400 bg-gray-50 px-1 rounded">{{ item.time }}</span>
+                            </div>
+                            <div class="flex-1 pb-3 border-b border-dashed border-gray-100 last:border-0">
+                                <template v-if="!editMode">
+                                    <div class="font-bold text-gray-700 text-base mb-1">{{ item.title }}</div>
+                                    <div v-if="item.note" class="text-gray-500 text-xs flex items-start gap-1">
+                                        <i class="fa-solid fa-comment-dots text-pink-300 mt-0.5"></i> {{ item.note }}
+                                    </div>
+                                    <a v-if="shouldShowMap(item.title)" 
+                                       :href="getMapLink(item.title)" 
+                                       target="_blank"
+                                       class="inline-flex items-center gap-1 mt-2 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full hover:bg-blue-100 transition">
+                                       <i class="fa-solid fa-location-arrow"></i> 導航去這裡
+                                    </a>
+                                </template>
+                                <template v-else>
+                                    <input v-model="item.title" class="w-full border rounded px-2 py-1 mb-1 text-sm font-bold placeholder-gray-300" placeholder="行程標題">
+                                    <input v-model="item.note" class="w-full border rounded px-2 py-1 text-xs placeholder-gray-300" placeholder="備註細節">
+                                </template>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -155,154 +213,324 @@
         </div>
 
         <div v-else-if="currentPage === 'accounting'" key="accounting" class="px-4 pb-24">
-            <div class="bg-white p-3 rounded-xl shadow-sm mb-4 flex justify-between items-center">
-                <span class="font-bold text-gray-600">幣別切換</span>
-                <div class="flex bg-gray-100 rounded-lg p-1">
-                    <button @click="currency = 'JPY'" :class="currency==='JPY'?'bg-white shadow text-pink-600':'text-gray-400'" class="px-3 py-1 rounded text-xs font-bold transition">JPY</button>
-                    <button @click="currency = 'TWD'" :class="currency==='TWD'?'bg-white shadow text-pink-600':'text-gray-400'" class="px-3 py-1 rounded text-xs font-bold transition">TWD</button>
+            <div class="bg-white p-2 rounded-xl shadow-sm mb-4 flex justify-between items-center border border-pink-100">
+                <span class="text-xs font-bold text-gray-500 pl-2">顯示幣別 (匯率: {{exchangeRate}})</span>
+                <div class="flex bg-pink-50 rounded-lg p-1">
+                    <button @click="currencyMode = 'JPY'" :class="{'bg-white text-pink-600 shadow-sm': currencyMode === 'JPY', 'text-gray-400': currencyMode !== 'JPY'}" class="px-3 py-1 rounded-md text-xs font-bold transition">JPY</button>
+                    <button @click="currencyMode = 'TWD'" :class="{'bg-white text-pink-600 shadow-sm': currencyMode === 'TWD', 'text-gray-400': currencyMode !== 'TWD'}" class="px-3 py-1 rounded-md text-xs font-bold transition">TWD</button>
                 </div>
             </div>
 
-            <div class="bg-pink-50 p-4 rounded-xl border border-pink-200 mb-6 shadow-inner">
-                <h3 class="font-bold text-pink-600 mb-3 text-sm">記上一筆</h3>
-                <div class="flex gap-2 mb-2">
-                    <input v-model="newExp.item" placeholder="項目" class="flex-1 p-2 rounded border-none shadow-sm text-sm">
-                    <input v-model.number="newExp.amount" type="number" placeholder="日幣金額" class="w-24 p-2 rounded border-none shadow-sm text-sm">
+            <div class="bg-white rounded-2xl shadow-md p-4 mb-6 border-t-4 border-pink-400 relative">
+                <div class="absolute -top-3 left-4 bg-pink-400 text-white text-xs px-2 py-0.5 rounded">新增支出</div>
+                <div class="grid grid-cols-5 gap-2 mb-3 mt-1">
+                    <input v-model="newExpense.item" placeholder="項目 (如: 晚餐)" class="col-span-3 p-2 bg-gray-50 rounded-lg text-sm border-none focus:ring-2 focus:ring-pink-200">
+                    <input v-model.number="newExpense.amount" type="number" placeholder="¥金額" class="col-span-2 p-2 bg-gray-50 rounded-lg text-sm border-none focus:ring-2 focus:ring-pink-200">
                 </div>
-                <div class="flex gap-2 items-center">
-                    <span class="text-xs text-gray-500">誰先付:</span>
-                    <button v-for="p in ['我','旅伴']" @click="newExp.payer = p" :class="newExp.payer === p ? 'bg-pink-500 text-white' : 'bg-white text-gray-500'" class="px-3 py-1 rounded-full text-xs shadow-sm transition">{{ p }}</button>
-                    <button @click="addExp" class="ml-auto bg-gray-800 text-white px-4 py-1 rounded-lg text-xs font-bold shadow hover:bg-black">新增</button>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400">誰先墊付?</span>
+                    <div class="flex gap-2 flex-1">
+                        <button v-for="user in ['我', '旅伴']" :key="user" 
+                            @click="newExpense.payer = user"
+                            :class="newExpense.payer === user ? 'bg-pink-500 text-white' : 'bg-gray-100 text-gray-500'"
+                            class="flex-1 py-1.5 rounded-lg text-xs font-bold transition">
+                            {{ user }}
+                        </button>
+                    </div>
+                    <button @click="addExpense" class="bg-gray-800 text-white w-16 py-1.5 rounded-lg text-xs font-bold active:scale-95 transition">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl shadow border border-yellow-100 mb-6 text-center">
-                <h3 class="text-xs font-bold text-yellow-700 mb-1">目前結算 (自動對分)</h3>
-                <div v-if="balance.val === 0" class="text-green-600 font-bold">目前兩清！</div>
+            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-5 rounded-2xl shadow-sm border border-yellow-200 mb-6 text-center relative overflow-hidden">
+                <i class="fa-solid fa-coins absolute -right-3 -bottom-3 text-6xl text-yellow-200 opacity-50"></i>
+                <h3 class="text-xs font-bold text-yellow-700 tracking-widest mb-2">結算狀態 (自動對分)</h3>
+                
+                <div v-if="balanceResult.amount === 0" class="text-green-600 font-bold text-lg">
+                    <i class="fa-regular fa-circle-check"></i> 目前兩清！
+                </div>
                 <div v-else>
-                    <span class="font-bold text-gray-800">{{ balance.from }}</span> 需給 <span class="font-bold text-gray-800">{{ balance.to }}</span>
-                    <div class="text-2xl font-black text-pink-600 my-1">{{ fmt(balance.val) }}</div>
+                    <div class="flex justify-center items-end gap-2 text-gray-700 mb-1">
+                        <span class="font-bold text-lg">{{ balanceResult.debtor }}</span>
+                        <span class="text-xs pb-1">需給</span>
+                        <span class="font-bold text-lg">{{ balanceResult.creditor }}</span>
+                    </div>
+                    <div class="text-3xl font-black text-pink-500 tracking-tight">
+                        {{ formatMoney(balanceResult.amount) }}
+                    </div>
+                    <div class="text-[10px] text-gray-400 mt-1">已自動扣抵雙方墊付差額</div>
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <div v-for="(e, i) in expenses" :key="i" class="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center">
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div class="bg-gray-50 px-4 py-2 text-xs font-bold text-gray-500 flex justify-between">
+                    <span>項目</span>
+                    <span>金額</span>
+                </div>
+                <div v-for="(exp, index) in expenses" :key="index" class="p-3 border-b border-gray-100 last:border-0 flex justify-between items-center hover:bg-pink-50 transition">
                     <div>
-                        <div class="font-bold text-gray-700 text-sm">{{ e.item }}</div>
-                        <div class="text-[10px] text-gray-400">{{ e.payer }} 先付</div>
+                        <div class="font-bold text-gray-700 text-sm">{{ exp.item }}</div>
+                        <div class="text-[10px] text-gray-400 flex items-center gap-1">
+                            <span :class="exp.payer==='我'?'text-pink-400':'text-blue-400'">●</span>
+                            {{ exp.payer }} 先付
+                        </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-mono font-bold text-pink-600">{{ fmt(e.amount) }}</span>
-                        <button @click="delExp(i)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        <span class="font-mono font-bold text-gray-600 text-sm">{{ formatMoney(exp.amount) }}</span>
+                        <button @click="removeExpense(index)" class="text-gray-300 hover:text-red-400 px-2">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-else-if="currentPage === 'shopping'" class="px-4">
-             <h3 class="font-bold text-pink-600 mb-4">必買清單 (示意)</h3>
-             <div class="grid grid-cols-2 gap-4">
-                <div v-for="i in 4" class="bg-white p-2 rounded-xl shadow watercolor-img">
-                    <img src="https://placehold.co/150x150/FFEFF4/FF69B4?text=Product" class="w-full rounded mb-2">
-                    <div class="text-xs font-bold text-gray-600">熱門商品 {{i}}</div>
+        <div v-else-if="currentPage === 'shopping'" key="shopping" class="px-4 pb-24">
+            
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-pink-600 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-crown text-yellow-400"></i> Cosme 熱門賞
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div v-for="item in shopping.cosme" :key="item.name" class="bg-white rounded-2xl p-3 shadow-md border border-pink-100">
+                        <div class="relative mb-2">
+                            <img :src="item.img" class="w-full h-32 object-cover watercolor-img" alt="Product">
+                            <div class="absolute -top-2 -left-2 bg-yellow-400 text-white text-xs font-black w-6 h-6 flex items-center justify-content rounded-full shadow border-2 border-white pl-1.5">{{ item.rank }}</div>
+                        </div>
+                        <h4 class="font-bold text-sm text-gray-800 truncate">{{ item.name }}</h4>
+                        <p class="text-xs text-gray-400">{{ item.brand }}</p>
+                    </div>
                 </div>
-             </div>
-        </div>
-        
-        <div v-else-if="currentPage === 'preparation'" class="px-4">
-            <h3 class="font-bold text-green-600 mb-4">票券自動檢查</h3>
-            <button @click="checkTickets" class="w-full bg-green-500 text-white p-3 rounded-xl shadow mb-4">一鍵生成建議票券</button>
-            <div v-for="t in tickets" class="bg-white border-l-4 border-green-500 p-3 rounded shadow mb-2">
-                <div class="font-bold text-green-700">{{ t.name }}</div>
-                <div class="text-xs text-gray-500">{{ t.desc }}</div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold text-pink-600 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-blue-400"></i> LDK 毒舌雜誌推薦
+                </h3>
+                <div class="space-y-4">
+                    <div v-for="item in shopping.ldk" :key="item.name" class="bg-white rounded-2xl p-3 shadow-md flex gap-3 items-center border border-pink-100">
+                        <img :src="item.img" class="w-20 h-20 object-cover watercolor-img flex-shrink-0">
+                        <div>
+                            <span class="bg-pink-100 text-pink-600 text-[10px] px-2 py-0.5 rounded font-bold mb-1 inline-block">{{ item.category }}</span>
+                            <h4 class="font-bold text-sm text-gray-800">{{ item.name }}</h4>
+                            <p class="text-xs text-gray-500 mt-1 leading-tight">{{ item.desc }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div v-else-if="currentPage === 'weather'" class="px-4">
-            <h3 class="font-bold text-blue-500 mb-4">氣象與穿搭</h3>
-            <div class="bg-white p-4 rounded-xl shadow text-center">
-                <i class="fa-solid fa-cloud-sun text-4xl text-yellow-400 mb-2"></i>
-                <div class="font-bold">3/28 東京</div>
-                <div class="text-sm text-gray-500">12°C - 18°C</div>
-                <div class="mt-2 text-xs bg-pink-100 text-pink-600 inline-block px-2 py-1 rounded">建議：薄風衣 + 針織衫</div>
+        <div v-else-if="currentPage === 'weather'" key="weather" class="px-4 pb-24">
+            <div class="bg-gradient-to-br from-pink-400 to-pink-600 text-white rounded-2xl p-5 mb-6 shadow-lg relative overflow-hidden">
+                <div class="sakura-bg opacity-30"></div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <h3 class="font-bold text-lg"><i class="fa-solid fa-tree"></i> 2026 櫻花預測</h3>
+                        <p class="text-xs text-pink-100 opacity-90">行程期間: 3/28 - 4/04</p>
+                    </div>
+                    <div class="text-3xl chiikawa-float">🌸</div>
+                </div>
+                
+                <div class="mt-4 flex gap-2 text-center">
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1 border border-white/30">
+                        <div class="text-xs opacity-80">東京</div>
+                        <div class="font-bold text-xl">滿開中</div>
+                        <div class="text-[10px]">🌸🌸🌸🌸</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-2 flex-1 border border-white/30">
+                        <div class="text-xs opacity-80">河口湖</div>
+                        <div class="font-bold text-xl">含苞</div>
+                        <div class="text-[10px]">🌱🌱</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-gray-700 mb-3 ml-1">一週穿搭建議</h3>
+            <div class="space-y-3">
+                <div v-for="w in weatherData" :key="w.day" class="bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between border-l-4" :class="w.borderColor">
+                    <div class="text-center w-12">
+                        <div class="text-xs text-gray-400">{{ w.date }}</div>
+                        <div class="font-bold text-gray-600">Day {{ w.day }}</div>
+                    </div>
+                    <div class="text-center flex-1 px-2">
+                        <i :class="w.icon" class="text-2xl mb-1 block transition hover:scale-110"></i>
+                        <span class="text-xs font-bold">{{ w.temp }}</span>
+                    </div>
+                    <div class="w-28 bg-gray-50 rounded-lg p-2 flex flex-col items-center">
+                        <div class="text-2xl mb-1 chiikawa-float-delay">{{ w.emoji }}</div>
+                        <div class="text-[10px] text-gray-500 font-bold text-center leading-tight">{{ w.advice }}</div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div v-else-if="currentPage === 'emergency'" class="px-4">
-             <button class="w-full bg-white border-2 border-red-200 p-4 rounded-xl shadow mb-4 flex items-center gap-4">
-                <i class="fa-solid fa-camera text-2xl text-red-500"></i>
-                <div class="text-left font-bold">開啟翻譯相機</div>
-            </button>
+
+        <div v-else-if="currentPage === 'preparation'" key="preparation" class="px-4 pb-24">
+            
+            <div class="mb-6 bg-white p-4 rounded-2xl shadow-md text-center">
+                <div class="text-sm text-gray-500 mb-2">根據您的行程自動分析</div>
+                <button @click="generateTickets" class="w-full bg-gradient-to-r from-green-400 to-green-500 text-white py-3 rounded-xl shadow-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition">
+                    <i class="fa-solid fa-wand-magic-sparkles animate-pulse"></i> 生成必買票券清單
+                </button>
+            </div>
+
+            <transition-group name="fade" tag="div" class="space-y-3 mb-8">
+                <div v-for="(ticket, idx) in tickets" :key="idx" class="bg-white border-l-4 border-green-400 rounded-xl p-4 shadow-sm relative">
+                    <button @click="removeTicket(idx)" class="absolute top-2 right-2 text-gray-300"><i class="fa-solid fa-times"></i></button>
+                    <h4 class="font-bold text-green-700 text-sm">{{ ticket.name }}</h4>
+                    <p class="text-xs text-gray-500 mt-1">{{ ticket.reason }}</p>
+                    <div class="mt-2 text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded inline-block">
+                        <i class="fa-solid fa-circle-info"></i> {{ ticket.note }}
+                    </div>
+                </div>
+            </transition-group>
+
+            <h3 class="font-bold text-gray-700 mb-3 ml-1">行前檢查 Check</h3>
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <label v-for="(item, idx) in prepList" :key="idx" class="flex items-center p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition">
+                    <div class="relative flex items-center">
+                        <input type="checkbox" v-model="item.checked" class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-pink-300 checked:bg-pink-500 checked:border-pink-500 transition-all">
+                        <i class="fa-solid fa-check text-white absolute left-1 top-1 text-xs opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
+                    </div>
+                    <span :class="{'line-through text-gray-300': item.checked}" class="ml-3 text-sm font-medium text-gray-600 select-none">{{ item.text }}</span>
+                </label>
+            </div>
+        </div>
+
+        <div v-else-if="currentPage === 'emergency'" key="emergency" class="px-4 pb-24">
+            
+            <div class="text-center mb-6 mt-4">
+                <div class="inline-block p-4 rounded-full bg-red-50 border-4 border-red-100 mb-2 chiikawa-float">
+                    <i class="fa-solid fa-kit-medical text-4xl text-red-500"></i>
+                </div>
+                <h2 class="text-xl font-bold text-red-600">緊急應變中心</h2>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                <button @click="showCamera = true" class="bg-white border-2 border-pink-400 p-4 rounded-2xl shadow-md flex items-center gap-4 active:bg-pink-50 transition relative overflow-hidden">
+                    <div class="absolute right-0 top-0 bg-pink-400 text-white text-[10px] px-2 rounded-bl-lg">AI 辨識</div>
+                    <div class="bg-pink-100 p-3 rounded-full">
+                        <i class="fa-solid fa-camera text-pink-600 text-xl"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-bold text-gray-800">即時翻譯攝影機</div>
+                        <div class="text-xs text-gray-500">掃描日文菜單 / 藥妝標籤</div>
+                    </div>
+                </button>
+
+                <a href="tel:119" class="bg-white border-2 border-red-200 p-4 rounded-2xl shadow-md flex items-center gap-4 active:bg-red-50 transition">
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fa-solid fa-phone text-red-600 text-xl"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-bold text-gray-800">日本救護車 / 火警</div>
+                        <div class="text-xs text-red-500 font-bold">直撥 119 (免加國碼)</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="mt-6 bg-white p-5 rounded-2xl shadow-sm">
+                <h3 class="font-bold text-gray-700 mb-3 text-sm">緊急指差用語</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between border-b border-dashed border-gray-200 pb-2">
+                        <span class="text-sm">我不舒服</span>
+                        <div class="text-right">
+                            <div class="font-bold text-gray-800">具合が悪いです</div>
+                            <div class="text-[10px] text-gray-400">Gu-ai ga wa-rui de-su</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between border-b border-dashed border-gray-200 pb-2">
+                        <span class="text-sm">請幫我叫醫生</span>
+                        <div class="text-right">
+                            <div class="font-bold text-gray-800">医者を呼んで</div>
+                            <div class="text-[10px] text-gray-400">I-sha o yon-de</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </transition>
-</div>
 
-<style>
-    .btn-menu {
-        @apply p-4 bg-white rounded-xl shadow-md border-b-4 active:border-b-0 active:translate-y-1 transition flex flex-col items-center justify-center h-24 font-bold;
-    }
-</style>
+    <div v-if="showCamera" class="camera-overlay" @click="showCamera = false">
+        <div class="absolute top-10 w-full text-center text-white z-10">
+            <h3 class="text-xl font-bold drop-shadow-md">智慧掃描中...</h3>
+            <p class="text-sm opacity-80">請對準日文文字 (模擬)</p>
+        </div>
+        
+        <div class="scan-frame">
+            <div class="scan-line"></div>
+        </div>
+
+        <div class="absolute bottom-20 bg-white/90 backdrop-blur px-6 py-3 rounded-xl shadow-2xl animate-bounce text-center">
+            <div class="text-xs text-gray-500 mb-1">偵測到文字</div>
+            <div class="font-bold text-pink-600 text-lg">特選黑毛和牛</div>
+            <div class="text-xs text-gray-400 mt-1">(點擊畫面關閉)</div>
+        </div>
+    </div>
+
+</div>
 
 <script>
     const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
     createApp({
         setup() {
+            // --- 核心變數 ---
             const currentPage = ref('home');
             const pageTitle = ref('Home');
             const editMode = ref(false);
-            const showSyncTip = ref(false);
-            const currency = ref('JPY');
-            const exRate = 0.22;
+            const showCamera = ref(false);
+            const savedMessage = ref(false);
+            const currencyMode = ref('JPY'); 
+            const exchangeRate = 0.22; // 匯率
 
-            // --- 資料核心 ---
-            // 完整行程資料
+            // --- 資料集 (依據您提供的8天7夜行程) ---
             const itinerary = ref([
-                { area: '抵達 & 晴空塔', events: [
+                { date: '3/28 (六) 抵達 & 晴空塔', events: [
                     { time: '06:40', title: '桃園起飛 (IT200)', note: 'T1' },
-                    { time: '10:40', title: '抵達東京成田', note: '領西瓜卡' },
-                    { time: '14:00', title: '晴空塔', note: '事先購票' },
+                    { time: '10:40', title: '抵達東京成田', note: '領西瓜卡/Skyliner' },
+                    { time: '14:00', title: '晴空塔 SkyTree', note: '事先購票' },
                     { time: '18:00', title: '錦糸町晚餐', note: '燒肉或居酒屋' }
                 ]},
-                { area: '淺草 & 上野', events: [
+                { date: '3/29 (日) 淺草 & 上野', events: [
                     { time: '09:00', title: '淺草寺參拜', note: '雷門拍照' },
                     { time: '12:00', title: '午餐: 淺草周邊', note: '文字燒/天婦羅' },
                     { time: '14:00', title: '小網神社', note: '強運厄除' },
-                    { time: '15:30', title: '上野恩賜公園', note: '賞櫻' },
+                    { time: '15:30', title: '上野恩賜公園', note: '賞櫻野餐' },
                     { time: '18:00', title: '秋葉原/東京一番街', note: '逛街' },
                     { time: '20:00', title: '晚餐', note: '依逛街地決定' }
                 ]},
-                { area: '出發富士山', events: [
+                { date: '3/30 (一) 出發富士山', events: [
                     { time: '09:00', title: '錦糸町出發 -> 富士山', note: '開始租車 (3天2夜)' },
                     { time: '13:00', title: '河口湖自然生活館', note: '看富士山' },
-                    { time: '15:00', title: '新倉富士淺間神社', note: '需爬階梯' },
-                    { time: '17:00', title: '金鳥居 & 本町商店街', note: '拍照點' },
+                    { time: '15:00', title: '新倉富士淺間神社', note: '需爬階梯, 停車場要排' },
+                    { time: '17:00', title: '金鳥居 & 本町商店街', note: '注意交通安全' },
                     { time: '19:00', title: '晚餐', note: '自煮 or 商店街' }
                 ]},
-                { area: '山中湖單車', events: [
+                { date: '3/31 (二) 山中湖單車', events: [
                     { time: '05:30', title: '平野之濱日出', note: '早起注意保暖' },
                     { time: '09:00', title: '山中湖租單車', note: '長池親水公園/白鳥濱' },
                     { time: '12:00', title: '午餐: 山中湖', note: '' },
                     { time: '14:00', title: 'KABA 水陸巴士', note: '旭日丘湖畔' },
-                    { time: '18:00', title: 'Ogino 超市採買', note: '買食材回宿煮' }
+                    { time: '18:00', title: 'Ogino 河口湖超市', note: '買食材回宿煮' }
                 ]},
-                { area: '纜車 & 返回新宿', events: [
-                    { time: '09:00', title: '金鳥居補拍 / 纜車', note: '絕景鞦韆' },
+                { date: '4/01 (三) 纜車 & 返回新宿', events: [
+                    { time: '09:00', title: '河口湖纜車/絕景鞦韆', note: '早點去排隊' },
                     { time: '11:00', title: 'Fujisan shokupan', note: '買吐司伴手禮' },
                     { time: '14:00', title: '富士回遊 -> 新宿', note: '還車後搭車' },
                     { time: '17:00', title: '池袋太陽城', note: 'Check-in 放行李' },
                     { time: '19:00', title: '晚餐: 太陽城內', note: '' }
                 ]},
-                { area: '鎌倉江之電', events: [
+                { date: '4/02 (四) 鎌倉江之電', events: [
                     { time: '09:00', title: '新宿 -> 藤澤', note: '江之電一日遊' },
                     { time: '10:30', title: '江之島', note: '吻仔魚丼' },
-                    { time: '13:00', title: '鎌倉高校前', note: '灌籃高手' },
+                    { time: '13:00', title: '鎌倉高校前', note: '灌籃高手平交道' },
                     { time: '14:00', title: '七里濱', note: '午餐/下午茶' },
                     { time: '16:00', title: '鎌倉小町通', note: '' },
-                    { time: '19:00', title: '返回新宿晚餐', note: '自煮 or 外食' }
+                    { time: '19:00', title: '返回新宿晚餐', note: '' }
                 ]},
-                { area: '澀谷潮流', events: [
+                { date: '4/03 (五) 澀谷潮流', events: [
                     { time: '09:00', title: '東京鐵塔', note: '拍照' },
                     { time: '10:30', title: '六本木/麻布台Hills', note: '' },
                     { time: '12:00', title: '午餐: 六本木', note: '' },
@@ -310,7 +538,7 @@
                     { time: '16:30', title: 'SHIBUYA SKY', note: '夕陽場需預約' },
                     { time: '19:00', title: '澀谷十字路口', note: '最後採買/晚餐' }
                 ]},
-                { area: '返台', events: [
+                { date: '4/04 (六) 返台', events: [
                     { time: 'Free', title: '自由補貨時間', note: '整理行李' },
                     { time: '17:00', title: '前往成田機場', note: 'NEX/Skyliner' },
                     { time: '20:40', title: '起飛 (IT201)', note: 'T1' },
@@ -319,8 +547,38 @@
             ]);
 
             const expenses = ref([]);
-            const newExp = reactive({ item: '', amount: null, payer: '我' });
+            const newExpense = reactive({ item: '', amount: null, payer: '我' });
+            
+            const prepList = ref([
+                { text: '護照 (效期6個月以上)', checked: false },
+                { text: 'Visit Japan Web 填寫', checked: false },
+                { text: '國際駕照 (譯本)', checked: false },
+                { text: 'esim / 漫遊開通', checked: false }
+            ]);
             const tickets = ref([]);
+
+            const shopping = reactive({
+                cosme: [
+                    { name: 'Decorte 散粉', brand: 'Cosme Decorte', rank: 1, img: 'https://placehold.co/200x200/fff/FF69B4?text=Powder&font=playfair' },
+                    { name: 'Tirtir 氣墊', brand: 'TIRTIR', rank: 2, img: 'https://placehold.co/200x200/fff/FF69B4?text=Cushion&font=playfair' },
+                    { name: 'Canmake 眼影', brand: 'Canmake', rank: 3, img: 'https://placehold.co/200x200/fff/FF69B4?text=Eye&font=playfair' },
+                    { name: '&Honey 髮油', brand: 'Honey', rank: 4, img: 'https://placehold.co/200x200/fff/FF69B4?text=Oil&font=playfair' }
+                ],
+                ldk: [
+                    { name: 'Quality 1st 面膜', category: 'A評價', desc: '保濕力最強，3分鐘搞定', img: 'https://placehold.co/100x100/fff/FF69B4?text=Mask' },
+                    { name: 'LDK 防曬乳', category: 'S評價', desc: '不黏膩且防護力高', img: 'https://placehold.co/100x100/fff/FF69B4?text=Sun' }
+                ]
+            });
+
+            const weatherData = ref([
+                { day: 1, date: '3/28', temp: '12-18°C', icon: 'fa-solid fa-cloud-sun text-yellow-500', advice: '薄長袖', emoji: '🧥', borderColor: 'border-yellow-300' },
+                { day: 2, date: '3/29', temp: '15-20°C', icon: 'fa-solid fa-sun text-orange-500', advice: '洋裝OK', emoji: '👗', borderColor: 'border-orange-300' },
+                { day: 3, date: '3/30', temp: '5-12°C', icon: 'fa-solid fa-snowflake text-blue-300', advice: '河口湖冷!', emoji: '🧣', borderColor: 'border-blue-300' },
+                { day: 4, date: '3/31', temp: '4-11°C', icon: 'fa-solid fa-cloud text-gray-400', advice: '羽絨衣', emoji: '🧤', borderColor: 'border-gray-300' },
+                { day: 5, date: '4/01', temp: '10-16°C', icon: 'fa-solid fa-sun text-orange-500', advice: '針織衫', emoji: '👚', borderColor: 'border-orange-300' },
+                { day: 6, date: '4/02', temp: '14-19°C', icon: 'fa-solid fa-wind text-green-400', advice: '海邊風大', emoji: '🧢', borderColor: 'border-green-300' },
+                { day: 7, date: '4/03', temp: '15-21°C', icon: 'fa-solid fa-sun text-red-400', advice: '舒適逛街', emoji: '👟', borderColor: 'border-red-300' }
+            ]);
 
             // --- 計算屬性 ---
             const countdownDays = computed(() => {
@@ -328,107 +586,121 @@
                 return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
             });
 
-            const balance = computed(() => {
-                let myPaid = 0, total = 0;
-                expenses.value.forEach(e => {
-                    total += e.amount;
-                    if(e.payer === '我') myPaid += e.amount;
+            const balanceResult = computed(() => {
+                let myPaid = 0;
+                let total = 0;
+                
+                expenses.value.forEach(exp => {
+                    total += exp.amount;
+                    if (exp.payer === '我') myPaid += exp.amount;
                 });
+
                 const perPerson = total / 2;
-                const diff = myPaid - perPerson;
-                if(Math.abs(diff) < 1) return { val: 0 };
+                const myBalance = myPaid - perPerson;
+                
+                if (Math.abs(myBalance) < 1) return { amount: 0 };
+                
                 return {
-                    from: diff > 0 ? '旅伴' : '我',
-                    to: diff > 0 ? '我' : '旅伴',
-                    val: Math.abs(diff)
+                    debtor: myBalance > 0 ? '旅伴' : '我',
+                    creditor: myBalance > 0 ? '我' : '旅伴',
+                    amount: Math.abs(myBalance)
                 };
             });
 
-            // --- 功能函數 ---
-            const navigate = (p) => { 
-                currentPage.value = p; 
-                pageTitle.value = { itinerary:'行程表', accounting:'分帳表', home:'Home' }[p] || p;
+            // --- 功能與邏輯 ---
+            
+            // 地圖連結產生器 (針對富士山停車場等)
+            const shouldShowMap = (title) => {
+                const keywords = ['停車場', '自然生活館', '神社', '公園', 'Sky', '超市'];
+                return keywords.some(k => title.includes(k));
+            };
+            const getMapLink = (title) => {
+                // 針對特定地點優化
+                if(title.includes('新倉')) return 'https://goo.gl/maps/Place1'; // 示意
+                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title + ' 日本')}`;
+            };
+
+            const formatMoney = (val) => {
+                if(currencyMode.value === 'JPY') return `¥${Math.round(val).toLocaleString()}`;
+                return `NT$${Math.round(val * exchangeRate).toLocaleString()}`;
+            };
+
+            const addExpense = () => {
+                if(!newExpense.item || !newExpense.amount) return;
+                expenses.value.push({ ...newExpense });
+                newExpense.item = ''; newExpense.amount = null;
+                saveData();
+            };
+            const removeExpense = (i) => {
+                if(confirm('刪除此筆?')) { expenses.value.splice(i, 1); saveData(); }
+            };
+
+            // 自動生成票券 (智慧判斷)
+            const generateTickets = () => {
+                const list = [];
+                const str = JSON.stringify(itinerary.value);
+                
+                if(str.includes('Skyliner') || str.includes('成田')) 
+                    list.push({name: 'Skyliner 京成電鐵', reason: '機場往返市區最快', note: 'Klook 買比現場便宜'});
+                if(str.includes('江之電') || str.includes('鎌倉')) 
+                    list.push({name: '江之島−鎌倉周遊券', reason: 'Day 6 江之電無限搭乘', note: '新宿出發版或現地版'});
+                if(str.includes('SHIBUYA SKY')) 
+                    list.push({name: 'SHIBUYA SKY 展望台', reason: 'Day 7 夕陽熱門時段', note: '需提前4週搶票'});
+                if(str.includes('晴空塔')) 
+                    list.push({name: '東京晴空塔門票', reason: 'Day 1 行程', note: '天望甲板+天望回廊'});
+                if(str.includes('富士回遊')) 
+                    list.push({name: 'JR 富士回遊號', reason: '回新宿不塞車', note: '非常熱門需提前預訂'});
+                
+                tickets.value = list;
+                saveData();
+            };
+            const removeTicket = (i) => { tickets.value.splice(i,1); saveData(); };
+
+            // 導航與手勢
+            const navigate = (p) => {
+                currentPage.value = p;
                 window.scrollTo(0,0);
+                const titles = { itinerary:'行程規劃', accounting:'旅費分帳', shopping:'必買清單', weather:'氣象穿搭', preparation:'行前準備', emergency:'緊急應變' };
+                pageTitle.value = titles[p] || 'Home';
             };
             const goHome = () => { navigate('home'); editMode.value = false; };
-            const toggleEdit = () => editMode.value = !editMode.value;
-            const addExp = () => {
-                if(newExp.item && newExp.amount) {
-                    expenses.value.push({...newExp});
-                    newExp.item = ''; newExp.amount = null;
-                    saveLocal();
-                }
-            };
-            const delExp = (i) => { expenses.value.splice(i,1); saveLocal(); };
-            const fmt = (n) => currency.value === 'JPY' ? `¥${Math.round(n).toLocaleString()}` : `NT$${Math.round(n*exRate).toLocaleString()}`;
-            
-            const checkTickets = () => {
-                tickets.value = [
-                    {name:'Skyliner 來回', desc:'機場交通'},
-                    {name:'SHIBUYA SKY', desc:'Day7 黃昏場需搶票'},
-                    {name:'江之島鎌倉周遊券', desc:'Day6 江之電無限搭'}
-                ];
-                saveLocal();
+            const toggleEdit = () => { editMode.value = !editMode.value; if(!editMode.value) saveData(); };
+
+            // Swipe Logic
+            let touchStartX = 0;
+            const handleTouchStart = (e) => { touchStartX = e.changedTouches[0].screenX; };
+            const handleTouchEnd = (e) => {
+                if (e.changedTouches[0].screenX - touchStartX > 100 && currentPage.value !== 'home') goHome();
             };
 
-            // --- 核心：同步與存檔 (Magic Link) ---
-            const saveLocal = () => {
-                const data = { it: itinerary.value, ex: expenses.value, ti: tickets.value };
-                localStorage.setItem('trip2026', JSON.stringify(data));
+            // Data Persistence (模擬 GitHub 編輯)
+            const saveData = () => {
+                const data = { itinerary: itinerary.value, expenses: expenses.value, prep: prepList.value, tickets: tickets.value };
+                localStorage.setItem('trip_2026_v17', JSON.stringify(data));
+                savedMessage.value = true;
+                setTimeout(() => savedMessage.value = false, 2000);
             };
-
-            const loadLocal = () => {
-                // 1. 優先檢查網址是否有資料 (Import)
-                const urlParams = new URLSearchParams(window.location.search);
-                const syncData = urlParams.get('data');
-                
-                if (syncData) {
-                    try {
-                        const json = LZString.decompressFromEncodedURIComponent(syncData);
-                        const data = JSON.parse(json);
-                        if(data.it) itinerary.value = data.it;
-                        if(data.ex) expenses.value = data.ex;
-                        if(data.ti) tickets.value = data.ti;
-                        showSyncTip.value = true;
-                        // 載入後存入 LocalStorage 並清除網址讓看起來乾淨
-                        saveLocal();
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    } catch(e) { console.error('Sync failed', e); }
-                } else {
-                    // 2. 否則從 LocalStorage 讀取
-                    const saved = localStorage.getItem('trip2026');
-                    if(saved) {
-                        const data = JSON.parse(saved);
-                        if(data.it) itinerary.value = data.it;
-                        if(data.ex) expenses.value = data.ex;
-                        if(data.ti) tickets.value = data.ti;
-                    }
+            const loadData = () => {
+                const saved = localStorage.getItem('trip_2026_v17');
+                if(saved) {
+                    const p = JSON.parse(saved);
+                    if(p.itinerary) itinerary.value = p.itinerary; // 若有編輯過則覆蓋
+                    if(p.expenses) expenses.value = p.expenses;
+                    if(p.prep) prepList.value = p.prep;
+                    if(p.tickets) tickets.value = p.tickets;
                 }
             };
 
-            const generateShareLink = () => {
-                saveLocal(); // 先存
-                const data = { it: itinerary.value, ex: expenses.value, ti: tickets.value };
-                const json = JSON.stringify(data);
-                const compressed = LZString.compressToEncodedURIComponent(json);
-                const url = `${window.location.origin}${window.location.pathname}?data=${compressed}`;
-                
-                // 複製到剪貼簿
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('✨ 同步連結已複製！\n\n請將此連結傳給旅伴，或貼到您的手機瀏覽器開啟，\n資料就會自動同步囉！');
-                }).catch(() => {
-                    prompt('請手動複製連結傳送：', url);
-                });
-            };
-
-            onMounted(loadLocal);
+            onMounted(loadData);
 
             return {
                 currentPage, pageTitle, navigate, goHome,
                 itinerary, editMode, toggleEdit,
-                expenses, newExp, addExp, delExp, balance, currency, fmt,
-                tickets, checkTickets,
-                generateShareLink, showSyncTip, countdownDays
+                expenses, newExpense, addExpense, removeExpense, balanceResult, currencyMode, formatMoney, exchangeRate,
+                shopping, weatherData, prepList, tickets, generateTickets, removeTicket,
+                showCamera, countdownDays, savedMessage,
+                getMapLink, shouldShowMap,
+                handleTouchStart, handleTouchEnd
             };
         }
     }).mount('#app');
