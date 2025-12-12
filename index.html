@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>關東之旅 | 櫻花吉伊卡哇 V28</title>
+    <title>關東之旅 | 櫻花吉伊卡哇 V29</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
@@ -37,7 +37,6 @@
         }
     </script>
     <style>
-        /* 背景設定 */
         body { 
             background-color: #FFF0F5; 
             background-image: radial-gradient(#FFD1DC 15%, transparent 16%), radial-gradient(#FFF5BA 15%, transparent 16%);
@@ -50,35 +49,30 @@
             color: #5D4037;
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* 櫻花飄落 */
         .sakura { position: fixed; top: -10px; background: #FFB7B2; border-radius: 100% 0 100% 0; opacity: 0.6; animation: fall linear infinite; z-index: 0; pointer-events: none; width: 12px; height: 12px; }
         @keyframes fall { to { transform: translate(15vw, 105vh) rotate(360deg); } }
-
-        /* 卡片效果 */
+        
         .card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-radius: 24px; box-shadow: 0 8px 32px rgba(255, 182, 193, 0.25); border: 1px solid rgba(255, 255, 255, 0.8); transition: transform 0.2s; }
         .card:active { transform: scale(0.98); }
-
-        /* 擬真水彩圖片設定 */
-        .watercolor-img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(1.05) saturate(1.3) sepia(0.15); transition: transform 0.6s ease; }
-        .watercolor-paper-texture { position: absolute; inset: 0; opacity: 0.3; pointer-events: none; mix-blend-mode: multiply; background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiIG9wYWNpdHk9IjAuMSIvPgo8L3N2Zz4='); }
-
-        /* Banner */
+        
         .banner-container { height: 300px; background-image: url('2026.tokyo.jpg'); background-size: cover; background-position: center; border-bottom-left-radius: 45px; border-bottom-right-radius: 45px; position: relative; box-shadow: 0 10px 40px rgba(255, 182, 193, 0.6); margin-bottom: 24px; overflow: hidden; }
         .banner-fallback { background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); }
-
-        /* Timeline */
+        
+        .watercolor-img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(1.05) saturate(1.3) sepia(0.15); transition: transform 0.6s ease; }
+        .watercolor-paper-texture { position: absolute; inset: 0; opacity: 0.3; pointer-events: none; mix-blend-mode: multiply; background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiIG9wYWNpdHk9IjAuMSIvPgo8L3N2Zz4='); }
+        
         .timeline-line { position: absolute; left: 24px; top: 20px; bottom: -20px; width: 2px; background: repeating-linear-gradient(to bottom, #FFD1DC 0, #FFD1DC 6px, transparent 6px, transparent 12px); z-index: 0; }
         .timeline-dot { position: relative; z-index: 10; background: white; border: 2px solid #FF9EAC; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 4px #FFF0F5; }
-
-        /* Others */
+        
         .lightbox-modal { position: fixed; inset: 0; background: rgba(255,240,245,0.95); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s; }
         .lightbox-img { max-width: 100%; max-height: 80vh; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 8px solid white; }
+        
         .camera-overlay { position: fixed; inset: 0; background: black; z-index: 60; display: flex; flex-direction: column; }
         .camera-video { width: 100%; height: 100%; object-fit: cover; }
         .avatar-container { position: relative; overflow: hidden; }
         .avatar-edit-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.2s; }
         .avatar-container:hover .avatar-edit-overlay { opacity: 1; }
+        
         .fab-main { position: fixed; bottom: 30px; right: 20px; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; z-index: 50; box-shadow: 0 10px 25px rgba(255, 107, 107, 0.5); transition: transform 0.1s; border: 4px solid white; }
         .countdown-float { position: absolute; top: 200px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 10px 24px; border-radius: 50px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(255,105,180,0.3); z-index: 20; animation: float 4s ease-in-out infinite; border: 3px solid #FFD1DC; }
         .floating-search { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 40; }
@@ -95,7 +89,7 @@
     
     <div v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-[#FFF0F5] z-50">
         <div class="text-6xl animate-bounce-slow mb-4">🌸</div>
-        <div class="text-chii-text font-bold text-lg animate-pulse">V28 準備就緒...</div>
+        <div class="text-chii-text font-bold text-lg animate-pulse">V29 智慧修復版...</div>
     </div>
 
     <div v-if="isMounted" v-cloak class="min-h-screen pb-24 relative z-10">
@@ -216,7 +210,6 @@
                             <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-lg shadow-inner">{{ getExpenseIcon(exp.category) }}</div><div><div class="font-bold text-gray-700 text-sm">{{ exp.name }}</div><div class="text-[10px] text-gray-400">{{ exp.date }} · {{ exp.category }}</div></div></div>
                             <div class="text-right"><div class="font-bold text-gray-800"><span class="text-xs text-gray-400 pr-1">{{exp.currency}}</span>{{ Number(exp.amount).toLocaleString() }}</div><button @click="deleteExpense(exp.id)" class="text-[10px] text-red-300 mt-1">刪除</button></div>
                         </div>
-                        <div v-if="filteredExpenses.length === 0" class="text-center text-gray-400 py-10 text-sm">還沒有記帳紀錄喔</div>
                     </div>
                     <button @click="openExpenseModal" class="fab-main bg-chii-yellow text-gray-700 hover:bg-yellow-300"><i class="fa-solid fa-pen"></i></button>
                 </div>
@@ -244,7 +237,7 @@
             <div class="space-y-6 pb-24">
                 <div v-for="(item, idx) in shoppingList[shopCat]" :key="idx" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden mx-auto my-6 relative transition hover:-translate-y-1">
                     <div class="aspect-w-16 aspect-h-9 cursor-pointer relative" @click="openImage(item.img)">
-                        <img class="w-full h-64 object-cover watercolor-img" :src="item.img" :alt="item.name">
+                        <img class="w-full h-64 object-cover watercolor-img" :src="item.img" :alt="item.name" @error="handleImgError($event, 'shop', item.name)">
                         <div class="watercolor-paper-texture"></div>
                         <div v-if="shopCat==='wish'" @click.stop="shoppingList[shopCat].splice(idx, 1)" class="absolute top-2 right-2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-red-400 shadow-sm z-20"><i class="fa-solid fa-trash"></i></div>
                     </div>
@@ -263,7 +256,7 @@
             <div class="space-y-6 pb-24">
                 <div v-for="(food, idx) in foodList[foodLoc]" :key="idx" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden mx-auto my-6 relative transition hover:-translate-y-1">
                     <div class="aspect-w-16 aspect-h-9 cursor-pointer relative" @click="openImage(food.img)">
-                        <img class="w-full h-64 object-cover watercolor-img" :src="food.img" :alt="food.name">
+                        <img class="w-full h-64 object-cover watercolor-img" :src="food.img" :alt="food.name" @error="handleImgError($event, 'food', food.name)">
                         <div class="watercolor-paper-texture"></div>
                     </div>
                     <div class="p-5">
@@ -281,7 +274,7 @@
             <div class="space-y-6 pb-24">
                 <div v-for="(spot, idx) in photoSpots[photoArea]" :key="idx" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden mx-auto my-6 relative transition hover:-translate-y-1">
                     <div class="aspect-w-16 aspect-h-9 cursor-pointer relative" @click="openImage(spot.img)">
-                        <img class="w-full h-64 object-cover watercolor-img" :src="spot.img" :alt="spot.name">
+                        <img class="w-full h-64 object-cover watercolor-img" :src="spot.img" :alt="spot.name" @error="handleImgError($event, 'photo', spot.name)">
                         <div class="watercolor-paper-texture"></div>
                     </div>
                     <div class="p-5">
@@ -376,8 +369,8 @@
         <div v-if="showSyncModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative">
                 <button @click="showSyncModal=false" class="absolute top-4 right-4 text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
-                <h3 class="font-bold text-xl mb-2 text-center text-chii-text">📂 檔案存取 (V28)</h3>
-                <p class="text-xs text-gray-400 text-center mb-6">請建立 images 資料夾並放入圖片</p>
+                <h3 class="font-bold text-xl mb-2 text-center text-chii-text">📂 檔案存取 (V29)</h3>
+                <p class="text-xs text-gray-400 text-center mb-6">更換裝置或備份時使用</p>
                 <button @click="saveAsHtml" class="w-full py-3 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-xl font-bold mb-3 flex items-center justify-center gap-2 shadow-md active:scale-95 transition"><i class="fa-solid fa-file-code"></i> 儲存為網頁檔 (HTML)</button>
                 <div class="text-[10px] text-gray-400 text-center mb-3">👆 下載此檔案，下次直接開啟即可延續進度</div>
                 <hr class="border-gray-100 my-3">
@@ -395,7 +388,7 @@
 
     createApp({
         setup() {
-            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v28', searchQuery = ref('');
+            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v29', searchQuery = ref('');
             const showCamera = ref(false), videoElement = ref(null), showLightbox = ref(false), currentZoomImg = ref('');
             
             const defaultUsers = [
@@ -513,19 +506,19 @@
 
             const currentUserId = ref(1), expenses = ref([]), newExpense = ref({name:'', amount:'', category:'食', currency:'JPY'}), prepUser = ref(1);
             
-            // V28 Data: Using Local Images
+            // V29: Auto Fallback Images
             const shoppingList = ref({ 
                 'wish': [], 
                 'cosme': [
-                    {name:'Kate 怪獸唇膏', desc:'賣到缺貨的神級唇膏！不掉色、保濕度高，3:00AM微醺色號最顯白，一定要掃貨。', img:'https://placehold.co/600x400/FFD1DC/555?text=Kate+Lipstick', link:searchMap('Kate Monster Lip')},
-                    {name:'Tirtir 氣墊粉餅', desc:'日本女生人手一顆的紅盒氣墊，遮瑕力強且持妝度驚人，戴口罩也不容易脫妝。', img:'https://placehold.co/600x400/FFD1DC/555?text=Tirtir+Cushion', link:searchMap('Tirtir Cushion')}
+                    {name:'Kate 怪獸唇膏', desc:'賣到缺貨的神級唇膏！不掉色、保濕度高，3:00AM微醺色號最顯白，一定要掃貨。', img:'./images/kate.jpg', link:searchMap('Kate Monster Lip')},
+                    {name:'Tirtir 氣墊粉餅', desc:'日本女生人手一顆的紅盒氣墊，遮瑕力強且持妝度驚人，戴口罩也不容易脫妝。', img:'./images/tirtir.jpg', link:searchMap('Tirtir Cushion')}
                 ],
                 'ldk': [
-                    {name:'Lululun 面膜', desc:'LDK 評測常勝軍！每天敷也不心疼的高CP值面膜，依照不同膚質選擇對應顏色，保濕超有感。', img:'https://placehold.co/600x400/A2D2FF/555?text=Lululun+Mask', link:searchMap('Lululun Mask')},
-                    {name:'Melano CC 精華', desc:'平價美白神器！含有高濃度維他命C，對於淡化痘印非常有效，藥妝店必買清單之一。', img:'https://placehold.co/600x400/A2D2FF/555?text=VitaminC', link:searchMap('Melano CC')}
+                    {name:'Lululun 面膜', desc:'LDK 評測常勝軍！每天敷也不心疼的高CP值面膜，依照不同膚質選擇對應顏色，保濕超有感。', img:'./images/lululun.jpg', link:searchMap('Lululun Mask')},
+                    {name:'Melano CC 精華', desc:'平價美白神器！含有高濃度維他命C，對於淡化痘印非常有效，藥妝店必買清單之一。', img:'./images/cc.jpg', link:searchMap('Melano CC')}
                 ],
                 'souvenir': [
-                    {name:'NY Perfect Cheese', desc:'東京車站排隊名店！香濃起司搭配白巧克力與酥脆餅乾，口感層次豐富，送禮超有面子。', img:'https://placehold.co/600x400/FFF5BA/555?text=NY+Cheese', link:searchMap('NY Perfect Cheese')}
+                    {name:'NY Perfect Cheese', desc:'東京車站排隊名店！香濃起司搭配白巧克力與酥脆餅乾，口感層次豐富，送禮超有面子。', img:'./images/ny.jpg', link:searchMap('NY Perfect Cheese')}
                 ] 
             });
             const shopCat = ref('wish');
@@ -535,7 +528,7 @@
                     {
                         name:'AFURI 阿夫利拉麵', 
                         desc:'必吃的柚子鹽拉麵！清爽的黃金湯頭帶有淡淡的柚子香氣，搭配炭火炙燒的叉燒肉，是東京旅行不可錯過的美味。', 
-                        img:'./images/afuri-ramen.jpg', // 使用本機圖片
+                        img:'./images/afuri-ramen.jpg', 
                         link:'https://afuri.com/',
                         btnColor: 'bg-blue-400 hover:bg-blue-500',
                         btnText: '官方網站'
@@ -543,37 +536,37 @@
                     {
                         name:'HARBS 水果千層蛋糕', 
                         desc:'東京甜點界的夢幻逸品！六層薄透的法式可麗餅皮，夾著草莓、奇異果、香蕉等新鮮水果，搭配甜而不膩的特製鮮奶油，入口即化的口感讓人一試成主顧。', 
-                        img:'./images/harbs-fruit-crepe.jpg', // 使用本機圖片
+                        img:'./images/harbs-fruit-crepe.jpg',
                         link:'https://www.harbs.co.jp/',
                         btnColor: 'bg-yellow-400 hover:bg-yellow-500',
                         btnText: '查看官網菜單'
                     },
-                    {name:'淺草炸肉餅', desc:'仲見世通必吃散步美食。外皮金黃酥脆，內餡充滿肉汁與洋蔥的甜味，熱騰騰的口感讓人忍不住一口接一口。', img:'https://placehold.co/600x400/orange/white?text=Menchi', link:searchMap('淺草炸肉餅')},
-                    {name:'牛かつもと村', desc:'人氣炸牛排定食。將半熟的炸牛排放在石板上自行炙燒，滋滋作響的聲音與香氣，搭配山葵醬油絕配。', img:'https://placehold.co/600x400/orange/white?text=BeefCutlet', link:searchMap('牛かつもと村')}
+                    {name:'淺草炸肉餅', desc:'仲見世通必吃散步美食。外皮金黃酥脆，內餡充滿肉汁與洋蔥的甜味，熱騰騰的口感讓人忍不住一口接一口。', img:'./images/menchi.jpg', link:searchMap('淺草炸肉餅')},
+                    {name:'牛かつもと村', desc:'人氣炸牛排定食。將半熟的炸牛排放在石板上自行炙燒，滋滋作響的聲音與香氣，搭配山葵醬油絕配。', img:'./images/beef.jpg', link:searchMap('牛かつもと村')}
                 ], 
                 'Kamakura': [
-                    {name:'Bills 七里濱', desc:'世界第一好吃的早餐。在海邊享受鬆軟綿密的瑞可塔起司鬆餅，窗外就是湘南海岸的蔚藍海景。', img:'https://placehold.co/600x400/teal/white?text=Bills', link:searchMap('Bills 七里濱')}, 
-                    {name:'豐島屋 鴿子餅乾', desc:'鎌倉最具代表性的伴手禮。可愛的鴿子造型，濃郁的奶油香氣，口感酥脆樸實，是配茶的最佳點心。', img:'https://placehold.co/600x400/teal/white?text=Cookie', link:searchMap('豐島屋 本店')}
+                    {name:'Bills 七里濱', desc:'世界第一好吃的早餐。在海邊享受鬆軟綿密的瑞可塔起司鬆餅，窗外就是湘南海岸的蔚藍海景。', img:'./images/bills.jpg', link:searchMap('Bills 七里濱')}, 
+                    {name:'豐島屋 鴿子餅乾', desc:'鎌倉最具代表性的伴手禮。可愛的鴿子造型，濃郁的奶油香氣，口感酥脆樸實，是配茶的最佳點心。', img:'./images/dove.jpg', link:searchMap('豐島屋 本店')}
                 ], 
                 'Fuji': [
-                    {name:'Houtou Fudou 餺飥麵', desc:'河口湖必吃鄉土料理。像雲朵般的白色圓頂建築，Q彈的寬扁麵條吸滿南瓜味噌湯頭的精華，暖胃又暖心。', img:'https://placehold.co/600x400/blue/white?text=Houtou', link:searchMap('Houtou Fudou 東戀路店')}, 
-                    {name:'Fujisan Shokupan', desc:'超可愛的富士山造型吐司！切開來呈現藍白配色的富士山圖樣，使用山梨縣產葡萄果汁製作，拍照效果滿分。', img:'https://placehold.co/600x400/blue/white?text=Toast', link:searchMap('Fujisan Shokupan')}
+                    {name:'Houtou Fudou 餺飥麵', desc:'河口湖必吃鄉土料理。像雲朵般的白色圓頂建築，Q彈的寬扁麵條吸滿南瓜味噌湯頭的精華，暖胃又暖心。', img:'./images/houtou.jpg', link:searchMap('Houtou Fudou 東戀路店')}, 
+                    {name:'Fujisan Shokupan', desc:'超可愛的富士山造型吐司！切開來呈現藍白配色的富士山圖樣，使用山梨縣產葡萄果汁製作，拍照效果滿分。', img:'./images/toast.jpg', link:searchMap('Fujisan Shokupan')}
                 ] 
             });
             const foodLoc = ref('Tokyo');
             
             const photoSpots = ref({ 
                 'Tokyo': [
-                    {name:'SHIBUYA SKY', desc:'東京最美高空展望台！360度無死角俯瞰澀谷街頭，夕陽時分最美，角落的玻璃角是必拍的網美打卡點。', img:'https://placehold.co/600x400/FFD1DC/555?text=Shibuya+Sky', link:searchMap('SHIBUYA SKY')}, 
-                    {name:'東京鐵塔 (芝公園)', desc:'能拍到東京鐵塔全貌的最佳公園，坐在草地上野餐，以前方的紅塔為背景，隨手拍都是日劇氛圍。', img:'https://placehold.co/600x400/FFD1DC/555?text=Tokyo+Tower', link:searchMap('芝公園')}
+                    {name:'SHIBUYA SKY', desc:'東京最美高空展望台！360度無死角俯瞰澀谷街頭，夕陽時分最美，角落的玻璃角是必拍的網美打卡點。', img:'./images/sky.jpg', link:searchMap('SHIBUYA SKY')}, 
+                    {name:'東京鐵塔 (芝公園)', desc:'能拍到東京鐵塔全貌的最佳公園，坐在草地上野餐，以前方的紅塔為背景，隨手拍都是日劇氛圍。', img:'./images/tower.jpg', link:searchMap('芝公園')}
                 ], 
                 'Kamakura': [
-                    {name:'鎌倉高校前', desc:'灌籃高手經典場景再現！等待綠色江之電駛過平交道，背後是波光粼粼的大海，青春的回憶湧上心頭。', img:'https://placehold.co/600x400/A2D2FF/555?text=Slam+Dunk', link:searchMap('鎌倉高校前站')},
-                    {name:'長谷寺', desc:'繡球花季的絕美景點，寺內可以眺望由比濱海岸，精緻的日式庭園與良緣地藏也是拍照重點。', img:'https://placehold.co/600x400/A2D2FF/555?text=Hasedera', link:searchMap('長谷寺')}
+                    {name:'鎌倉高校前', desc:'灌籃高手經典場景再現！等待綠色江之電駛過平交道，背後是波光粼粼的大海，青春的回憶湧上心頭。', img:'./images/slamdunk.jpg', link:searchMap('鎌倉高校前站')},
+                    {name:'長谷寺', desc:'繡球花季的絕美景點，寺內可以眺望由比濱海岸，精緻的日式庭園與良緣地藏也是拍照重點。', img:'./images/hasedera.jpg', link:searchMap('長谷寺')}
                 ], 
                 'Fuji': [
-                    {name:'新倉山淺間公園', desc:'明信片等級的絕景！需爬398階梯，能同時拍到五重塔、櫻花與富士山，是代表日本的經典畫面。', img:'https://placehold.co/600x400/FFF5BA/555?text=Pagoda', link:searchMap('新倉山淺間公園')},
-                    {name:'河口湖 Lawson', desc:'便利商店背後就是巨大的富士山！雖人潮眾多，但藍白招牌與聖山的強烈對比，是社群媒體上的超人氣構圖。', img:'https://placehold.co/600x400/FFF5BA/555?text=Lawson', link:searchMap('Lawson 河口湖站前店')}
+                    {name:'新倉山淺間公園', desc:'明信片等級的絕景！需爬398階梯，能同時拍到五重塔、櫻花與富士山，是代表日本的經典畫面。', img:'./images/pagoda.jpg', link:searchMap('新倉山淺間公園')},
+                    {name:'河口湖 Lawson', desc:'便利商店背後就是巨大的富士山！雖人潮眾多，但藍白招牌與聖山的強烈對比，是社群媒體上的超人氣構圖。', img:'./images/lawson.jpg', link:searchMap('Lawson 河口湖站前店')}
                 ] 
             });
             const photoArea = ref('Tokyo');
@@ -701,7 +694,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = '2026_tokyo_trip_v28.html';
+                a.download = '2026_tokyo_trip_v29.html';
                 a.click();
                 URL.revokeObjectURL(url);
                 syncMsg.value = '網頁檔下載成功！';
@@ -744,6 +737,11 @@
             };
             const closeCamera = () => { if(videoElement.value && videoElement.value.srcObject) videoElement.value.srcObject.getTracks().forEach(t => t.stop()); showCamera.value = false; };
             const togglePause = () => { if(videoElement.value.paused) videoElement.value.play(); else videoElement.value.pause(); };
+
+            // V29: Fallback Image Handler
+            const handleImgError = (e, type, name) => {
+                e.target.src = `https://placehold.co/600x400/FFD1DC/555?text=${encodeURIComponent(name)}`;
+            };
 
             onMounted(() => {
                 try {
@@ -789,7 +787,7 @@
                 showCamera, openCamera, closeCamera, togglePause, videoElement,
                 showLightbox, openImage, currentZoomImg,
                 avatarInput, triggerAvatarUpload, processAvatarUpload,
-                moneyMode
+                moneyMode, handleImgError
             };
         }
     }).mount('#app');
