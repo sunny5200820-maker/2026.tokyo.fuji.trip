@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>關東之旅 | 櫻花吉伊卡哇 V23</title>
+    <title>關東之旅 | 櫻花吉伊卡哇 V24</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
@@ -72,11 +72,11 @@
         .banner-container { height: 300px; background-image: url('2026.tokyo.jpg'); background-size: cover; background-position: center; border-bottom-left-radius: 45px; border-bottom-right-radius: 45px; position: relative; box-shadow: 0 10px 40px rgba(255, 182, 193, 0.6); margin-bottom: 24px; overflow: hidden; }
         .banner-fallback { background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); }
 
-        /* V23 時間軸樣式 */
+        /* 時間軸樣式 */
         .timeline-line { position: absolute; left: 24px; top: 20px; bottom: -20px; width: 2px; background: repeating-linear-gradient(to bottom, #FFD1DC 0, #FFD1DC 6px, transparent 6px, transparent 12px); z-index: 0; }
         .timeline-dot { position: relative; z-index: 10; background: white; border: 2px solid #FF9EAC; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 4px #FFF0F5; }
 
-        /* V23 擬真水彩濾鏡 & 紙張質感 */
+        /* 擬真水彩濾鏡 */
         .watercolor-img { 
             width: 100%; height: 100%; object-fit: cover;
             filter: contrast(1.1) brightness(1.05) saturate(1.3) sepia(0.15); 
@@ -101,6 +101,7 @@
         /* Floating Elements */
         .fab-main { position: fixed; bottom: 30px; right: 20px; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; z-index: 50; box-shadow: 0 10px 25px rgba(255, 107, 107, 0.5); transition: transform 0.1s; border: 4px solid white; }
         .countdown-float { position: absolute; top: 200px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 10px 24px; border-radius: 50px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(255,105,180,0.3); z-index: 20; animation: float 4s ease-in-out infinite; border: 3px solid #FFD1DC; }
+        .floating-search { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 40; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         [v-cloak] { display: none; }
@@ -114,7 +115,7 @@
     
     <div v-if="!isMounted" class="fixed inset-0 flex flex-col items-center justify-center bg-[#FFF0F5] z-50">
         <div class="text-6xl animate-bounce-slow mb-4">🌸</div>
-        <div class="text-chii-text font-bold text-lg animate-pulse">V23 載入中...</div>
+        <div class="text-chii-text font-bold text-lg animate-pulse">V24 載入中...</div>
     </div>
 
     <div v-if="isMounted" v-cloak class="min-h-screen pb-24 relative z-10">
@@ -154,12 +155,22 @@
                 </button>
             </div>
 
-            <div class="px-6 grid grid-cols-3 gap-y-10 gap-x-6 mb-8">
+            <div class="px-6 grid grid-cols-3 gap-y-10 gap-x-6 mb-20">
                 <div v-for="app in apps" :key="app.id" class="flex flex-col items-center cursor-pointer group" @click="currentView = app.view">
                     <div class="w-[72px] h-[72px] rounded-[28px] display-flex items-center justify-center text-3xl text-white shadow-lg transition transform group-hover:-translate-y-2 border-4 border-white" :class="app.bgClass">
                         <div class="w-full h-full flex items-center justify-center"><i :class="app.icon"></i></div>
                     </div>
                     <span class="mt-3 text-sm font-bold text-gray-600 group-hover:text-pink-500 transition">{{ app.name }}</span>
+                </div>
+            </div>
+
+            <div class="floating-search">
+                <div class="bg-white/90 backdrop-blur-lg p-2 rounded-full shadow-2xl flex items-center border-2 border-pink-200">
+                    <i class="fa-brands fa-google text-pink-300 ml-4 text-xl"></i>
+                    <input v-model="searchQuery" @keyup.enter="doGoogleSearch" placeholder="搜尋東京櫻花..." class="flex-1 bg-transparent border-none outline-none px-4 text-sm h-12 text-gray-600 font-medium">
+                    <button @click="doGoogleSearch" class="bg-pink-400 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md active:scale-95 transition hover:bg-pink-500">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -251,8 +262,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div v-for="user in users" :key="user.id" class="card p-5 text-center cursor-pointer relative hover:-translate-y-1 transition" @click="selectMoneyUser(user.id)">
                             <div class="w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center text-4xl overflow-hidden border-4 border-white shadow-sm bg-gray-100">
-                                <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover">
-                                <span v-else>{{ user.icon }}</span>
+                                <img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover"><span v-else>{{ user.icon }}</span>
                             </div>
                             <div class="font-bold text-gray-700 text-lg">{{ user.name }}</div>
                             <div class="text-xs text-gray-400 mt-1">進入專屬帳本</div>
@@ -298,7 +308,8 @@
             <div v-if="moneyTab === 'split'">
                 <div class="card p-6 border-l-4 border-chii-blue">
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-gray-700"><i class="fa-solid fa-calculator text-blue-400"></i> 即時分帳</h3>
-                    <div v-if="settlements.length === 0" class="text-center text-gray-400 py-8 text-sm">無債務關係</div>
+                    <p class="text-xs text-gray-400 mb-4 bg-blue-50 p-2 rounded">系統假設所有支出由「付款人」先墊付，並由「所有人」平分。</p>
+                    <div v-if="settlements.length === 0" class="text-center text-gray-400 py-8 text-sm bg-gray-50 rounded-xl">目前無債務關係</div>
                     <div v-else class="space-y-3">
                         <div v-for="(s, idx) in settlements" :key="idx" class="flex items-center justify-between bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
                             <div class="flex items-center gap-2 text-sm font-bold"><span class="text-gray-700">{{ getUserById(s.from).name }}</span><i class="fa-solid fa-angles-right text-gray-300 text-xs"></i><span class="text-blue-500">給 {{ getUserById(s.to).name }}</span></div>
@@ -318,7 +329,7 @@
                 <button v-for="cat in ['wish','cosme','ldk','souvenir']" :key="cat" @click="shopCat = cat" :class="['px-5 py-2 rounded-full text-sm font-bold transition whitespace-nowrap shadow-sm', shopCat === cat ? 'bg-pink-400 text-white' : 'bg-white text-gray-400 border border-gray-100']">{{ {'wish':'我的願望','cosme':'藥妝','ldk':'LDK','souvenir':'伴手禮'}[cat] }}</button>
             </div>
             <div class="space-y-6 pb-24">
-                <div v-for="(item, idx) in shoppingList[shopCat]" :key="idx" class="max-w-sm bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden mx-auto mb-6 transform transition hover:-translate-y-1">
+                <div v-for="(item, idx) in shoppingList[shopCat]" :key="idx" class="max-w-sm bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden mx-auto mb-6 transform transition hover:-translate-y-1 relative group">
                     <div class="aspect-w-16 aspect-h-9 cursor-pointer relative" @click="openImage(item.img)">
                         <img :src="item.img" class="w-full h-64 object-cover watercolor-img" :alt="item.name + '水彩插畫'">
                         <div class="watercolor-paper-texture"></div>
@@ -373,13 +384,13 @@
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4"><h3 class="text-white font-bold text-xl drop-shadow-md">{{ spot.name }}</h3></div>
                     </div>
                     <div class="p-5">
-                        <div class="flex justify-between items-start">
-                             <p class="mb-4 font-normal text-gray-700 text-sm leading-relaxed text-justify flex-1">{{ spot.desc }}</p>
-                             <button @click.stop="photoSpots[photoArea].splice(idx,1)" class="text-gray-300 hover:text-red-400 text-sm ml-2"><i class="fa-solid fa-trash"></i></button>
+                        <p class="mb-4 font-normal text-gray-700 text-sm leading-relaxed text-justify">{{ spot.desc }}</p>
+                        <div class="flex gap-2">
+                            <a :href="spot.link" target="_blank" class="flex-1 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-400 rounded-lg hover:bg-blue-500 transition shadow-sm">
+                                前往導航 <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/></svg>
+                            </a>
+                            <button @click.stop="photoSpots[photoArea].splice(idx,1)" class="w-10 flex items-center justify-center border border-gray-200 rounded-lg text-gray-400 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
                         </div>
-                        <a :href="spot.link" target="_blank" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-400 rounded-lg hover:bg-blue-500 transition shadow-sm w-full justify-center">
-                            前往導航 <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/></svg>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -462,6 +473,7 @@
                     <input type="number" v-model="newExpense.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl outline-none border focus:border-yellow-300">
                     <select v-model="newExpense.currency" class="w-24 p-3 bg-gray-50 rounded-xl outline-none border font-bold text-gray-600"><option value="JPY">JPY</option><option value="TWD">TWD</option></select>
                 </div>
+                <div class="mb-3"><label class="text-xs text-gray-400 font-bold ml-1">誰先付錢?</label><div class="flex gap-2 mt-1 overflow-x-auto pb-1"><button v-for="u in users" :key="u.id" @click="currentUserId=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border', currentUserId===u.id ? 'bg-yellow-100 border-yellow-300 text-yellow-700' : 'bg-white border-gray-200 text-gray-400']">{{ u.name }}</button></div></div>
                 <div class="flex gap-2 justify-center mb-6"><button v-for="c in ['食','衣','住','行','樂']" :key="c" @click="newExpense.category=c" :class="['w-10 h-10 rounded-full font-bold transition', newExpense.category==c?'bg-chii-yellow text-gray-800 shadow-md scale-110':'bg-gray-100 text-gray-400']">{{c}}</button></div>
                 <div class="flex gap-3"><button @click="showExpenseModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button><button @click="addExpense" class="flex-1 py-3 bg-chii-yellow text-gray-800 rounded-xl font-bold shadow-md">儲存</button></div>
             </div>
@@ -486,7 +498,7 @@
         <div v-if="showSyncModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
             <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative">
                 <button @click="showSyncModal=false" class="absolute top-4 right-4 text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
-                <h3 class="font-bold text-xl mb-2 text-center text-chii-text">📂 檔案存取 (V23)</h3>
+                <h3 class="font-bold text-xl mb-2 text-center text-chii-text">📂 檔案存取 (V24)</h3>
                 <p class="text-xs text-gray-400 text-center mb-6">更換裝置或備份時使用</p>
                 <button @click="saveAsHtml" class="w-full py-3 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-xl font-bold mb-3 flex items-center justify-center gap-2 shadow-md active:scale-95 transition"><i class="fa-solid fa-file-code"></i> 儲存為網頁檔 (HTML)</button>
                 <div class="text-[10px] text-gray-400 text-center mb-3">👆 下載此檔案，下次直接開啟即可延續進度</div>
@@ -505,7 +517,7 @@
 
     createApp({
         setup() {
-            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v23', searchQuery = ref('');
+            const isMounted = ref(false), currentView = ref('home'), hasBanner = ref(true), STORAGE_KEY = 'tokyo_trip_v24', searchQuery = ref('');
             const showCamera = ref(false), videoElement = ref(null), showLightbox = ref(false), currentZoomImg = ref('');
             
             const defaultUsers = [
@@ -515,7 +527,7 @@
                 {id: 4, name: '小桃', bg: '#FFB7B2', icon:'🍑', avatar:'', list: []}
             ];
             const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-            const prepMode = ref('select'), moneyTab = ref('record'), moneyMode = ref('select'); // V23 New State for Money
+            const prepMode = ref('select'), moneyTab = ref('record'), moneyMode = ref('select');
             const tripStartDate = new Date('2026-03-27');
             const daysUntilTrip = computed(() => Math.ceil((tripStartDate - new Date()) / (1000 * 60 * 60 * 24)));
             const exchangeRate = ref(0.22); 
@@ -528,7 +540,7 @@
                 if (currentView.value !== 'home' && diff > 80 && !showLightbox.value) { 
                     if(showCamera.value) return; 
                     if(currentView.value === 'prep' && prepMode.value === 'list') prepMode.value = 'select';
-                    else if(currentView.value === 'money' && moneyTab.value === 'record' && moneyMode.value === 'list') moneyMode.value = 'select'; // V23 Swipe Logic
+                    else if(currentView.value === 'money' && moneyTab.value === 'record' && moneyMode.value === 'list') moneyMode.value = 'select';
                     else goHome(); 
                 } 
             };
@@ -623,19 +635,19 @@
 
             const currentUserId = ref(1), expenses = ref([]), newExpense = ref({name:'', amount:'', category:'食', currency:'JPY'}), prepUser = ref(1);
             
-            // V23 Data
+            // V24 Data: Rich Card Data
             const shoppingList = ref({ 
                 'wish': [], 
                 'cosme': [
-                    {name:'Kate 怪獸唇膏', desc:'賣到缺貨的神級唇膏！不掉色、保濕度高，3:00AM微醺色號最顯白，一定要掃貨。', img:'https://placehold.co/400x400/FFD1DC/555?text=Lipstick', link:searchMap('Kate Monster Lip')},
-                    {name:'Tirtir 氣墊粉餅', desc:'日本女生人手一顆的紅盒氣墊，遮瑕力強且持妝度驚人，戴口罩也不容易脫妝。', img:'https://placehold.co/400x400/FFD1DC/555?text=Cushion', link:searchMap('Tirtir Cushion')}
+                    {name:'Kate 怪獸唇膏', desc:'賣到缺貨的神級唇膏！不掉色、保濕度高，3:00AM微醺色號最顯白，一定要掃貨。', img:'https://placehold.co/600x400/FFD1DC/555?text=Lipstick', link:searchMap('Kate Monster Lip')},
+                    {name:'Tirtir 氣墊粉餅', desc:'日本女生人手一顆的紅盒氣墊，遮瑕力強且持妝度驚人，戴口罩也不容易脫妝。', img:'https://placehold.co/600x400/FFD1DC/555?text=Cushion', link:searchMap('Tirtir Cushion')}
                 ],
                 'ldk': [
-                    {name:'Lululun 面膜', desc:'LDK 評測常勝軍！每天敷也不心疼的高CP值面膜，依照不同膚質選擇對應顏色，保濕超有感。', img:'https://placehold.co/400x400/A2D2FF/555?text=Mask', link:searchMap('Lululun Mask')},
-                    {name:'Melano CC 精華', desc:'平價美白神器！含有高濃度維他命C，對於淡化痘印非常有效，藥妝店必買清單之一。', img:'https://placehold.co/400x400/A2D2FF/555?text=VitaminC', link:searchMap('Melano CC')}
+                    {name:'Lululun 面膜', desc:'LDK 評測常勝軍！每天敷也不心疼的高CP值面膜，依照不同膚質選擇對應顏色，保濕超有感。', img:'https://placehold.co/600x400/A2D2FF/555?text=Mask', link:searchMap('Lululun Mask')},
+                    {name:'Melano CC 精華', desc:'平價美白神器！含有高濃度維他命C，對於淡化痘印非常有效，藥妝店必買清單之一。', img:'https://placehold.co/600x400/A2D2FF/555?text=VitaminC', link:searchMap('Melano CC')}
                 ],
                 'souvenir': [
-                    {name:'NY Perfect Cheese', desc:'東京車站排隊名店！香濃起司搭配白巧克力與酥脆餅乾，口感層次豐富，送禮超有面子。', img:'https://placehold.co/400x400/FFF5BA/555?text=Cheese', link:searchMap('NY Perfect Cheese')}
+                    {name:'NY Perfect Cheese', desc:'東京車站排隊名店！香濃起司搭配白巧克力與酥脆餅乾，口感層次豐富，送禮超有面子。', img:'https://placehold.co/600x400/FFF5BA/555?text=Cheese', link:searchMap('NY Perfect Cheese')}
                 ] 
             });
             const shopCat = ref('wish');
@@ -795,7 +807,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = '2026_tokyo_trip_v23.html';
+                a.download = '2026_tokyo_trip_v24.html';
                 a.click();
                 URL.revokeObjectURL(url);
                 syncMsg.value = '網頁檔下載成功！';
@@ -827,6 +839,8 @@
                 reader.readAsText(file);
             };
             
+            const getW = async (lat,lon,refVal) => { try{ const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,cloud_cover&timezone=Asia%2FTokyo`); const d=await r.json(); refVal.value={temp:d.current.temperature_2m, icon:d.current.weather_code<=3?'🌤️':'🌧️', desc:d.current.weather_code<=3?'晴':'雨', visibility:Math.max(0,100-d.current.cloud_cover)}; }catch(e){} };
+
             const openCamera = async () => {
                 showCamera.value = true;
                 try {
@@ -850,11 +864,12 @@
                         photoSpots.value = d.photo || photoSpots.value;
                         japanesePhrases.value = d.jp || japanesePhrases.value;
                     } else {
-                        // V23 Init
                         users.value.forEach(u => u.list = ['護照', '日幣', '信用卡', 'SIM卡'].map(t => ({text:t, checked:false})));
                     }
                 } catch(e) {}
                 
+                getW(35.6895, 139.6917, tokyoWeather); getW(35.3192, 139.5467, kamakuraWeather); getW(35.3606, 138.7274, fujiWeather);
+
                 const sc = document.getElementById('sakura-container');
                 for(let i=0;i<20;i++){ const e=document.createElement('div'); e.className='sakura'; e.style.left=Math.random()*100+'vw'; e.style.animationDuration=Math.random()*3+4+'s'; sc.appendChild(e); }
                 isMounted.value = true;
@@ -880,7 +895,7 @@
                 showCamera, openCamera, closeCamera, togglePause, videoElement,
                 showLightbox, openImage, currentZoomImg,
                 avatarInput, triggerAvatarUpload, processAvatarUpload,
-                moneyMode // Export for template
+                moneyMode
             };
         }
     }).mount('#app');
