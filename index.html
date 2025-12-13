@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V25.00 Stable)</title>
+<title>關東之旅 2026 (V25.01 Ultimate)</title>
 
 <script>
     window.tailwind = {
@@ -31,45 +32,119 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* 核心基礎 */
-    html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;background-image:radial-gradient(#FFD1DC 15%,transparent 16%),radial-gradient(#FFF5BA 15%,transparent 16%);background-size:60px 60px;background-position:0 0,30px 30px;font-family:"Zen Maru Gothic",sans-serif;color:#5D4037;overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
+    /* 核心基礎修復：使用 100dvh 解決手機瀏覽器網址列遮擋問題 */
+    html, body {
+        margin: 0; padding: 0; width: 100%; height: 100%;
+        font-family: "Zen Maru Gothic", sans-serif;
+        color: #5D4037;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+        background-color: #FFF0F5;
+    }
+
+    /* 獨立背景層：解決手機背景滾動卡頓問題 */
+    #fixed-bg {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
+        background-color: #FFF0F5;
+        background-image: radial-gradient(#FFD1DC 15%, transparent 16%), radial-gradient(#FFF5BA 15%, transparent 16%);
+        background-size: 60px 60px;
+        background-position: 0 0, 30px 30px;
+    }
+
+    /* 輸入框字體優化 */
     input, textarea, select { font-size: 16px !important; font-family: inherit; }
-    #app{display:block;min-height:100vh}
-    [v-cloak]{display:none !important}
-    .hide-scrollbar::-webkit-scrollbar{display:none}.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+    
+    #app { display: block; min-height: 100dvh; position: relative; }
+    [v-cloak] { display: none !important; }
+    
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
     /* UI 元件 */
-    .card{background:rgba(255,255,255,0.92);border-radius:24px;box-shadow:0 8px 30px rgba(255,105,180,0.12);border:1px solid rgba(255,255,255,0.8);margin-bottom:16px;position:relative;overflow:hidden;backdrop-filter:blur(10px);transition:transform 0.2s}
+    .card {
+        background: rgba(255,255,255,0.92);
+        border-radius: 24px;
+        box-shadow: 0 8px 30px rgba(255,105,180,0.12);
+        border: 1px solid rgba(255,255,255,0.8);
+        margin-bottom: 16px;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        transition: transform 0.2s;
+    }
     .card:active { transform: scale(0.99); }
     
-    /* 懸浮導航 */
-    .fab-home{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:white;z-index:900;border:4px solid white;box-shadow:0 10px 25px rgba(255,105,180,0.5);background:linear-gradient(135deg,#FF9EAC,#FFD1DC);cursor:grab;touch-action:none;transition:transform 0.2s}
-    .fab-home:active{transform:translateX(-50%) scale(0.9);}
-    .fab-main{position:fixed;bottom:calc(110px + env(safe-area-inset-bottom));right:20px;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;z-index:40;border:3px solid white;box-shadow:0 8px 20px rgba(0,0,0,0.15);background-color:#ff9eac;transition:all 0.2s}
-    
-    /* 機票票券 */
+    /* 懸浮導航：增加 Safe Area 底部距離 */
+    .fab-home {
+        position: fixed;
+        bottom: calc(30px + env(safe-area-inset-bottom)); /* 適配 iPhone 底部橫條 */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 68px; height: 68px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 28px; color: white;
+        z-index: 900;
+        border: 4px solid white;
+        box-shadow: 0 10px 25px rgba(255,105,180,0.5);
+        background: linear-gradient(135deg,#FF9EAC,#FFD1DC);
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .fab-home:active { transform: translateX(-50%) scale(0.9); }
+
+    .fab-main {
+        position: fixed;
+        bottom: calc(110px + env(safe-area-inset-bottom)); /* 適配 iPhone 底部橫條 */
+        right: 20px;
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px; color: white;
+        z-index: 40;
+        border: 3px solid white;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        background-color: #ff9eac;
+        transition: all 0.2s;
+    }
+
     .boarding-pass { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid white; margin-bottom: 20px; position: relative; }
     
-    /* 歡迎頁 */
-    .welcome-screen{position:fixed;inset:0;z-index:9999;background:#FFF0F5;transition:transform 0.8s cubic-bezier(0.7,0,0.3,1); cursor: pointer;}
-    .welcome-screen.hidden-screen{transform:translateY(-100%);pointer-events:none}
+    .welcome-screen {
+        position: fixed; inset: 0; z-index: 9999;
+        background: #FFF0F5;
+        transition: transform 0.8s cubic-bezier(0.7,0,0.3,1);
+        cursor: pointer;
+        height: 100dvh; /* 確保全螢幕 */
+    }
+    .welcome-screen.hidden-screen { transform: translateY(-100%); pointer-events: none; }
     
-    /* Sakura */
-    .sakura{position:fixed;top:-10px;background:#FFB7B2;border-radius:100% 0 100% 0;opacity:0.6;animation:fall linear infinite;z-index:0;pointer-events:none;width:14px;height:14px; box-shadow: 0 2px 5px rgba(255,105,180,0.2);}
-    @keyframes fall{to{transform:translate(15vw,105vh) rotate(360deg)}}
+    /* 櫻花特效 */
+    .sakura {
+        position: fixed; top: -20px;
+        background: #FFB7B2;
+        border-radius: 100% 0 100% 0;
+        opacity: 0.6;
+        animation: fall linear infinite;
+        z-index: 0; pointer-events: none;
+        width: 14px; height: 14px;
+        box-shadow: 0 2px 5px rgba(255,105,180,0.2);
+    }
+    @keyframes fall { to { transform: translate(10vw, 105vh) rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<div id="loading-check" style="display:none;">System Ready</div>
-
+<div id="fixed-bg"></div>
 <div id="sakura-container"></div>
 
 <div id="app" v-cloak>
     
     <div :class="['welcome-screen flex flex-col items-center justify-between', isWelcomeClosed ? 'hidden-screen' : '']">
-        <div class="absolute inset-0 z-0" @click="enterSite"><img :src="getImg('welcome.jpg')" class="w-full h-full object-cover opacity-90"></div>
-        <div class="absolute top-6 right-6 z-50">
+        <div class="absolute inset-0 z-0" @click="enterSite">
+            <img :src="getImg('welcome.jpg')" class="w-full h-full object-cover opacity-90" @error="handleImgError">
+        </div>
+        <div class="absolute top-6 right-6 z-50 pt-[env(safe-area-inset-top)]">
             <button @click.stop="handleAuthClick" :class="['flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/50 shadow-lg font-bold text-sm transition', isLoggedIn ? 'bg-green-500/80 text-white' : 'bg-white/40 text-gray-800']">
                 <i :class="isLoggedIn ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-arrow-up'"></i> {{ isLoggedIn ? '已連線' : '雲端登入' }}
             </button>
@@ -146,6 +221,7 @@
                     </div>
                 </div>
             </div>
+            <div v-if="getCurrentItinerary().length === 0" class="text-center text-gray-400 py-10 font-bold">今日無排定行程</div>
         </div>
     </div>
 
@@ -195,8 +271,8 @@
             <button @click="hotelTab='car'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='car'?'bg-green-500 text-white':'text-gray-400']">租車</button>
         </div>
         <div v-if="hotelTab==='stay'" class="space-y-6">
-            <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('bnb.jpg')" class="w-full h-full object-cover"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">錦糸町民宿</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query={encodeURIComponent('錦糸町民宿')}" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
-            <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('megu.jpg')" class="w-full h-full object-cover"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">Megu Fuji</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query={encodeURIComponent('Megu Fuji 2021')}" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
+            <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('bnb.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">錦糸町民宿</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query={encodeURIComponent('錦糸町民宿')}" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
+            <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('megu.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">Megu Fuji</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query={encodeURIComponent('Megu Fuji 2021')}" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
         </div>
         <div v-if="hotelTab==='flight'" class="animate-fade-in">
              <div v-if="!currentUser" class="text-center py-10 text-gray-400 font-bold">⚠️ 請先選擇身分</div>
@@ -337,7 +413,7 @@ createApp({
         const hotelTab = ref('stay');
         const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
-        const weatherData = ref([{name:'Tokyo',temp:'--'},{name:'Kamakura',temp:'--'},{name:'Fuji',temp:'--'}]);
+        const weatherData = ref([{name:'Tokyo',temp:'--',bg:'bg-blue-400'},{name:'Kamakura',temp:'--',bg:'bg-indigo-400'},{name:'Fuji',temp:'--',bg:'bg-purple-400'}]);
         
         const showExpenseModal = ref(false);
         const modalData = ref({});
@@ -349,7 +425,7 @@ createApp({
         const modalCallback = ref(null);
 
         const apps = [{id:1,name:'行程',icon:'fa-solid fa-map',view:'itinerary',bgClass:'bg-pink-400'},{id:2,name:'小財庫',icon:'fa-solid fa-yen-sign',view:'money',bgClass:'bg-yellow-400'},{id:3,name:'住宿交通',icon:'fa-solid fa-hotel',view:'hotel',bgClass:'bg-indigo-400'},{id:4,name:'行前準備',icon:'fa-solid fa-suitcase',view:'prep',bgClass:'bg-blue-400'},{id:5,name:'吃吃喝喝',icon:'fa-solid fa-utensils',view:'food',bgClass:'bg-orange-400'},{id:6,name:'網美打卡',icon:'fa-solid fa-camera',view:'photo',bgClass:'bg-rose-400'},{id:7,name:'快樂購',icon:'fa-solid fa-bag-shopping',view:'shopping',bgClass:'bg-purple-400'},{id:8,name:'天氣',icon:'fa-solid fa-cloud-sun',view:'weather',bgClass:'bg-sky-400'},{id:9,name:'翻譯',icon:'fa-solid fa-language',view:'japanese',bgClass:'bg-emerald-400'}];
-        const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'}];
+        const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'},{week:'D8',title:'4/03'}];
         const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
         const smartReminders = computed(() => { const l=[]; if(daysUntilTrip.value<=30)l.push("富士回遊號該搶票了！"); if(daysUntilTrip.value<=2)l.push("線上報到 (48hr前)"); return l; });
 
@@ -365,6 +441,27 @@ createApp({
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300?text=Image';
         const getUserName = (id) => users.value.find(u=>u.id===id)?.name||'未知';
         const getClothingAdvice = (t) => t<10?'羽絨+圍巾':t<15?'大衣+發熱衣':'洋蔥式穿搭';
+
+        // 修復：新增 getPageTitle 函式，防止標題顯示錯誤
+        const getPageTitle = (view) => {
+            const map = {
+                'itinerary': '行程表', 'money': '小財庫', 'hotel': '住宿交通', 'prep': '行前準備',
+                'food': '美食地圖', 'photo': '打卡景點', 'shopping': '購物清單', 'weather': '天氣預報', 'japanese': '翻譯蒟蒻'
+            };
+            return map[view] || '關東之旅';
+        };
+
+        // 修復：新增 getIconByCategory 函式，防止行程頁面報錯
+        const getIconByCategory = (cat) => {
+            const map = {
+                'Flight': 'fa-solid fa-plane',
+                'Sightseeing': 'fa-solid fa-camera',
+                'Food': 'fa-solid fa-utensils',
+                'Shopping': 'fa-solid fa-bag-shopping',
+                'Transport': 'fa-solid fa-train-subway'
+            };
+            return map[cat] || 'fa-solid fa-location-dot';
+        };
 
         const enterSite = () => { isWelcomeClosed.value=true; showPersonaModal.value=true; };
         const setCurrentUser = (u) => { currentUser.value=u; showPersonaModal.value=false; currentView.value='menu'; };
@@ -392,7 +489,24 @@ createApp({
         const suggestedTickets = computed(() => { const n=JSON.stringify(itinerary.value); const l=[]; if(n.includes('迪士尼'))l.push({name:'迪士尼門票',link:'https://www.klook.com/'}); if(n.includes('SHIBUYA'))l.push({name:'SHIBUYA SKY',link:'https://www.klook.com/'}); return l; });
         const fetchWeather = async () => { try{ const g=async(la,lo,i)=>{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current_weather=true`);const d=await r.json();weatherData.value[i].temp=d.current_weather.temperature;}; await g(35.68,139.69,0); await g(35.31,139.54,1); await g(35.36,138.72,2); }catch(e){} };
 
+        // 櫻花特效初始化
+        const initSakura = () => {
+            const container = document.getElementById('sakura-container');
+            if(!container) return;
+            const createPetal = () => {
+                const petal = document.createElement('div');
+                petal.className = 'sakura';
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = Math.random() * 3 + 2 + 's';
+                petal.style.opacity = Math.random();
+                container.appendChild(petal);
+                setTimeout(() => petal.remove(), 5000);
+            };
+            setInterval(createPetal, 300);
+        };
+
         onMounted(() => {
+            initSakura(); // 啟動櫻花
             if(auth) onAuthStateChanged(auth, u=>{ isLoggedIn.value=!!u; if(u&&db) onSnapshot(doc(db,"trips","kanto2026"),d=>{if(d.exists()){const dt=d.data(); users.value=dt.users||users.value; itinerary.value=dt.itinerary||itinerary.value; expenses.value=dt.expenses||[]; spots.value=dt.spots||spots.value; shopping.value=dt.shopping||shopping.value; japanesePhrases.value=dt.phrases||japanesePhrases.value; reminderText.value=dt.reminder||reminderText.value; drivePlan.value=dt.drivePlan||drivePlan.value; }}) });
             const l=localStorage.getItem('V25_LOCAL'); 
             if(l&&!auth){ 
@@ -412,7 +526,7 @@ createApp({
         });
 
         return {
-            currentView, isWelcomeClosed, isLoggedIn, showGoogleSearch, enterSite, apps, getPageTitle, handleAuthClick,
+            currentView, isWelcomeClosed, isLoggedIn, enterSite, apps, getPageTitle, handleAuthClick,
             showLoginModal, loginForm, doLogin, daysUntilTrip, reminderText, smartReminders, tripDays, selectedDayIndex, itineraryMode, getCurrentItinerary,
             moneyTab, exchangeRate, myExpenses, myTotalExpenseTWD, settlements, getUserName, openExpenseModal, showExpenseModal, modalData, toggleShare, saveExpense, deleteExpense,
             hotelTab, suggestedTickets, addPrepItem, shopCat, shopping, openAddShopModal, currentLoc, spots, openAddSpotModal, weatherData, getClothingAdvice, japanesePhrases, expandCard, expandedPhrase, openAddPhraseModal,
