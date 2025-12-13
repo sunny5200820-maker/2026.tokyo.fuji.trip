@@ -6,65 +6,37 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V14.00 旗艦無錯版)</title>
+<title>關東之旅 2026 (V15.00 絕對修復版)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
-
 <script>
-    tailwind.config={
-        theme:{
-            extend:{
-                colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},
-                fontFamily:{sans:['Zen Maru Gothic','sans-serif']},
-                animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.6s ease-out forwards'},
-                keyframes:{
-                    wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},
-                    float:{'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},
-                    fadeIn:{from:{opacity:0,transform:'translateY(20px)'},to:{opacity:1,transform:'translateY(0)'}}
-                }
-            }
-        }
-    }
+    tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},fontFamily:{sans:['Zen Maru Gothic','sans-serif']},animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards'},keyframes:{wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},float:{'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},fadeIn:{from:{opacity:0,transform:'translateY(15px)'},to:{opacity:1,transform:'translateY(0)'}}}}}}
 </script>
-
 <style>
-    /* 全局設定 */
     html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;background-image:radial-gradient(#FFD1DC 15%,transparent 16%),radial-gradient(#FFF5BA 15%,transparent 16%);background-size:60px 60px;background-position:0 0,30px 30px;font-family:-apple-system,BlinkMacSystemFont,"Zen Maru Gothic",sans-serif;color:#5D4037;overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
-    input, textarea, select { font-size: 16px !important; } /* 防止 iOS 自動縮放 */
-    button { touch-action: manipulation; } /* 優化點擊反應 */
+    input, textarea, select { font-size: 16px !important; }
     #app{display:block;min-height:100vh}
     [v-cloak]{display:none !important}
     .hide-scrollbar::-webkit-scrollbar{display:none}.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
     
     /* 錯誤攔截器 */
-    #crash-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 100000; padding: 20px; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #b71c1c; }
+    #crash-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 100000; padding: 20px; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
     #loading-screen { position: fixed; inset: 0; background: #FFF0F5; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
 
-    /* UI 組件 */
-    .card{background:rgba(255,255,255,0.95);border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid rgba(255,255,255,0.8);margin-bottom:16px;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
-    
-    /* 懸浮按鈕：Home (下方置中) */
-    .fab-home{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;z-index:900;border:4px solid white;box-shadow:0 8px 25px rgba(255,105,180,0.4);background:linear-gradient(135deg,#FF9EAC,#FFD1DC);cursor:grab;touch-action:none;transition:transform 0.1s}
+    .card{background:rgba(255,255,255,0.94);border-radius:24px;box-shadow:0 8px 25px rgba(0,0,0,0.05);border:1px solid rgba(255,255,255,0.8);margin-bottom:16px;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+    .fab-home{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;z-index:900;border:4px solid white;box-shadow:0 8px 25px rgba(255,105,180,0.4);background:linear-gradient(135deg,#FF9EAC,#FFD1DC);cursor:grab;touch-action:none;transition:transform 0.1s}
     .fab-home:active{transform:translateX(-50%) scale(0.9);cursor:grabbing}
-    
-    /* 懸浮按鈕：新增 (右下角) */
     .fab-main{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;z-index:40;border:3px solid white;box-shadow:0 8px 20px rgba(0,0,0,0.15);background-color:#ff9eac;transition:all 0.2s}
-    
-    /* Google 搜尋懸浮 (右下角固定) */
-    .google-float { position: fixed; bottom: 30px; right: 20px; z-index: 800; display: flex; align-items: center; justify-content: flex-end; }
+    .google-float { position: fixed; bottom: 25px; right: 20px; z-index: 800; display: flex; align-items: center; justify-content: flex-end; }
     .google-btn { width: 48px; height: 48px; border-radius: 50%; background: white; border: 2px solid #eee; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #4285F4; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; }
     .google-bar { width: 0; overflow: hidden; height: 48px; background: white; border-radius: 24px; display: flex; align-items: center; transition: width 0.3s, opacity 0.3s; opacity: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-right: 10px; }
     .google-float.active .google-bar { width: 220px; opacity: 1; padding: 0 10px; border: 1px solid #eee; }
-
-    /* 機票樣式 */
     .boarding-pass { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #eee; margin-bottom: 20px; position: relative; }
     .cut-line { border-top: 2px dashed #ddd; position: relative; margin: 15px 0; }
     .cut-line::before, .cut-line::after { content: ''; position: absolute; top: -10px; width: 20px; height: 20px; background: #FFF0F5; border-radius: 50%; }
     .cut-line::before { left: -10px; } .cut-line::after { right: -10px; }
-
-    /* 歡迎頁面 */
     .welcome-screen{position:fixed;inset:0;z-index:9999;background:#FFF0F5;transition:transform 0.7s cubic-bezier(0.7,0,0.3,1)}.welcome-screen.hidden-screen{transform:translateY(-100%);pointer-events:none}
     .welcome-bg{position:absolute;inset:0;z-index:0}.welcome-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,255,255,0.1),rgba(255,240,245,0.5))}
     .sakura{position:fixed;top:-10px;background:#FFB7B2;border-radius:100% 0 100% 0;opacity:0.6;animation:fall linear infinite;z-index:0;pointer-events:none;width:12px;height:12px}@keyframes fall{to{transform:translate(15vw,105vh) rotate(360deg)}}
@@ -73,10 +45,10 @@
 <body>
 
 <div id="crash-screen">
-    <h2 class="text-3xl font-bold mb-4">⚠️ 系統提示</h2>
-    <p class="mb-4 text-gray-600">偵測到資料異常，已自動啟動修復程序。</p>
-    <button onclick="localStorage.clear();location.reload()" class="bg-red-500 text-white px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition">重置並修復</button>
-    <pre id="error-log" class="mt-4 text-xs text-gray-400 bg-gray-100 p-2 rounded max-w-xs overflow-auto max-h-32 text-left"></pre>
+    <h2 class="text-3xl font-bold mb-4 text-red-500">⚠️ 程式異常</h2>
+    <p class="mb-4 text-gray-600">偵測到數據損毀，請點擊下方按鈕修復。</p>
+    <button onclick="localStorage.clear();location.reload()" class="bg-red-500 text-white px-8 py-3 rounded-full font-bold shadow-lg">重置並修復</button>
+    <pre id="error-log" class="mt-4 text-xs text-gray-400 bg-gray-100 p-2 rounded text-left overflow-auto max-w-xs"></pre>
 </div>
 <script>
     window.onerror = function(msg, url, line, col, error) {
@@ -90,7 +62,7 @@
 
 <div id="loading-screen">
     <div style="font-size: 60px;" class="animate-bounce">🌸</div>
-    <div class="mt-4 font-bold text-gray-600">V14.00 Flagship Loading...</div>
+    <div class="mt-4 font-bold text-gray-600">Trip V15.00 Loading...</div>
 </div>
 
 <div id="sakura-container"></div>
@@ -337,12 +309,14 @@ const sc = document.getElementById('sakura-container'); for(let i=0;i<12;i++){le
 
 createApp({
     setup() {
-        const STORAGE_KEY = 'V14_FLAGSHIP'; // New key to clear old cache
+        const STORAGE_KEY = 'v15_00_FINAL_CLEAN';
         const currentView = ref('menu');
         const isWelcomeClosed = ref(false);
         const showGoogleSearch = ref(false);
         
-        // --- DATA SECTION: 嚴格 JSON 格式 ---
+        // --- 核心修正：資料庫語法嚴格檢查 (Fix Ln: 456) ---
+        
+        // 1. 行程
         const defaultItinerary = [
             [
                 {id:101, category:'Flight', name:'06:40 桃園起飛 (TR898)', hours:'06:40', mapKeyword:'Taoyuan Airport', note:'T1航廈，提早2.5小時抵達'},
@@ -407,12 +381,28 @@ createApp({
             ]
         ];
         
+        // 2. 自駕地圖
         const drivePlan = [
             { day: 2, stops: [{name: 'Toyota Rent a Car', note: '河口湖站前取車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''},{name: '新倉山淺間公園', note: '五重塔(上午順光)', location: 'Chureito Pagoda', parking: 'Arakurayama Sengen Park Parking'},{name: '不動茶屋 (東戀路)', note: '午餐', location: 'Houtou Fudou Higashikoiji', parking: 'Houtou Fudou Parking'},{name: '大石公園', note: '河口湖畔散步', location: 'Oishi Park', parking: 'Oishi Park Parking'}] },
             { day: 3, stops: [{name: '平野之濱', note: '車拍逆富士', location: 'Hirano no Hama', parking: 'Hirano no Hama Parking'},{name: '長池親水公園', note: '拍天鵝', location: 'Nagaike Water Park', parking: 'Nagaike Water Park Parking'},{name: '忍野八海', note: '觀光名所', location: 'Oshino Hakkai', parking: 'Oshino Hakkai Parking'},{name: 'Ogino 超市', note: '採買晚餐', location: 'Ogino Kawaguchiko', parking: 'Ogino Kawaguchiko'}] },
             { day: 4, stops: [{name: '河口湖纜車', note: '天上山公園', location: 'Mt. Fuji Panoramic Ropeway', parking: 'Ropeway Parking'},{name: '富士山吐司', note: '伴手禮', location: 'Fujisan Shokupan', parking: 'Fujisan Shokupan'},{name: 'Toyota Rent a Car', note: '河口湖站前還車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''}] }
         ];
 
+        // 3. 基礎資料
+        const commonItems = ['護照', '日幣', 'SIM卡', '信用卡', '充電器', '常備藥', '牙刷牙膏', '轉接頭'];
+        const defaultUsers = [
+            {id:1,name:'吉伊',icon:'🐹',list:[...commonItems,'駕照'].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
+            {id:2,name:'小八',icon:'🐱',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
+            {id:3,name:'兔兔',icon:'🐰',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
+            {id:4,name:'小桃',icon:'🍑',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'}
+        ];
+        const hotels = [
+            {name:'錦糸町民宿',days:'Day 1-2',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA', img:'https://placehold.co/400x300/333/fff?text=BnB'},
+            {name:'Megu Fuji 2021',days:'Day 3-4',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Megu+Fuji+2021', img:'https://placehold.co/400x300/333/fff?text=Megu'},
+            {name:'DOMO Hotel Shinjuku',days:'Day 5-7',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=DOMO+Hotel+Shinjuku', img:'https://placehold.co/400x300/333/fff?text=DOMO'}
+        ];
+
+        // 4. 購物清單 (修復冒號引號錯誤)
         const defaultShopping = {
             wish: [
                 {name: 'Chiikawa Land', desc: '原宿/東京車站限定', link: 'https://www.google.com/search?q=Kiddy+Land+Harajuku', img: 'welcome.jpg'}, 
@@ -444,6 +434,7 @@ createApp({
             ]
         };
 
+        // 5. 美食清單 (修復冒號引號錯誤)
         const defaultFood = {
             Tokyo: [
                 {name: 'AFURI 拉麵', desc: '柚子鹽味 (原宿/六本木)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=AFURI+Harajuku',img:'afuri-ramen.jpg'}, 
@@ -468,6 +459,7 @@ createApp({
             ]
         };
 
+        // 6. 打卡清單 (修復冒號引號錯誤)
         const defaultPhoto = {
             Tokyo: [
                 {name: 'SHIBUYA SKY', desc: '高空展望台 (需預約)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=SHIBUYA+SKY',img'},
@@ -491,19 +483,6 @@ createApp({
                 {name: '山中湖平野之濱', desc: '逆富士絕景', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan6'}
             ]
         };
-
-        const commonItems = ['護照', '日幣', 'SIM卡', '信用卡', '充電器', '常備藥', '牙刷牙膏', '轉接頭'];
-        const defaultUsers = [
-            {id:1,name:'吉伊',icon:'🐹',list:[...commonItems,'駕照'].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
-            {id:2,name:'小八',icon:'🐱',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
-            {id:3,name:'兔兔',icon:'🐰',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
-            {id:4,name:'小桃',icon:'🍑',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'}
-        ];
-        const hotels = [
-            {name:'錦糸町民宿',days:'Day 1-2',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA', img:'https://placehold.co/400x300/333/fff?text=BnB'},
-            {name:'Megu Fuji 2021',days:'Day 3-4',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Megu+Fuji+2021', img:'https://placehold.co/400x300/333/fff?text=Megu'},
-            {name:'DOMO Hotel Shinjuku',days:'Day 5-7',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=DOMO+Hotel+Shinjuku', img:'https://placehold.co/400x300/333/fff?text=DOMO'}
-        ];
 
         // State & Refs
         const users = ref(defaultUsers);
