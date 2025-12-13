@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V25.01 Ultimate)</title>
+<title>關東之旅 2026 (V25.02 Fix)</title>
 
 <script>
     window.tailwind = {
@@ -442,7 +442,6 @@ createApp({
         const getUserName = (id) => users.value.find(u=>u.id===id)?.name||'未知';
         const getClothingAdvice = (t) => t<10?'羽絨+圍巾':t<15?'大衣+發熱衣':'洋蔥式穿搭';
 
-        // 修復：新增 getPageTitle 函式，防止標題顯示錯誤
         const getPageTitle = (view) => {
             const map = {
                 'itinerary': '行程表', 'money': '小財庫', 'hotel': '住宿交通', 'prep': '行前準備',
@@ -451,7 +450,6 @@ createApp({
             return map[view] || '關東之旅';
         };
 
-        // 修復：新增 getIconByCategory 函式，防止行程頁面報錯
         const getIconByCategory = (cat) => {
             const map = {
                 'Flight': 'fa-solid fa-plane',
@@ -526,6 +524,7 @@ createApp({
         });
 
         return {
+            users, // ★★★★ 關鍵修復：這裡補上了 users，讓選單可以顯示了！ ★★★★
             currentView, isWelcomeClosed, isLoggedIn, enterSite, apps, getPageTitle, handleAuthClick,
             showLoginModal, loginForm, doLogin, daysUntilTrip, reminderText, smartReminders, tripDays, selectedDayIndex, itineraryMode, getCurrentItinerary,
             moneyTab, exchangeRate, myExpenses, myTotalExpenseTWD, settlements, getUserName, openExpenseModal, showExpenseModal, modalData, toggleShare, saveExpense, deleteExpense,
