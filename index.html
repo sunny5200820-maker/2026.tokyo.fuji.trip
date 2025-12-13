@@ -4,26 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>關東8日之旅 V6.0 (最終完美版)</title>
+    <title>關東8日之旅 V7.0 (最終修正)</title>
     
     <style>
-        /* 基礎設定 - 強制顯示 */
-        html, body {
-            margin: 0; padding: 0; height: 100%;
+        body { 
+            margin: 0; padding: 0; 
             background-color: #FFF0F5; 
-            /* 粉紅點點背景 */
             background-image: radial-gradient(#FFD1DC 15%, transparent 16%), radial-gradient(#FFF5BA 15%, transparent 16%);
             background-size: 60px 60px;
             background-position: 0 0, 30px 30px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #5D4037;
+            font-family: sans-serif; 
             overflow-x: hidden;
+            color: #5D4037;
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* 確保 App 區塊永遠可見 */
-        #app { display: block !important; opacity: 1 !important; min-height: 100vh; }
-
         /* 櫻花特效 */
         .sakura { position: fixed; top: -10px; background: #FFB7B2; border-radius: 100% 0 100% 0; opacity: 0.6; animation: fall linear infinite; z-index: 0; pointer-events: none; width: 12px; height: 12px; }
         @keyframes fall { to { transform: translate(15vw, 105vh) rotate(360deg); } }
@@ -50,11 +45,9 @@
         /* 進度條 */
         .progress-container { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-top: 5px; }
         .progress-fill { height: 100%; transition: width 0.5s ease; }
-
-        /* 靜態載入遮罩 (純HTML) */
-        #static-loading { position: fixed; inset: 0; background: #FFF0F5; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .loading-icon { font-size: 50px; animation: spin 2s infinite linear; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* 錯誤顯示區 */
+        #error-box { display: none; position: fixed; top: 0; left: 0; width: 100%; background: red; color: white; padding: 10px; z-index: 999999; font-size: 12px; }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -77,15 +70,11 @@
 </head>
 <body>
 
+    <div id="error-box"></div>
     <div id="sakura-container"></div>
 
-    <div id="static-loading">
-        <div class="loading-icon">🌸</div>
-        <div style="font-weight:bold; color:#555;">V6.0 啟動中...</div>
-        <button onclick="forceStart()" style="margin-top:20px; padding:5px 15px; border:1px solid #ccc; border-radius:20px; font-size:12px; color:#888;">如果卡住請點我</button>
-    </div>
-
     <div id="app">
+        
         <div v-if="currentView !== 'home'" class="fixed top-0 left-0 right-0 h-16 bg-[#FFF0F5]/95 backdrop-blur z-40 flex items-center justify-between px-4 border-b border-pink-100 shadow-sm transition-all">
             <button @click="currentView='home'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow border border-pink-100"><i class="fa-solid fa-chevron-left"></i></button>
             <h1 class="font-bold text-gray-700 flex items-center gap-2"><i class="fa-solid fa-sakura text-pink-400"></i> {{ getPageTitle(currentView) }}</h1>
@@ -99,7 +88,9 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#FFF0F5]"></div>
             </div>
             
-            <div class="fixed z-50 bg-white/90 backdrop-blur border-4 border-chii-pink px-4 py-2 rounded-full shadow-lg flex items-center gap-2" style="top: 150px; left: 20px;">
+            <div ref="countdownEl" class="fixed z-50 cursor-grab bg-white/90 backdrop-blur border-4 border-chii-pink px-4 py-2 rounded-full shadow-lg flex items-center gap-2" 
+                 :style="{ top: countdownPos.y + 'px', left: countdownPos.x + 'px' }" 
+                 @touchstart="startDrag" @mousedown="startDrag">
                 <div class="text-2xl animate-wiggle">🐹</div>
                 <div class="flex flex-col"><div class="text-[10px] text-gray-500 font-bold uppercase">Countdown</div><div class="text-xl font-black text-pink-500 leading-none">{{ daysUntilTrip }} <span class="text-xs text-gray-400">天</span></div></div>
             </div>
@@ -166,7 +157,6 @@
                     <div class="flex justify-between items-center mb-3 px-1"><h3 class="font-bold text-gray-700 flex items-center gap-2">{{ getUserById(currentUserId).name }} 的帳本</h3><button @click="moneyMode='select'" class="text-xs bg-white px-3 py-1 rounded shadow text-gray-500">切換</button></div>
                     <div class="card p-4 mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 border relative overflow-hidden">
                         <div class="text-xs text-yellow-600 font-bold mb-1">個人總支出 (不含公帳)</div><div class="text-2xl font-black text-gray-800">¥{{ Number(userPersonalTotal).toLocaleString() }}</div>
-                        <i class="fa-solid fa-coins absolute bottom-[-10px] right-[-10px] text-6xl text-yellow-200 opacity-50"></i>
                     </div>
                     <div class="space-y-3"><div v-for="exp in personalExpenses" :key="exp.id" class="card p-3 flex justify-between items-center"><div><div class="font-bold text-gray-800 text-sm">{{ exp.name }}</div><div class="text-[10px] text-gray-400">{{ exp.date }}</div></div><div class="text-right font-bold text-gray-800">¥{{ Number(exp.amount).toLocaleString() }}<button @click="deleteExpense(exp.id)" class="text-red-300 ml-2 text-xs"><i class="fa-solid fa-trash"></i></button></div></div></div>
                     <button @click="openExpenseModal('personal')" class="fab-main"><i class="fa-solid fa-pen"></i></button>
@@ -306,7 +296,7 @@
                     </div>
                 </div>
             </div>
-            <button @click="openAddCommonModal(currentView)" class="fab-main hover:scale-110" :class="currentView==='shopping'?'bg-purple-400':currentView==='food'?'bg-orange-400':'bg-rose-400'"><i class="fa-solid fa-plus"></i></button>
+            <button @click="openAddCommonModal(currentView)" class="fab-main hover:scale-110"><i class="fa-solid fa-plus"></i></button>
         </div>
 
         <div v-if="currentView === 'japanese'" class="px-4 py-2">
@@ -334,31 +324,48 @@
     </div>
 
     <script>
-        function forceStart() {
-            document.getElementById('static-loading').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            document.getElementById('app').style.opacity = '1';
-        }
-
-        // 全域錯誤監聽
-        window.addEventListener('error', function(e) {
-            document.querySelector('.loading-text').innerHTML = "發生錯誤<br><span style='font-size:10px; color:red;'>" + e.message + "</span>";
-            document.getElementById('force-btn').style.display = 'inline-block';
-        });
-
-        // 產生櫻花
+        window.onerror = function(msg, url, line) {
+            const err = document.getElementById('error-box');
+            if(err){ err.style.display='block'; err.innerHTML=`Error: ${msg} (Line ${line})`; }
+        };
         const sc = document.getElementById('sakura-container');
         for(let i=0; i<20; i++){ const e = document.createElement('div'); e.className = 'sakura'; e.style.left = Math.random()*100+'vw'; e.style.animationDuration = Math.random()*3+4+'s'; sc.appendChild(e); }
-        
-        // 3秒後若還沒進去，顯示強制按鈕
-        setTimeout(() => {
-            if(document.getElementById('static-loading').style.display !== 'none') {
-                document.getElementById('force-btn').style.display = 'inline-block';
-            }
-        }, 3000);
     </script>
 
     <script>
+        // 定義資料 (在 createApp 之前)
+        const defaultItinerary = [
+            [{ id: 101, category: 'Flight', name: '06:40 桃園起飛', hours: '06:40', mapKeyword: '桃園機場', note: '提早2小時抵達機場' }, { id: 102, category: 'Flight', name: '10:40 抵達成田機場', hours: '10:40', mapKeyword: '成田機場', note: '領取行李、購買交通卡' }, { id: 103, category: 'Sightseeing', name: '晴空塔 Tokyo Skytree', hours: '下午', mapKeyword: 'Tokyo Skytree', note: '可逛 Solamachi 商店街' }, { id: 104, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', mapKeyword: '錦糸町美食', note: '依照當下心情選擇' }],
+            [{ id: 201, category: 'Sightseeing', name: '淺草寺', hours: '上午', mapKeyword: '淺草寺', note: '雷門、仲見世通' }, { id: 202, category: 'Food', name: '午餐：淺草寺周遭', hours: '中午', mapKeyword: '淺草午餐', note: '推薦炸肉餅、鰻魚飯' }, { id: 203, category: 'Sightseeing', name: '小網神社', hours: '下午', mapKeyword: '小網神社', note: '強運厄除' }, { id: 204, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', mapKeyword: '上野恩賜公園', note: '散步、星巴克' }, { id: 205, category: 'Shopping', name: '秋葉原 或 東京一番街', hours: '晚上', mapKeyword: '東京站一番街', note: '動漫周邊 / 伴手禮' }],
+            [{ id: 301, category: 'Transport', name: '前往富士山 (租車)', hours: '上午', mapKeyword: '河口湖租車', note: '從錦糸町出發，開始3天2夜自駕' }, { id: 302, category: 'Sightseeing', name: '河口湖自然生活館', hours: '下午', mapKeyword: '河口湖自然生活館' }, { id: 303, category: 'Sightseeing', name: '新倉富士淺間神社', hours: '下午', mapKeyword: '新倉富士淺間神社' }, { id: 304, category: 'Sightseeing', name: '金鳥居 & 本町商店街', hours: '傍晚', mapKeyword: '富士吉田本町通り' }, { id: 305, category: 'Food', name: '晚餐：自炊或商店街', hours: '晚上', mapKeyword: '富士吉田晚餐' }],
+            [{ id: 401, category: 'Sightseeing', name: '平野之濱日出', hours: '清晨', mapKeyword: '平野之濱', note: '絕美逆富士' }, { id: 402, category: 'Sightseeing', name: '長池親水公園 & 白鳥濱', hours: '上午', mapKeyword: '長池親水公園', note: '餵天鵝、拍美照' }, { id: 403, category: 'Transport', name: '租自行車環湖', hours: '上午', mapKeyword: '山中湖自行車租借', note: '享受湖畔微風' }, { id: 404, category: 'Food', name: '午餐：山中湖餐廳', hours: '中午', mapKeyword: '山中湖美食' }, { id: 405, category: 'Sightseeing', name: 'KABA 水陸巴士', hours: '下午', mapKeyword: '山中湖KABA' }, { id: 406, category: 'Shopping', name: 'Ogino 超市採買', hours: '傍晚', mapKeyword: 'Ogino 河口湖店', note: '晚餐食材' }],
+            [{ id: 501, category: 'Sightseeing', name: '金鳥居 (補拍)', hours: '早上', mapKeyword: '金鳥居', note: '若前兩天沒拍到' }, { id: 502, category: 'Sightseeing', name: '河口湖纜車 & 絕景鞦韆', hours: '早上', mapKeyword: '河口湖富士山全景纜車' }, { id: 503, category: 'Shopping', name: 'Fujisan Shokupan', hours: '中午', mapKeyword: 'Fujisan Shokupan', note: '購買富士山吐司' }, { id: 504, category: 'Transport', name: '搭乘富士回遊返新宿', hours: '下午', mapKeyword: '河口湖站', note: '還車後搭車' }, { id: 505, category: 'Shopping', name: '池袋太陽城', hours: '晚上', mapKeyword: '池袋太陽城', note: '購物、晚餐' }],
+            [{ id: 601, category: 'Transport', name: '新宿前往藤澤', hours: '上午', mapKeyword: '藤澤站', note: '江之電一日遊開始' }, { id: 602, category: 'Sightseeing', name: '江之島', hours: '上午', mapKeyword: '江之島', note: '參道、神社' }, { id: 603, category: 'Sightseeing', name: '鎌倉高校前', hours: '中午', mapKeyword: '鎌倉高校前駅', note: '灌籃高手平交道' }, { id: 604, category: 'Sightseeing', name: '七里濱 & 午餐', hours: '下午', mapKeyword: '七里濱', note: 'Bills 或周邊餐廳' }, { id: 605, category: 'Sightseeing', name: '鎌倉', hours: '傍晚', mapKeyword: '鎌倉小町通', note: '逛街、大佛' }],
+            [{ id: 701, category: 'Sightseeing', name: '東京鐵塔', hours: '上午', mapKeyword: '芝公園', note: '拍照點：芝公園' }, { id: 702, category: 'Sightseeing', name: '六本木 / 麻布台', hours: '中午', mapKeyword: '麻布台之丘', note: '午餐在此解決' }, { id: 703, category: 'Sightseeing', name: '前往澀谷', hours: '下午', mapKeyword: '澀谷', note: '逛街' }, { id: 704, category: 'Sightseeing', name: 'SHIBUYA SKY', hours: '傍晚', mapKeyword: 'SHIBUYA SKY', note: '需預約夕陽時段' }, { id: 705, category: 'Shopping', name: '澀谷最後採買', hours: '晚上', mapKeyword: '澀谷十字路口', note: '藥妝、唐吉訶德' }],
+            [{ id: 801, category: 'Sightseeing', name: '自由行程', hours: '白天', mapKeyword: '', note: '補貨或休息' }, { id: 802, category: 'Flight', name: '20:40 成田起飛', hours: '20:40', mapKeyword: '成田機場', note: '提早抵達機場' }, { id: 803, category: 'Flight', name: '23:20 抵達桃園', hours: '23:20', mapKeyword: '桃園機場', note: '平安回家' }]
+        ];
+        
+        const defaultUsers = [{id: 1, name: '吉伊', bg: '#FFD1DC', icon:'🐹', list:['護照']}, {id: 2, name: '小八', bg: '#A2D2FF', icon:'🐱', list:['護照']}, {id: 3, name: '兔兔', bg: '#FFF5BA', icon:'🐰', list:['護照']}, {id: 4, name: '小桃', bg: '#FFB7B2', icon:'🍑', list:['護照']}];
+        
+        const defaultFood = {
+            'Tokyo': [{id:1, name:'AFURI 阿夫利拉麵', desc:'必吃的柚子鹽拉麵！', img:'./images/afuri-ramen.jpg', link:'https://afuri.com/'}, {id:2, name:'HARBS 水果千層蛋糕', desc:'東京甜點界的夢幻逸品！', img:'./images/harbs-fruit-crepe.jpg', link:'https://www.harbs.co.jp/'}, {id:3, name:'淺草炸肉餅', desc:'仲見世通必吃散步美食。', img:'./images/menchi.jpg', link:'https://www.google.com/maps/search/?api=1&query=$%E6%B7%BA%E8%8D%89%E7%82%B8%E8%82%89%E9%A4%85'}, {id:4, name:'牛かつもと村', desc:'人氣炸牛排定食。', img:'./images/beef.jpg', link:'https://www.google.com/maps/search/?api=1&query=$%E7%89%9B%E3%81%8B%E3%81%A4%E3%82%82%E3%81%A8%E6%9D%91'}],
+            'Kamakura': [{id:5, name:'Bills 七里濱', desc:'世界第一好吃的早餐。', img:'./images/bills.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Bills%20%E4%B8%83%E9%87%8C%E6%BF%B1'}, {id:6, name:'豐島屋 鴿子餅乾', desc:'鎌倉最具代表性伴手禮。', img:'./images/dove.jpg', link:'https://www.google.com/maps/search/?api=1&query=$%E8%B1%90%E5%B3%B6%E5%B1%8B%20%E6%9C%AC%E5%BA%97'}],
+            'Fuji': [{id:7, name:'Houtou Fudou 餺飥麵', desc:'河口湖必吃鄉土料理。', img:'./images/houtou.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Houtou%20Fudou%20%E6%9D%B1%E6%8B%80%E8%B7%AF%E5%BA%97'}, {id:8, name:'Fujisan Shokupan', desc:'超可愛的富士山造型吐司！', img:'./images/toast.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Fujisan%20Shokupan'}]
+        };
+
+        const defaultShop = {
+            'wish': [],
+            'cosme': [{id:1, name:'Kate 怪獸唇膏', desc:'賣到缺貨的神級唇膏！', img:'./images/kate.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Kate%20Monster%20Lip'}, {id:2, name:'Tirtir 氣墊粉餅', desc:'日本女生人手一顆的紅盒氣墊。', img:'./images/tirtir.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Tirtir%20Cushion'}],
+            'ldk': [{id:3, name:'Lululun 面膜', desc:'LDK 評測常勝軍！', img:'./images/lululun.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Lululun%20Mask'}, {id:4, name:'Melano CC 精華', desc:'平價美白神器！', img:'./images/cc.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Melano%20CC'}],
+            'souvenir': [{id:5, name:'NY Perfect Cheese', desc:'東京車站排隊名店！', img:'./images/ny.jpg', link:'https://www.google.com/maps/search/?api=1&query=$NY%20Perfect%20Cheese'}]
+        };
+
+        const defaultPhoto = {
+            'Tokyo': [{id:1, name:'SHIBUYA SKY', desc:'東京最美高空展望台！', img:'./images/sky.jpg', link:'https://www.google.com/maps/search/?api=1&query=$SHIBUYA%20SKY'}, {id:2, name:'東京鐵塔 (芝公園)', desc:'能拍到東京鐵塔全貌的最佳公園。', img:'./images/tower.jpg', link:'https://www.google.com/maps/search/?api=1&query=$%E8%8A%9D%E5%85%AC%E5%9C%92'}],
+            'Kamakura': [{id:3, name:'鎌倉高校前', desc:'灌籃高手經典場景再現！', img:'./images/slamdunk.jpg', link:'https://www.google.com/maps/search/?api=1&query=$%E9%90%AE%E5%80%89%E9%AB%98%E6%A0%A1%E5%89%8D%E7%AB%99'}, {id:4, name:'長谷寺', desc:'繡球花季的絕美景點。', img:'./images/hasedera.jpg', link:'https://www.google.com/maps/search/?api=1&query=$%E9%95%B7%E8%B0%B7%E5%AF%BA'}],
+            'Fuji': [{id:5, name:'新倉山淺間公園', desc:'明信片等級的絕景！', img:'./images/pagoda.jpg', link:'https://www.google.com/maps/search/?api=1&query=$%E6%96%B0%E5%80%89%E5%B1%B1%E6%B7%BA%E9%96%93%E5%85%AC%E5%9C%92'}, {id:6, name:'河口湖 Lawson', desc:'便利商店背後就是巨大的富士山！', img:'./images/lawson.jpg', link:'https://www.google.com/maps/search/?api=1&query=$Lawson%20%E6%B2%B3%E5%8F%A3%E6%B9%96%E7%AB%99%E5%89%8D%E5%BA%97'}]
+        };
+
         const { createApp, ref, computed, onMounted, watch } = Vue;
 
         createApp({
@@ -377,20 +384,8 @@
                 const tripDays = [{ week: 'Day 1', title: '抵達' }, { week: 'Day 2', title: '淺草' }, { week: 'Day 3', title: '河口湖' }, { week: 'Day 4', title: '山中湖' }, { week: 'Day 5', title: '新宿' }, { week: 'Day 6', title: '鎌倉' }, { week: 'Day 7', title: '澀谷' }, { week: 'Day 8', title: '返程' }];
                 const selectedDayIndex = ref(0);
                 
-                // 完整資料結構 (不再使用簡易版)
-                const defaultItinerary = [
-                    [{ id: 101, category: 'Flight', name: '06:40 桃園起飛', hours: '06:40', mapKeyword: '桃園機場', note: '提早2小時抵達機場' }, { id: 102, category: 'Flight', name: '10:40 抵達成田機場', hours: '10:40', mapKeyword: '成田機場', note: '領取行李、購買交通卡' }, { id: 103, category: 'Sightseeing', name: '晴空塔 Tokyo Skytree', hours: '下午', mapKeyword: 'Tokyo Skytree', note: '可逛 Solamachi 商店街' }, { id: 104, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', mapKeyword: '錦糸町美食', note: '依照當下心情選擇' }],
-                    [{ id: 201, category: 'Sightseeing', name: '淺草寺', hours: '上午', mapKeyword: '淺草寺', note: '雷門、仲見世通' }, { id: 202, category: 'Food', name: '午餐：淺草寺周遭', hours: '中午', mapKeyword: '淺草午餐', note: '推薦炸肉餅、鰻魚飯' }, { id: 203, category: 'Sightseeing', name: '小網神社', hours: '下午', mapKeyword: '小網神社', note: '強運厄除' }, { id: 204, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', mapKeyword: '上野恩賜公園', note: '散步、星巴克' }, { id: 205, category: 'Shopping', name: '秋葉原 或 東京一番街', hours: '晚上', mapKeyword: '東京站一番街', note: '動漫周邊 / 伴手禮' }],
-                    [{ id: 301, category: 'Transport', name: '前往富士山 (租車)', hours: '上午', mapKeyword: '河口湖租車', note: '從錦糸町出發，開始3天2夜自駕' }, { id: 302, category: 'Sightseeing', name: '河口湖自然生活館', hours: '下午', mapKeyword: '河口湖自然生活館' }, { id: 303, category: 'Sightseeing', name: '新倉富士淺間神社', hours: '下午', mapKeyword: '新倉富士淺間神社' }, { id: 304, category: 'Sightseeing', name: '金鳥居 & 本町商店街', hours: '傍晚', mapKeyword: '富士吉田本町通り' }, { id: 305, category: 'Food', name: '晚餐：自炊或商店街', hours: '晚上', mapKeyword: '富士吉田晚餐' }],
-                    [{ id: 401, category: 'Sightseeing', name: '平野之濱日出', hours: '清晨', mapKeyword: '平野之濱', note: '絕美逆富士' }, { id: 402, category: 'Sightseeing', name: '長池親水公園 & 白鳥濱', hours: '上午', mapKeyword: '長池親水公園', note: '餵天鵝、拍美照' }, { id: 403, category: 'Transport', name: '租自行車環湖', hours: '上午', mapKeyword: '山中湖自行車租借', note: '享受湖畔微風' }, { id: 404, category: 'Food', name: '午餐：山中湖餐廳', hours: '中午', mapKeyword: '山中湖美食' }, { id: 405, category: 'Sightseeing', name: 'KABA 水陸巴士', hours: '下午', mapKeyword: '山中湖KABA' }, { id: 406, category: 'Shopping', name: 'Ogino 超市採買', hours: '傍晚', mapKeyword: 'Ogino 河口湖店', note: '晚餐食材' }],
-                    [{ id: 501, category: 'Sightseeing', name: '金鳥居 (補拍)', hours: '早上', mapKeyword: '金鳥居', note: '若前兩天沒拍到' }, { id: 502, category: 'Sightseeing', name: '河口湖纜車 & 絕景鞦韆', hours: '早上', mapKeyword: '河口湖富士山全景纜車' }, { id: 503, category: 'Shopping', name: 'Fujisan Shokupan', hours: '中午', mapKeyword: 'Fujisan Shokupan', note: '購買富士山吐司' }, { id: 504, category: 'Transport', name: '搭乘富士回遊返新宿', hours: '下午', mapKeyword: '河口湖站', note: '還車後搭車' }, { id: 505, category: 'Shopping', name: '池袋太陽城', hours: '晚上', mapKeyword: '池袋太陽城', note: '購物、晚餐' }],
-                    [{ id: 601, category: 'Transport', name: '新宿前往藤澤', hours: '上午', mapKeyword: '藤澤站', note: '江之電一日遊開始' }, { id: 602, category: 'Sightseeing', name: '江之島', hours: '上午', mapKeyword: '江之島', note: '參道、神社' }, { id: 603, category: 'Sightseeing', name: '鎌倉高校前', hours: '中午', mapKeyword: '鎌倉高校前駅', note: '灌籃高手平交道' }, { id: 604, category: 'Sightseeing', name: '七里濱 & 午餐', hours: '下午', mapKeyword: '七里濱', note: 'Bills 或周邊餐廳' }, { id: 605, category: 'Sightseeing', name: '鎌倉', hours: '傍晚', mapKeyword: '鎌倉小町通', note: '逛街、大佛' }],
-                    [{ id: 701, category: 'Sightseeing', name: '東京鐵塔', hours: '上午', mapKeyword: '芝公園', note: '拍照點：芝公園' }, { id: 702, category: 'Sightseeing', name: '六本木 / 麻布台', hours: '中午', mapKeyword: '麻布台之丘', note: '午餐在此解決' }, { id: 703, category: 'Sightseeing', name: '前往澀谷', hours: '下午', mapKeyword: '澀谷', note: '逛街' }, { id: 704, category: 'Sightseeing', name: 'SHIBUYA SKY', hours: '傍晚', mapKeyword: 'SHIBUYA SKY', note: '需預約夕陽時段' }, { id: 705, category: 'Shopping', name: '澀谷最後採買', hours: '晚上', mapKeyword: '澀谷十字路口', note: '藥妝、唐吉訶德' }],
-                    [{ id: 801, category: 'Sightseeing', name: '自由行程', hours: '白天', mapKeyword: '', note: '補貨或休息' }, { id: 802, category: 'Flight', name: '20:40 成田起飛', hours: '20:40', mapKeyword: '成田機場', note: '提早抵達機場' }, { id: 803, category: 'Flight', name: '23:20 抵達桃園', hours: '23:20', mapKeyword: '桃園機場', note: '平安回家' }]
-                ];
-                
                 const itineraryData = ref(defaultItinerary);
-                const users = ref([{id: 1, name: '吉伊', bg: '#FFD1DC', icon:'🐹', list:['護照']}, {id: 2, name: '小八', bg: '#A2D2FF', icon:'🐱', list:['護照']}, {id: 3, name: '兔兔', bg: '#FFF5BA', icon:'🐰', list:['護照']}, {id: 4, name: '小桃', bg: '#FFB7B2', icon:'🍑', list:['護照']}]);
+                const users = ref(defaultUsers);
                 const expenses = ref([]);
                 const daysUntilTrip = ref(100);
                 
@@ -424,23 +419,9 @@
                 const sakuraStatus = ref('預測中');
                 const exchangeRate = ref(0.22);
 
-                // Lists Data
-                const shoppingList = ref({ 
-                    'wish': [], 
-                    'cosme': [{id:1, name:'Kate 怪獸唇膏', desc:'賣到缺貨的神級唇膏！', img:'./images/kate.jpg', link:searchMap('Kate Monster Lip')}, {id:2, name:'Tirtir 氣墊粉餅', desc:'日本女生人手一顆的紅盒氣墊。', img:'./images/tirtir.jpg', link:searchMap('Tirtir Cushion')}],
-                    'ldk': [{id:3, name:'Lululun 面膜', desc:'LDK 評測常勝軍！', img:'./images/lululun.jpg', link:searchMap('Lululun Mask')}, {id:4, name:'Melano CC 精華', desc:'平價美白神器！', img:'./images/cc.jpg', link:searchMap('Melano CC')}],
-                    'souvenir': [{id:5, name:'NY Perfect Cheese', desc:'東京車站排隊名店！', img:'./images/ny.jpg', link:searchMap('NY Perfect Cheese')}] 
-                });
-                const foodList = ref({ 
-                    'Tokyo': [{id:1, name:'AFURI 阿夫利拉麵', desc:'必吃的柚子鹽拉麵！', img:'./images/afuri-ramen.jpg', link:'https://afuri.com/'}, {id:2, name:'HARBS 水果千層蛋糕', desc:'東京甜點界的夢幻逸品！', img:'./images/harbs-fruit-crepe.jpg', link:'https://www.harbs.co.jp/'}, {id:3, name:'淺草炸肉餅', desc:'仲見世通必吃散步美食。', img:'./images/menchi.jpg', link:searchMap('淺草炸肉餅')}, {id:4, name:'牛かつもと村', desc:'人氣炸牛排定食。', img:'./images/beef.jpg', link:searchMap('牛かつもと村')}], 
-                    'Kamakura': [{id:5, name:'Bills 七里濱', desc:'世界第一好吃的早餐。', img:'./images/bills.jpg', link:searchMap('Bills 七里濱')}, {id:6, name:'豐島屋 鴿子餅乾', desc:'鎌倉最具代表性伴手禮。', img:'./images/dove.jpg', link:searchMap('豐島屋 本店')}], 
-                    'Fuji': [{id:7, name:'Houtou Fudou 餺飥麵', desc:'河口湖必吃鄉土料理。', img:'./images/houtou.jpg', link:searchMap('Houtou Fudou 東戀路店')}, {id:8, name:'Fujisan Shokupan', desc:'超可愛的富士山造型吐司！', img:'./images/toast.jpg', link:searchMap('Fujisan Shokupan')}] 
-                });
-                const photoSpots = ref({ 
-                    'Tokyo': [{id:1, name:'SHIBUYA SKY', desc:'東京最美高空展望台！', img:'./images/sky.jpg', link:searchMap('SHIBUYA SKY')}, {id:2, name:'東京鐵塔 (芝公園)', desc:'能拍到東京鐵塔全貌的最佳公園。', img:'./images/tower.jpg', link:searchMap('芝公園')}], 
-                    'Kamakura': [{id:3, name:'鎌倉高校前', desc:'灌籃高手經典場景再現！', img:'./images/slamdunk.jpg', link:searchMap('鎌倉高校前站')}, {id:4, name:'長谷寺', desc:'繡球花季的絕美景點。', img:'./images/hasedera.jpg', link:searchMap('長谷寺')}], 
-                    'Fuji': [{id:5, name:'新倉山淺間公園', desc:'明信片等級的絕景！', img:'./images/pagoda.jpg', link:searchMap('新倉山淺間公園')}, {id:6, name:'河口湖 Lawson', desc:'便利商店背後就是巨大的富士山！', img:'./images/lawson.jpg', link:searchMap('Lawson 河口湖站前店')}] 
-                });
+                const shoppingList = ref(defaultShop);
+                const foodList = ref(defaultFood);
+                const photoSpots = ref(defaultPhoto);
                 const japanesePhrases = ref([{jp:'すみません', tw:'不好意思'}, {jp:'これをお願いします', tw:'我要這個'}, {jp:'お会計お願いします', tw:'結帳'}]);
                 
                 // Computed
@@ -514,45 +495,33 @@
                 const openImage = (src) => { currentZoomImg.value = src; showLightbox.value = true; };
                 const speak = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; window.speechSynthesis.speak(u); };
                 
-                // Backup
                 const saveAsHtml = () => { 
                     const state = { itinerary: itineraryData.value, users: users.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value, jp: japanesePhrases.value }; 
                     let html = document.documentElement.outerHTML; 
                     html = html.replace('const itineraryData = ref(defaultItinerary);', 'const itineraryData = ref('+JSON.stringify(state.itinerary)+');')
-                               .replace('const users = ref([{id: 1', 'const users = ref('+JSON.stringify(state.users)+'); //')
+                               .replace('const users = ref(defaultUsers);', 'const users = ref('+JSON.stringify(state.users)+');')
                                .replace('const expenses = ref([]);', 'const expenses = ref('+JSON.stringify(state.expenses)+');');
-                    const blob = new Blob([html], {type: 'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '2026_Tokyo_V6.0.html'; a.click(); 
+                    const blob = new Blob([html], {type: 'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '2026_Tokyo_V7.0.html'; a.click(); 
                 };
                 const downloadBackup = () => { const data = JSON.stringify({itinerary:itineraryData.value, users:users.value}); const blob = new Blob([data], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup.json'; a.click(); };
                 const loadBackup = (e) => { const r = new FileReader(); r.onload = (ev) => { try{ const d=JSON.parse(ev.target.result); itineraryData.value=d.itinerary; users.value=d.users; alert('讀取成功'); showSyncModal.value=false; }catch(err){alert('格式錯誤');} }; r.readAsText(e.target.files[0]); };
 
-                // API
                 const getW = async (lat,lon,refVal) => { try{ const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=Asia%2FTokyo`); const d=await r.json(); refVal.value={temp:d.current.temperature_2m, icon:d.current.weather_code<=3?'🌤️':'☁️'}; }catch(e){} };
                 const fetchRate = async () => { try { const r=await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const d=await r.json(); if(d.rates.TWD) exchangeRate.value = (1/d.rates.TWD).toFixed(3); } catch(e){} };
 
                 onMounted(() => {
-                    const STORAGE_KEY = 'v60_golden_release'; // 使用全新金鑰
+                    const STORAGE_KEY = 'v70_final_key';
                     const s = localStorage.getItem(STORAGE_KEY);
-                    if(s) { try { const d=JSON.parse(s); itineraryData.value=d.itinerary||defaultItinerary; expenses.value=d.expenses||[]; shoppingList.value=d.shop||shoppingList.value; foodList.value=d.food||foodList.value; photoSpots.value=d.photo||photoSpots.value; } catch(e){} }
-                    else {
-                        const basic = ['護照', '日幣', '信用卡', 'SIM卡'];
-                        const drive = JSON.stringify(itineraryData.value).includes('租車') ? ['駕照/譯本'] : [];
-                        users.value.forEach((u, i) => u.list = [...basic, ...(i===0?drive:[])].map(t => ({text:t, checked:false}))); 
-                    }
+                    if(s) { try { const d=JSON.parse(s); itineraryData.value=d.itinerary||defaultItinerary; expenses.value=d.expenses||[]; shoppingList.value=d.shop||defaultShop; foodList.value=d.food||defaultFood; photoSpots.value=d.photo||defaultPhoto; } catch(e){} }
                     
                     getW(35.6895, 139.6917, tokyoWeather); getW(35.3192, 139.5467, kamakuraWeather); getW(35.3606, 138.7274, fujiWeather); fetchRate();
                     daysUntilTrip.value = Math.ceil((new Date('2026-03-27') - new Date()) / (86400000));
-
-                    // 移除載入遮罩
-                    setTimeout(() => {
-                        const loader = document.getElementById('static-loading');
-                        const appDiv = document.getElementById('app');
-                        if(loader) { loader.style.opacity = '0'; appDiv.style.display = 'block'; setTimeout(() => { loader.style.display = 'none'; appDiv.style.opacity = '1'; }, 500); }
-                    }, 800);
+                    
+                    setTimeout(() => { document.getElementById('app').style.display='block'; setTimeout(()=>document.getElementById('app').style.opacity='1',50); }, 500);
                 });
 
                 watch([itineraryData, expenses, shoppingList, foodList, photoSpots], () => {
-                    localStorage.setItem('v60_golden_release', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value}));
+                    localStorage.setItem('v70_final_key', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value}));
                 }, {deep: true});
 
                 const apps = [
