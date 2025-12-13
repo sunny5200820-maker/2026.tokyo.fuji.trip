@@ -6,51 +6,54 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V14.00 究極無錯版)</title>
+<title>關東之旅 2026 (V14.00 旗艦無錯版)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
+
 <script>
     tailwind.config={
         theme:{
             extend:{
                 colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},
                 fontFamily:{sans:['Zen Maru Gothic','sans-serif']},
-                animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards'},
+                animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.6s ease-out forwards'},
                 keyframes:{
                     wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},
                     float:{'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},
-                    fadeIn:{from:{opacity:0,transform:'translateY(15px)'},to:{opacity:1,transform:'translateY(0)'}}
+                    fadeIn:{from:{opacity:0,transform:'translateY(20px)'},to:{opacity:1,transform:'translateY(0)'}}
                 }
             }
         }
     }
 </script>
+
 <style>
-    /* 全局樣式設定 */
+    /* 全局設定 */
     html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;background-image:radial-gradient(#FFD1DC 15%,transparent 16%),radial-gradient(#FFF5BA 15%,transparent 16%);background-size:60px 60px;background-position:0 0,30px 30px;font-family:-apple-system,BlinkMacSystemFont,"Zen Maru Gothic",sans-serif;color:#5D4037;overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
-    input, textarea, select { font-size: 16px !important; } /* iOS 防縮放 */
+    input, textarea, select { font-size: 16px !important; } /* 防止 iOS 自動縮放 */
+    button { touch-action: manipulation; } /* 優化點擊反應 */
     #app{display:block;min-height:100vh}
-    [v-cloak]{display:none !important} /* 隱藏未編譯的 Vue 模板 */
+    [v-cloak]{display:none !important}
     .hide-scrollbar::-webkit-scrollbar{display:none}.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
     
-    /* 錯誤攔截器樣式 */
-    #crash-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 100000; padding: 20px; text-align: center; color: #b71c1c; overflow: auto; flex-direction: column; justify-content: center; align-items: center; }
+    /* 錯誤攔截器 */
+    #crash-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 100000; padding: 20px; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #b71c1c; }
     #loading-screen { position: fixed; inset: 0; background: #FFF0F5; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
 
     /* UI 組件 */
-    .card{background:rgba(255,255,255,0.94);border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,0.05);border:1px solid rgba(255,255,255,0.8);margin-bottom:16px;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+    .card{background:rgba(255,255,255,0.95);border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid rgba(255,255,255,0.8);margin-bottom:16px;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
     
-    /* 懸浮按鈕 - 下方置中 (Home) */
-    .fab-home{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;z-index:900;border:4px solid white;box-shadow:0 8px 25px rgba(255,105,180,0.4);background:linear-gradient(135deg,#FF9EAC,#FFD1DC);cursor:grab;touch-action:none;transition:transform 0.1s}
+    /* 懸浮按鈕：Home (下方置中) */
+    .fab-home{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;z-index:900;border:4px solid white;box-shadow:0 8px 25px rgba(255,105,180,0.4);background:linear-gradient(135deg,#FF9EAC,#FFD1DC);cursor:grab;touch-action:none;transition:transform 0.1s}
     .fab-home:active{transform:translateX(-50%) scale(0.9);cursor:grabbing}
     
-    /* 懸浮按鈕 - 右下角 (Add/Edit) */
+    /* 懸浮按鈕：新增 (右下角) */
     .fab-main{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;z-index:40;border:3px solid white;box-shadow:0 8px 20px rgba(0,0,0,0.15);background-color:#ff9eac;transition:all 0.2s}
     
     /* Google 搜尋懸浮 (右下角固定) */
-    .google-float { position: fixed; bottom: 25px; right: 20px; z-index: 800; display: flex; align-items: center; justify-content: flex-end; }
+    .google-float { position: fixed; bottom: 30px; right: 20px; z-index: 800; display: flex; align-items: center; justify-content: flex-end; }
     .google-btn { width: 48px; height: 48px; border-radius: 50%; background: white; border: 2px solid #eee; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #4285F4; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; }
     .google-bar { width: 0; overflow: hidden; height: 48px; background: white; border-radius: 24px; display: flex; align-items: center; transition: width 0.3s, opacity 0.3s; opacity: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-right: 10px; }
     .google-float.active .google-bar { width: 220px; opacity: 1; padding: 0 10px; border: 1px solid #eee; }
@@ -70,24 +73,24 @@
 <body>
 
 <div id="crash-screen">
-    <h2 class="text-3xl font-bold mb-4">⚠️ 發生錯誤</h2>
-    <p class="mb-2 text-gray-600">請截圖給開發者。</p>
-    <pre id="error-log" class="text-left bg-gray-100 p-4 rounded text-xs w-full max-w-md overflow-auto"></pre>
-    <button onclick="localStorage.clear();location.reload()" class="mt-4 bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow">清除快取並重試</button>
+    <h2 class="text-3xl font-bold mb-4">⚠️ 系統提示</h2>
+    <p class="mb-4 text-gray-600">偵測到資料異常，已自動啟動修復程序。</p>
+    <button onclick="localStorage.clear();location.reload()" class="bg-red-500 text-white px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition">重置並修復</button>
+    <pre id="error-log" class="mt-4 text-xs text-gray-400 bg-gray-100 p-2 rounded max-w-xs overflow-auto max-h-32 text-left"></pre>
 </div>
 <script>
     window.onerror = function(msg, url, line, col, error) {
         document.getElementById('loading-screen').style.display = 'none';
-        const crash = document.getElementById('crash-screen');
-        crash.style.display = 'flex';
-        document.getElementById('error-log').innerText = `${msg}\nLocation: ${url}:${line}:${col}\n${error ? error.stack : ''}`;
+        const c = document.getElementById('crash-screen');
+        c.style.display = 'flex';
+        document.getElementById('error-log').innerText = `${msg}\nLn: ${line}`;
         return false;
     };
 </script>
 
 <div id="loading-screen">
     <div style="font-size: 60px;" class="animate-bounce">🌸</div>
-    <div class="mt-4 font-bold text-gray-600">Trip V14.00 啟動中...</div>
+    <div class="mt-4 font-bold text-gray-600">V14.00 Flagship Loading...</div>
 </div>
 
 <div id="sakura-container"></div>
@@ -330,39 +333,165 @@
 
 <script>
 const { createApp, ref, computed, onMounted, watch } = Vue;
-const sc = document.getElementById('sakura-container'); for(let i=0;i<10;i++){let e=document.createElement('div');e.className='sakura';e.style.left=Math.random()*100+'vw';e.style.animationDuration=Math.random()*3+6+'s';sc.appendChild(e)}
+const sc = document.getElementById('sakura-container'); for(let i=0;i<12;i++){let e=document.createElement('div');e.className='sakura';e.style.left=Math.random()*100+'vw';e.style.animationDuration=Math.random()*3+6+'s';sc.appendChild(e)}
 
 createApp({
     setup() {
-        const STORAGE_KEY = 'v14_00_BUG_FREE';
+        const STORAGE_KEY = 'V14_FLAGSHIP'; // New key to clear old cache
         const currentView = ref('menu');
         const isWelcomeClosed = ref(false);
         const showGoogleSearch = ref(false);
         
-        // --- 核心資料庫 (嚴格語法檢查：確保逗號與閉合) ---
-        
-        // 1. 行程
+        // --- DATA SECTION: 嚴格 JSON 格式 ---
         const defaultItinerary = [
-            [{id:101,category:'Flight',name:'06:40 桃園起飛 (TR898)',hours:'06:40',mapKeyword:'Taoyuan Airport',note:'T1航廈，提早2.5小時抵達'},{id:102,category:'Flight',name:'10:40 抵達成田 (NRT)',hours:'10:40',mapKeyword:'Narita Airport',note:'入境審查 -> 領行李 -> 搭車'},{id:103,category:'Transport',name:'前往錦糸町民宿',hours:'12:30',mapKeyword:'Kinshicho Station',note:'寄放行李 (連結請見住宿頁)'},{id:104,category:'Sightseeing',name:'晴空塔 Solamachi',hours:'14:00',mapKeyword:'Tokyo Skytree',note:'逛街/水族館'},{id:105,category:'Food',name:'晚餐：敘敘苑燒肉',hours:'18:00',mapKeyword:'Jojoen Skytree',note:'高空景觀燒肉'}],
-            [{id:201,category:'Sightseeing',name:'淺草寺 & 雷門',hours:'09:00',mapKeyword:'Senso-ji',note:'趁早去避開人潮'},{id:202,category:'Food',name:'午餐：淺草今半',hours:'12:00',mapKeyword:'Asakusa Imahan',note:'壽喜燒老店'},{id:203,category:'Sightseeing',name:'上野恩賜公園',hours:'14:00',mapKeyword:'Ueno Park',note:'賞櫻熱點'},{id:204,category:'Shopping',name:'阿美橫町',hours:'16:00',mapKeyword:'Ameyoko',note:'藥妝/零食採買'},{id:205,category:'Food',name:'晚餐：鳥貴族',hours:'19:00',mapKeyword:'Torikizoku Ueno',note:'平價串燒'}],
-            // Day 3: Kinshicho 07:08 Direct -> Kawaguchiko 09:28
-            [{id:301,category:'Transport',name:'富士回遊3號 (直達)',hours:'07:08',mapKeyword:'Kinshicho Station',note:'每日唯一班次，錦糸町直達河口湖'},{id:302,category:'Transport',name:'抵達河口湖站',hours:'09:28',mapKeyword:'Kawaguchiko Station',note:'出站前往取車'},{id:303,category:'Transport',name:'Toyota Rent a Car',hours:'09:40',mapKeyword:'Toyota Rent a Car Kawaguchiko Station',note:'站前店取車'},{id:304,category:'Sightseeing',name:'新倉山淺間公園',hours:'10:30',mapKeyword:'Chureito Pagoda',note:'上午順光拍五重塔'},{id:305,category:'Food',name:'午餐：不動茶屋 (東戀路)',hours:'12:30',mapKeyword:'Houtou Fudou Higashikoiji',note:'東戀路店，雲朵建築'},{id:306,category:'Sightseeing',name:'河口湖自然生活館',hours:'14:30',mapKeyword:'Oishi Park',note:'大石公園賞花'},{id:307,category:'Sightseeing',name:'下吉田本町通',hours:'17:00',mapKeyword:'Honcho Street Fujiyoshida',note:'昭和復古街景'},{id:308,category:'Hotel',name:'Check-in: Megu Fuji',hours:'18:30',mapKeyword:'Megu Fuji 2021',note:'入住休息'}],
-            [{id:401,category:'Sightseeing',name:'山中湖平野之濱',hours:'06:00',mapKeyword:'Hirano no Hama',note:'看逆富士日出'},{id:402,category:'Sightseeing',name:'長池親水公園',hours:'09:00',mapKeyword:'Nagaike Water Park',note:'餵天鵝/拍富士山'},{id:403,category:'Sightseeing',name:'忍野八海',hours:'11:00',mapKeyword:'Oshino Hakkai',note:'名水百選'},{id:404,category:'Food',name:'午餐：山麓園',hours:'13:00',mapKeyword:'Sanrokuen',note:'爐端燒體驗'},{id:405,category:'Sightseeing',name:'KABA 水陸巴士',hours:'15:00',mapKeyword:'Yamanakako KABA',note:'遊湖體驗'},{id:406,category:'Shopping',name:'Ogino 超市',hours:'17:00',mapKeyword:'Ogino Kawaguchiko',note:'採買晚餐食材'}],
-            // Day 5: Return Car -> Bus/Train to Shinjuku
-            [{id:501,category:'Sightseeing',name:'河口湖纜車 / 盪鞦韆',hours:'09:00',mapKeyword:'Mt. Fuji Panoramic Ropeway',note:'絕景鞦韆'},{id:502,category:'Shopping',name:'富士山吐司',hours:'11:00',mapKeyword:'Fujisan Shokupan',note:'伴手禮'},{id:503,category:'Transport',name:'河口湖站還車',hours:'13:30',mapKeyword:'Toyota Rent a Car Kawaguchiko Station',note:'結束自駕'},{id:504,category:'Transport',name:'返回新宿 (巴士/鐵路)',hours:'14:00',mapKeyword:'Shinjuku Station',note:'搭乘高速巴士或電車'},{id:505,category:'Hotel',name:'Check-in: DOMO Hotel',hours:'16:30',mapKeyword:'DOMO Hotel Shinjuku',note:'入住新宿'},{id:506,category:'Food',name:'晚餐/逛街：池袋太陽城',hours:'18:00',mapKeyword:'Sunshine City',note:'寶可夢中心'}],
-            [{id:601,category:'Transport',name:'搭乘江之電',hours:'09:00',mapKeyword:'Fujisawa Station',note:'前往鎌倉'},{id:602,category:'Sightseeing',name:'鎌倉高校前',hours:'10:00',mapKeyword:'Kamakura Kokomae',note:'灌籃高手平交道'},{id:603,category:'Food',name:'午餐：Bills',hours:'12:00',mapKeyword:'Bills Shichirigahama',note:'海邊鬆餅'},{id:604,category:'Sightseeing',name:'鎌倉大佛 & 長谷寺',hours:'14:00',mapKeyword:'Kotoku-in',note:'參拜'},{id:605,category:'Sightseeing',name:'江之島夕陽',hours:'17:00',mapKeyword:'Enoshima Sea Candle',note:'稚兒之淵'},{id:606,category:'Food',name:'晚餐：新宿歌舞伎町',hours:'19:30',mapKeyword:'Kabukicho',note:'居酒屋'}],
-            [{id:701,category:'Sightseeing',name:'東京鐵塔',hours:'10:00',mapKeyword:'Tokyo Tower',note:'芝公園野餐'},{id:702,category:'Sightseeing',name:'麻布台之丘',hours:'13:00',mapKeyword:'Azabudai Hills',note:'新地標逛街'},{id:703,category:'Shopping',name:'澀谷 Parco / Loft',hours:'15:00',mapKeyword:'Shibuya Parco',note:'任天堂/寶可夢中心'},{id:704,category:'Sightseeing',name:'SHIBUYA SKY',hours:'17:30',mapKeyword:'SHIBUYA SKY',note:'預約夕陽時段'},{id:705,category:'Food',name:'晚餐：澀谷橫丁',hours:'19:30',mapKeyword:'Miyashita Park',note:'宮下公園'}],
-            [{id:801,category:'Shopping',name:'最後補貨',hours:'10:00',mapKeyword:'Shinjuku',note:'唐吉訶德/藥妝'},{id:802,category:'Transport',name:'前往成田機場',hours:'13:00',mapKeyword:'Narita Express',note:'搭乘 NEX'},{id:803,category:'Flight',name:'20:40 起飛 (BR197)',hours:'20:40',mapKeyword:'Narita Airport',note:'再見東京'},{id:804,category:'Flight',name:'23:20 抵達桃園',hours:'23:20',mapKeyword:'Taoyuan Airport',note:'平安回家'}]
+            [
+                {id:101, category:'Flight', name:'06:40 桃園起飛 (TR898)', hours:'06:40', mapKeyword:'Taoyuan Airport', note:'T1航廈，提早2.5小時抵達'},
+                {id:102, category:'Flight', name:'10:40 抵達成田 (NRT)', hours:'10:40', mapKeyword:'Narita Airport', note:'入境審查 -> 領行李 -> 搭車'},
+                {id:103, category:'Transport', name:'前往錦糸町民宿', hours:'12:30', mapKeyword:'Kinshicho Station', note:'寄放行李 (連結請見住宿頁)'},
+                {id:104, category:'Sightseeing', name:'晴空塔 Solamachi', hours:'14:00', mapKeyword:'Tokyo Skytree', note:'逛街/水族館'},
+                {id:105, category:'Food', name:'晚餐：敘敘苑燒肉', hours:'18:00', mapKeyword:'Jojoen Skytree', note:'高空景觀燒肉'}
+            ],
+            [
+                {id:201, category:'Sightseeing', name:'淺草寺 & 雷門', hours:'09:00', mapKeyword:'Senso-ji', note:'趁早去避開人潮'},
+                {id:202, category:'Food', name:'午餐：淺草今半', hours:'12:00', mapKeyword:'Asakusa Imahan', note:'壽喜燒老店'},
+                {id:203, category:'Sightseeing', name:'上野恩賜公園', hours:'14:00', mapKeyword:'Ueno Park', note:'賞櫻熱點'},
+                {id:204, category:'Shopping', name:'阿美橫町', hours:'16:00', mapKeyword:'Ameyoko', note:'藥妝/零食採買'},
+                {id:205, category:'Food', name:'晚餐：鳥貴族', hours:'19:00', mapKeyword:'Torikizoku Ueno', note:'平價串燒'}
+            ],
+            [
+                {id:301, category:'Transport', name:'富士回遊3號 (直達)', hours:'07:08', mapKeyword:'Kinshicho Station', note:'每日唯一班次，錦糸町直達河口湖'},
+                {id:302, category:'Transport', name:'抵達河口湖站', hours:'09:28', mapKeyword:'Kawaguchiko Station', note:'出站前往取車'},
+                {id:303, category:'Transport', name:'Toyota Rent a Car', hours:'09:40', mapKeyword:'Toyota Rent a Car Kawaguchiko Station', note:'站前店取車'},
+                {id:304, category:'Sightseeing', name:'新倉山淺間公園', hours:'10:30', mapKeyword:'Chureito Pagoda', note:'上午順光拍五重塔'},
+                {id:305, category:'Food', name:'午餐：不動茶屋 (東戀路)', hours:'12:30', mapKeyword:'Houtou Fudou Higashikoiji', note:'東戀路店，雲朵建築'},
+                {id:306, category:'Sightseeing', name:'河口湖自然生活館', hours:'14:30', mapKeyword:'Oishi Park', note:'大石公園賞花'},
+                {id:307, category:'Sightseeing', name:'下吉田本町通', hours:'17:00', mapKeyword:'Honcho Street Fujiyoshida', note:'昭和復古街景'},
+                {id:308, category:'Hotel', name:'Check-in: Megu Fuji', hours:'18:30', mapKeyword:'Megu Fuji 2021', note:'入住休息'}
+            ],
+            [
+                {id:401, category:'Sightseeing', name:'山中湖平野之濱', hours:'06:00', mapKeyword:'Hirano no Hama', note:'看逆富士日出'},
+                {id:402, category:'Sightseeing', name:'長池親水公園', hours:'09:00', mapKeyword:'Nagaike Water Park', note:'餵天鵝/拍富士山'},
+                {id:403, category:'Sightseeing', name:'忍野八海', hours:'11:00', mapKeyword:'Oshino Hakkai', note:'名水百選'},
+                {id:404, category:'Food', name:'午餐：山麓園', hours:'13:00', mapKeyword:'Sanrokuen', note:'爐端燒體驗'},
+                {id:405, category:'Sightseeing', name:'KABA 水陸巴士', hours:'15:00', mapKeyword:'Yamanakako KABA', note:'遊湖體驗'},
+                {id:406, category:'Shopping', name:'Ogino 超市', hours:'17:00', mapKeyword:'Ogino Kawaguchiko', note:'採買晚餐食材'}
+            ],
+            [
+                {id:501, category:'Sightseeing', name:'河口湖纜車 / 盪鞦韆', hours:'09:00', mapKeyword:'Mt. Fuji Panoramic Ropeway', note:'絕景鞦韆'},
+                {id:502, category:'Shopping', name:'富士山吐司', hours:'11:00', mapKeyword:'Fujisan Shokupan', note:'伴手禮'},
+                {id:503, category:'Transport', name:'河口湖站還車', hours:'13:30', mapKeyword:'Toyota Rent a Car Kawaguchiko Station', note:'結束自駕'},
+                {id:504, category:'Transport', name:'返回新宿 (巴士/鐵路)', hours:'14:00', mapKeyword:'Shinjuku Station', note:'搭乘高速巴士或電車'},
+                {id:505, category:'Hotel', name:'Check-in: DOMO Hotel', hours:'16:30', mapKeyword:'DOMO Hotel Shinjuku', note:'入住新宿'},
+                {id:506, category:'Food', name:'晚餐/逛街：池袋太陽城', hours:'18:00', mapKeyword:'Sunshine City', note:'寶可夢中心'}
+            ],
+            [
+                {id:601, category:'Transport', name:'搭乘江之電', hours:'09:00', mapKeyword:'Fujisawa Station', note:'前往鎌倉'},
+                {id:602, category:'Sightseeing', name:'鎌倉高校前', hours:'10:00', mapKeyword:'Kamakura Kokomae', note:'灌籃高手平交道'},
+                {id:603, category:'Food', name:'午餐：Bills', hours:'12:00', mapKeyword:'Bills Shichirigahama', note:'海邊鬆餅'},
+                {id:604, category:'Sightseeing', name:'鎌倉大佛 & 長谷寺', hours:'14:00', mapKeyword:'Kotoku-in', note:'參拜'},
+                {id:605, category:'Sightseeing', name:'江之島夕陽', hours:'17:00', mapKeyword:'Enoshima Sea Candle', note:'稚兒之淵'},
+                {id:606, category:'Food', name:'晚餐：新宿歌舞伎町', hours:'19:30', mapKeyword:'Kabukicho', note:'居酒屋'}
+            ],
+            [
+                {id:701, category:'Sightseeing', name:'東京鐵塔', hours:'10:00', mapKeyword:'Tokyo Tower', note:'芝公園野餐'},
+                {id:702, category:'Sightseeing', name:'麻布台之丘', hours:'13:00', mapKeyword:'Azabudai Hills', note:'新地標逛街'},
+                {id:703, category:'Shopping', name:'澀谷 Parco / Loft', hours:'15:00', mapKeyword:'Shibuya Parco', note:'任天堂/寶可夢中心'},
+                {id:704, category:'Sightseeing', name:'SHIBUYA SKY', hours:'17:30', mapKeyword:'SHIBUYA SKY', note:'預約夕陽時段'},
+                {id:705, category:'Food', name:'晚餐：澀谷橫丁', hours:'19:30', mapKeyword:'Miyashita Park', note:'宮下公園'}
+            ],
+            [
+                {id:801, category:'Shopping', name:'最後補貨', hours:'10:00', mapKeyword:'Shinjuku', note:'唐吉訶德/藥妝'},
+                {id:802, category:'Transport', name:'前往成田機場', hours:'13:00', mapKeyword:'Narita Express', note:'搭乘 NEX'},
+                {id:803, category:'Flight', name:'20:40 起飛 (BR197)', hours:'20:40', mapKeyword:'Narita Airport', note:'再見東京'},
+                {id:804, category:'Flight', name:'23:20 抵達桃園', hours:'23:20', mapKeyword:'Taoyuan Airport', note:'平安回家'}
+            ]
         ];
         
-        // 2. 自駕地圖
         const drivePlan = [
             { day: 2, stops: [{name: 'Toyota Rent a Car', note: '河口湖站前取車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''},{name: '新倉山淺間公園', note: '五重塔(上午順光)', location: 'Chureito Pagoda', parking: 'Arakurayama Sengen Park Parking'},{name: '不動茶屋 (東戀路)', note: '午餐', location: 'Houtou Fudou Higashikoiji', parking: 'Houtou Fudou Parking'},{name: '大石公園', note: '河口湖畔散步', location: 'Oishi Park', parking: 'Oishi Park Parking'}] },
             { day: 3, stops: [{name: '平野之濱', note: '車拍逆富士', location: 'Hirano no Hama', parking: 'Hirano no Hama Parking'},{name: '長池親水公園', note: '拍天鵝', location: 'Nagaike Water Park', parking: 'Nagaike Water Park Parking'},{name: '忍野八海', note: '觀光名所', location: 'Oshino Hakkai', parking: 'Oshino Hakkai Parking'},{name: 'Ogino 超市', note: '採買晚餐', location: 'Ogino Kawaguchiko', parking: 'Ogino Kawaguchiko'}] },
             { day: 4, stops: [{name: '河口湖纜車', note: '天上山公園', location: 'Mt. Fuji Panoramic Ropeway', parking: 'Ropeway Parking'},{name: '富士山吐司', note: '伴手禮', location: 'Fujisan Shokupan', parking: 'Fujisan Shokupan'},{name: 'Toyota Rent a Car', note: '河口湖站前還車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''}] }
         ];
 
-        // 3. 使用者與飯店
+        const defaultShopping = {
+            wish: [
+                {name: 'Chiikawa Land', desc: '原宿/東京車站限定', link: 'https://www.google.com/search?q=Kiddy+Land+Harajuku', img: 'welcome.jpg'}, 
+                {name: '富士山杯', desc: '星巴克/田島硝子', link: 'https://www.google.com/search?q=Starbucks+Japan+Fuji+Mug', img: '2026.tokyo.jpg'},
+                {name: 'Le Labo', desc: '東京限定 Gaiac 10', link: 'https://www.google.com/search?q=Le+Labo+Tokyo', img: ''},
+                {name: 'Porter', desc: '吉田包 (表參道)', link: 'https://www.google.com/search?q=Porter+Omotesando', img: ''},
+                {name: 'Human Made', desc: '藍瓶聯名周邊', link: 'https://www.google.com/search?q=Human+Made+Offline+Store', img: ''}
+            ],
+            cosme: [
+                {name: 'Tirtir 氣墊', desc: '紅盒高遮瑕', link: 'https://www.google.com/search?q=Tirtir+Cushion', img: ''}, 
+                {name: 'Kate 怪獸唇膏', desc: '色號 03/05/103', link: 'https://www.google.com/search?q=Kate+Lip+Monster', img: ''},
+                {name: '&Honey 髮油', desc: 'Melty 修護系列', link: 'https://www.google.com/search?q=and+honey+hair+oil', img: ''},
+                {name: 'Canmake', desc: '棉花糖蜜粉餅', link: 'https://www.google.com/search?q=Canmake+Tokyo', img: ''},
+                {name: 'Takami 小藍瓶', desc: '角質代謝精華', link: 'https://www.google.com/search?q=Takami+Skin+Peel', img: ''}
+            ],
+            ldk: [
+                {name: 'Lululun 面膜', desc: '東京/富士山限定', link: 'https://www.google.com/search?q=Lululun+Mask', img: ''},
+                {name: 'Fino 髮膜', desc: '高 CP 值必囤', link: 'https://www.google.com/search?q=Fino+Hair+Mask', img: ''},
+                {name: 'Excel 眉筆', desc: 'PD01 / PD02', link: 'https://www.google.com/search?q=Excel+Makeup', img: ''},
+                {name: 'Biore 防曬', desc: '水感防曬精華', link: 'https://www.google.com/search?q=Biore+UV', img: ''},
+                {name: 'Nivea 藍罐', desc: '日版成分不同', link: 'https://www.google.com/search?q=Nivea+Japan', img: ''}
+            ],
+            souvenir: [
+                {name: 'NY Perfect Cheese', desc: '東京站必排起司脆餅', link: 'https://www.google.com/search?q=New+York+Perfect+Cheese', img: ''},
+                {name: 'Tokyo Banana', desc: '皮卡丘/哆啦A夢版', link: 'https://www.google.com/search?q=Tokyo+Banana', img: ''},
+                {name: 'Press Butter Sand', desc: '焦糖奶油夾心', link: 'https://www.google.com/search?q=Press+Butter+Sand', img: ''},
+                {name: 'Sugar Butter Tree', desc: '砂糖奶油樹', link: 'https://www.google.com/search?q=Sugar+Butter+Tree', img: ''},
+                {name: 'Audrey', desc: '草莓花束餅乾', link: 'https://www.google.com/search?q=Audrey+Tokyo', img: ''}
+            ]
+        };
+
+        const defaultFood = {
+            Tokyo: [
+                {name: 'AFURI 拉麵', desc: '柚子鹽味 (原宿/六本木)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=AFURI+Harajuku',img:'afuri-ramen.jpg'}, 
+                {name: 'HARBS', desc: '水果千層蛋糕', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=HARBS+Lumine+Est',img:'harbs-fruit-crepe.jpg'},
+                {name: '牛卡滋本村', desc: '炸牛排 (澀谷/新宿)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson4'},
+                {name: '六厘舍', desc: '濃厚沾麵 (東京一番街)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson5'},
+                {name: 'Shake Shack', desc: '明治神宮外苑店 (絕美)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson6'}
+            ],
+            Kamakura: [
+                {name: 'Bills', desc: '世界第一早餐 (七里濱)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Bills+Shichirigahama',img'}, 
+                {name: 'Pacific Drive-In', desc: '海景咖啡廳', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson7'},
+                {name: 'Caraway', desc: '排隊咖哩名店', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson8'},
+                {name: 'Yoridocoro', desc: '江之電窗景定食', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson9'},
+                {name: '豐島屋', desc: '鴿子餅乾本店', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street0'}
+            ],
+            Fuji: [
+                {name: 'Houtou Fudou', desc: '不動茶屋 (東戀路店)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Houtou+Fudou+Higashikoiji',img'},
+                {name: 'Fuji Tempura Idaten', desc: '富士天婦羅', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street1'},
+                {name: 'Lake Bake', desc: '湖畔麵包 (大石公園旁)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street2'},
+                {name: 'Sanrokuen', desc: '山麓園 (圍爐裏燒烤)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street3'},
+                {name: '7-11 河口湖', desc: '便利商店景觀店', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street4'}
+            ]
+        };
+
+        const defaultPhoto = {
+            Tokyo: [
+                {name: 'SHIBUYA SKY', desc: '高空展望台 (需預約)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=SHIBUYA+SKY',img'},
+                {name: '東京鐵塔', desc: '芝公園/地下停車場視角', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street5'},
+                {name: '豪德寺', desc: '招財貓發源地', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street6'},
+                {name: 'TeamLab Planets', desc: '豐洲沉浸式藝術', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street7'},
+                {name: '淺草雷門', desc: '經典觀光地標', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street8'}
+            ],
+            Kamakura: [
+                {name: '鎌倉高校前', desc: '灌籃高手平交道', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Kamakura+Kokomae',img'},
+                {name: '長谷寺', desc: '眺望湘南海岸', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street9'},
+                {name: '高德院', desc: '鎌倉大佛', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan0'},
+                {name: '報國寺', desc: '夢幻竹林', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan1'},
+                {name: '七里濱海岸', desc: '夕陽與江之島', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan2'}
+            ],
+            Fuji: [
+                {name: '新倉山淺間公園', desc: '五重塔 + 富士山', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Chureito+Pagoda',img'},
+                {name: '羅森河口湖站前', desc: '經典便利商店景', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan3'},
+                {name: '大石公園', desc: '河口湖花海', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan4'},
+                {name: '本町商店街', desc: '昭和復古街道', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan5'},
+                {name: '山中湖平野之濱', desc: '逆富士絕景', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan6'}
+            ]
+        };
+
         const commonItems = ['護照', '日幣', 'SIM卡', '信用卡', '充電器', '常備藥', '牙刷牙膏', '轉接頭'];
         const defaultUsers = [
             {id:1,name:'吉伊',icon:'🐹',list:[...commonItems,'駕照'].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
@@ -371,103 +500,21 @@ createApp({
             {id:4,name:'小桃',icon:'🍑',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'}
         ];
         const hotels = [
-            {name:'錦糸町民宿',days:'Day 1-2',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA'},
-            {name:'Megu Fuji 2021',days:'Day 3-4',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Megu+Fuji+2021'},
-            {name:'DOMO Hotel Shinjuku',days:'Day 5-7',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=DOMO+Hotel+Shinjuku'}
+            {name:'錦糸町民宿',days:'Day 1-2',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA', img:'https://placehold.co/400x300/333/fff?text=BnB'},
+            {name:'Megu Fuji 2021',days:'Day 3-4',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Megu+Fuji+2021', img:'https://placehold.co/400x300/333/fff?text=Megu'},
+            {name:'DOMO Hotel Shinjuku',days:'Day 5-7',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=DOMO+Hotel+Shinjuku', img:'https://placehold.co/400x300/333/fff?text=DOMO'}
         ];
 
-        // 4. 購物清單 (嚴格檢查語法)
-        const defaultShopping = {
-            wish: [
-                {name:'Chiikawa Land',desc:'原宿/東京車站限定',link:'https://www.google.com/search?q=Kiddy+Land+Harajuku',img:'welcome.jpg'}, 
-                {name:'富士山杯',desc:'星巴克/田島硝子',link:'https://www.google.com/search?q=Starbucks+Japan+Fuji+Mug',img:'2026.tokyo.jpg'},
-                {name:'Le Labo',desc:'東京限定 Gaiac 10',link:'https://www.google.com/search?q=Le+Labo+Tokyo',img:''},
-                {name:'Porter',desc:'吉田包 (表參道)',link:'https://www.google.com/search?q=Porter+Omotesando',img:''},
-                {name:'Human Made',desc:'藍瓶聯名周邊',link:'https://www.google.com/search?q=Human+Made+Offline+Store',img:''}
-            ],
-            cosme: [
-                {name:'Tirtir 氣墊',desc:'紅盒高遮瑕',link:'https://www.google.com/search?q=Tirtir+Cushion',img:''}, 
-                {name:'Kate 怪獸唇膏',desc:'色號 03/05/103',link:'https://www.google.com/search?q=Kate+Lip+Monster',img:''},
-                {name:'&Honey 髮油',desc:'Melty 修護系列',link:'https://www.google.com/search?q=and+honey+hair+oil',img:''},
-                {name:'Canmake',desc:'棉花糖蜜粉餅',link:'https://www.google.com/search?q=Canmake+Tokyo',img:''},
-                {name:'Takami 小藍瓶',desc:'角質代謝精華',link:'https://www.google.com/search?q=Takami+Skin+Peel',img:''}
-            ],
-            ldk: [
-                {name:'Lululun 面膜',desc:'東京/富士山限定',link:'https://www.google.com/search?q=Lululun+Mask',img:''},
-                {name:'Fino 髮膜',desc:'高 CP 值必囤',link:'https://www.google.com/search?q=Fino+Hair+Mask',img:''},
-                {name:'Excel 眉筆',desc:'PD01 / PD02',link:'https://www.google.com/search?q=Excel+Makeup',img:''},
-                {name:'Biore 防曬',desc:'水感防曬精華',link:'https://www.google.com/search?q=Biore+UV',img:''},
-                {name:'Nivea 藍罐',desc:'日版成分不同',link:'https://www.google.com/search?q=Nivea+Japan',img:''}
-            ],
-            souvenir: [
-                {name:'NY Perfect Cheese',desc:'東京站必排起司脆餅',link:'https://www.google.com/search?q=New+York+Perfect+Cheese',img:''},
-                {name:'Tokyo Banana',desc:'皮卡丘/哆啦A夢版',link:'https://www.google.com/search?q=Tokyo+Banana',img:''},
-                {name:'Press Butter Sand',desc:'焦糖奶油夾心',link:'https://www.google.com/search?q=Press+Butter+Sand',img:''},
-                {name:'Sugar Butter Tree',desc:'砂糖奶油樹',link:'https://www.google.com/search?q=Sugar+Butter+Tree',img:''},
-                {name:'Audrey',desc:'草莓花束餅乾',link:'https://www.google.com/search?q=Audrey+Tokyo',img:''}
-            ]
-        };
-
-        // 5. 美食清單 (嚴格檢查語法)
-        const defaultFood = {
-            Tokyo: [
-                {name:'AFURI 拉麵',desc:'柚子鹽味 (原宿/六本木)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=AFURI+Harajuku',img:'afuri-ramen.jpg'}, 
-                {name:'HARBS',desc:'水果千層蛋糕',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=HARBS+Lumine+Est',img:'harbs-fruit-crepe.jpg'},
-                {name:'牛卡滋本村',desc:'炸牛排 (澀谷/新宿)',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson4'},
-                {name:'六厘舍',desc:'濃厚沾麵 (東京一番街)',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson5'},
-                {name:'Shake Shack',desc:'明治神宮外苑店 (絕美)',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson6'}
-            ],
-            Kamakura: [
-                {name:'Bills',desc:'世界第一早餐 (七里濱)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Bills+Shichirigahama',img'}, 
-                {name:'Pacific Drive-In',desc:'海景咖啡廳',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson7'},
-                {name:'Caraway',desc:'排隊咖哩名店',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson8'},
-                {name:'Yoridocoro',desc:'江之電窗景定食',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson9'},
-                {name:'豐島屋',desc:'鴿子餅乾本店',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street0'}
-            ],
-            Fuji: [
-                {name:'Houtou Fudou',desc:'不動茶屋 (東戀路店)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Houtou+Fudou+Higashikoiji',img'},
-                {name:'Fuji Tempura Idaten',desc:'富士天婦羅',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street1'},
-                {name:'Lake Bake',desc:'湖畔麵包 (大石公園旁)',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street2'},
-                {name:'Sanrokuen',desc:'山麓園 (圍爐裏燒烤)',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street3'},
-                {name:'7-11 河口湖',desc:'便利商店景觀店',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street4'}
-            ]
-        };
-
-        // 6. 打卡清單 (嚴格檢查語法)
-        const defaultPhoto = {
-            Tokyo: [
-                {name:'SHIBUYA SKY',desc:'高空展望台 (需預約)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=SHIBUYA+SKY',img'},
-                {name:'東京鐵塔',desc:'芝公園/地下停車場視角',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street5'},
-                {name:'豪德寺',desc:'招財貓發源地',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street6'},
-                {name:'TeamLab Planets',desc:'豐洲沉浸式藝術',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street7'},
-                {name:'淺草雷門',desc:'經典觀光地標',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street8'}
-            ],
-            Kamakura: [
-                {name:'鎌倉高校前',desc:'灌籃高手平交道',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Kamakura+Kokomae',img'},
-                {name:'長谷寺',desc:'眺望湘南海岸',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street9'},
-                {name:'高德院',desc:'鎌倉大佛',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan0'},
-                {name:'報國寺',desc:'夢幻竹林',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan1'},
-                {name:'七里濱海岸',desc:'夕陽與江之島',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan2'}
-            ],
-            Fuji: [
-                {name:'新倉山淺間公園',desc:'五重塔 + 富士山',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Chureito+Pagoda',img'},
-                {name:'羅森河口湖站前',desc:'經典便利商店景',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan3'},
-                {name:'大石公園',desc:'河口湖花海',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan4'},
-                {name:'本町商店街',desc:'昭和復古街道',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan5'},
-                {name:'山中湖平野之濱',desc:'逆富士絕景',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan6'}
-            ]
-        };
-
-        // State
+        // State & Refs
         const users = ref(defaultUsers);
         const expenses = ref([]);
         const shoppingList = ref(defaultShopping);
         const foodList = ref(defaultFood);
         const photoSpots = ref(defaultPhoto);
         const itineraryData = ref(defaultItinerary);
-        
-        // UI State
         const daysUntilTrip = ref(0);
+        
+        // UI Refs
         const showModal=ref(false), showCommonModal=ref(false), showExpenseModal=ref(false), showUserModal=ref(false), showSyncModal=ref(false);
         const isEditing=ref(false), editForm=ref({}), newCommon=ref({}), newExpense=ref({currency:'JPY'}), editingUser=ref({});
         const commonType=ref(''), editIndex=ref(-1), currentUserId=ref(1), currentFlightUser=ref(1), prepUser=ref(1);
@@ -475,12 +522,13 @@ createApp({
         const foodLoc=ref('Tokyo'), shopCat=ref('wish'), photoArea=ref('Tokyo'), expenseType=ref('personal');
         const tokyoWeather=ref({temp:'--',icon:'☁️'}), kamakuraWeather=ref({temp:'--',icon:'☁️'}), fujiWeather=ref({temp:'--',icon:'☁️'});
         const itineraryMode = ref('normal'); 
+        const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'},{jp:'お会計お願いします',tw:'我要結帳'},{jp:'トイレはどこですか',tw:'廁所在哪裡'},{jp:'袋はいりません',tw:'不用袋子'}]);
 
+        // Static Data
         const apps = [{id:1,name:'行程',icon:'fa-solid fa-map-location-dot',bgClass:'bg-pink-400',view:'itinerary'},{id:2,name:'小財庫',icon:'fa-solid fa-sack-dollar',bgClass:'bg-yellow-400',view:'money'},{id:3,name:'住宿機票',icon:'fa-solid fa-plane-arrival',bgClass:'bg-indigo-400',view:'hotel'},{id:4,name:'行前準備',icon:'fa-solid fa-suitcase-rolling',bgClass:'bg-blue-400',view:'prep'},{id:5,name:'吃吃喝喝',icon:'fa-solid fa-utensils',bgClass:'bg-orange-400',view:'food'},{id:6,name:'快樂Shop',icon:'fa-solid fa-bag-shopping',bgClass:'bg-purple-400',view:'shopping'},{id:7,name:'天氣週報',icon:'fa-solid fa-cloud-sun',bgClass:'bg-sky-400',view:'weather'},{id:8,name:'網美打卡',icon:'fa-solid fa-camera',bgClass:'bg-rose-400',view:'photo'},{id:9,name:'即時救命',icon:'fa-solid fa-language',bgClass:'bg-emerald-400',view:'japanese'}];
         const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'},{week:'D8',title:'4/03'}];
         const selectedDayIndex = ref(0);
-        const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'},{jp:'お会計お願いします',tw:'我要結帳'},{jp:'トイレはどこですか',tw:'廁所在哪裡'},{jp:'袋はいりません',tw:'不用袋子'}]);
-        
+
         // Computed
         const getUserById = (id) => users.value.find(u=>u.id===id)||users.value[0];
         const currentPrepList = computed(() => getUserById(prepUser.value).list);
@@ -493,7 +541,8 @@ createApp({
         const settlements = computed(() => { const bal={}; users.value.forEach(u=>bal[u.id]=0); groupExpenses.value.forEach(e=>{const amt=Number(e.amount);bal[e.user]+=amt;}); const avg=Object.values(bal).reduce((a,b)=>a+b,0)/users.value.length; const net=[]; users.value.forEach(u=>net.push({id:u.id, val:bal[u.id]-avg})); const res=[]; const db=net.filter(n=>n.val<-1).sort((a,b)=>a.val-b.val); const cr=net.filter(n=>n.val>1).sort((a,b)=>b.val-a.val); let i=0,j=0; while(i<db.length&&j<cr.length){let amt=Math.min(-db[i].val, cr[j].val); res.push({from:db[i].id, to:cr[j].id, amount:Math.round(amt)}); db[i].val+=amt; cr[j].val-=amt; if(Math.abs(db[i].val)<1)i++; if(Math.abs(cr[j].val)<1)j++;} return res; });
 
         // Functions
-        const getImg = (p) => { if(!p)return''; if(p.startsWith('http')||p.startsWith('data'))return p; return `https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/images/${p.replace('images/','')}`; };
+        const BASE_RAW_URL = 'https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/';
+        const getImg = (path) => { if (!path) return 'https://placehold.co/400x300/FFD1DC/ffffff?text=No+Image'; if (path.startsWith('http') || path.startsWith('data:image')) return path; const cleanName = path.replace(/^images\//, ''); if(cleanName === '2026.tokyo.jpg' || cleanName === 'welcome.jpg') return BASE_RAW_URL + cleanName; return BASE_RAW_URL + 'images/' + cleanName; };
         const handleImgError = (e) => { e.target.src='https://placehold.co/400x300/f3f4f6/cbd5e1?text=No+Image'; };
         const getPageTitle = (v) => apps.find(a=>a.view===v)?.name || v;
         const getIconByCategory = (c) => ({'Flight':'fa-plane','Sightseeing':'fa-camera','Food':'fa-utensils','Shopping':'fa-bag-shopping','Transport':'fa-train','Hotel':'fa-bed'}[c]||'fa-star');
@@ -509,72 +558,39 @@ createApp({
         const saveUserEdit = () => { const idx=users.value.findIndex(u=>u.id===editingUser.value.id); if(idx!==-1)users.value[idx]={...editingUser.value}; showUserModal.value=false; };
         const triggerAvatarUpload = () => document.querySelector('input[type=file][ref=avatarInput]').click();
         const processAvatarUpload = (e) => { const r=new FileReader(); r.onload=ev=>editingUser.value.avatar=ev.target.result; r.readAsDataURL(e.target.files[0]); };
-        
         const openExpenseModal = (t) => { expenseType.value=t; newExpense.value={amount:'',currency:'JPY',name:''}; showExpenseModal.value=true; };
         const addExpense = () => { expenses.value.push({...newExpense.value, id:Date.now(), user:currentUserId.value, type:expenseType.value, date:new Date().toLocaleDateString()}); showExpenseModal.value=false; };
         const deleteExpense = (id) => expenses.value=expenses.value.filter(e=>e.id!==id);
-        
         const openAddModal = () => { isEditing.value=false; editForm.value={category:'Sightseeing'}; showModal.value=true; };
         const editItem = (item,idx) => { isEditing.value=true; editIndex.value=idx; editForm.value={...item}; showModal.value=true; };
         const saveItem = () => { const target=itineraryData.value[selectedDayIndex.value]; if(isEditing.value) Object.assign(target[editIndex.value],editForm.value); else target.push({...editForm.value, id:Date.now()}); showModal.value=false; };
         const deleteItem = (idx) => { if(confirm('刪除?')) itineraryData.value[selectedDayIndex.value].splice(idx,1); };
-        
         const openAddCommonModal = (t) => { commonType.value=t; isEditing.value=false; newCommon.value={text1:'',text2:'',link:''}; showCommonModal.value=true; };
         const editCommonItem = (item,idx) => { commonType.value=currentView.value; isEditing.value=true; editIndex.value=idx; newCommon.value={text1:item.name, text2:item.desc, text3:item.img, link:item.link}; showCommonModal.value=true; };
-        const saveCommonItem = () => { 
-            const list = getCurrentList();
-            let finalLink = newCommon.value.link;
-            if(!finalLink) {
-                if(currentView.value === 'shopping') finalLink = `https://www.google.com/search?q=${encodeURIComponent(newCommon.value.text1)}`;
-                else finalLink = `https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=${encodeURIComponent(newCommon.value.text1)}`;
-            }
-            const item = {name:newCommon.value.text1, desc:newCommon.value.text2, img:newCommon.value.text3, link:finalLink};
-            if(isEditing.value) Object.assign(list[editIndex.value], item); else list.push(item); 
-            showCommonModal.value=false; 
-        };
+        const saveCommonItem = () => { const list = getCurrentList(); let finalLink = newCommon.value.link; if(!finalLink) { if(currentView.value === 'shopping') finalLink = `https://www.google.com/search?q=${encodeURIComponent(newCommon.value.text1)}`; else finalLink = `https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=${encodeURIComponent(newCommon.value.text1)}`; } const item = {name:newCommon.value.text1, desc:newCommon.value.text2, img:newCommon.value.text3, link:finalLink}; if(isEditing.value) Object.assign(list[editIndex.value], item); else list.push(item); showCommonModal.value=false; };
         const deleteCommonItem = (idx) => { if(confirm('刪除?')) getCurrentList().splice(idx,1); };
         const processCommonImageUpload = (e) => { const r=new FileReader(); r.onload=ev=>newCommon.value.text3=ev.target.result; r.readAsDataURL(e.target.files[0]); };
-
         const addPrepItem = () => { const t=prompt('項目:'); if(t) currentPrepList.value.push({text:t,checked:false}); };
         const editFlightField = (k) => { const u=getUserById(currentFlightUser.value); const map={'out_code':'flightOutCode','out_dep':'flightOutDep','out_arr':'flightOutArr','in_code':'flightInCode','in_dep':'flightInDep','in_arr':'flightInArr'}; const v=prompt('輸入:',u[map[k]]); if(v) u[map[k]]=v; };
-        
         const openCamera = () => { alert('📷 啟動相機 (模擬)... 請選擇照片'); document.querySelector('input[ref=commonImageInput]').click(); };
         const speak = (t) => { const u=new SpeechSynthesisUtterance(t); u.lang='ja-JP'; speechSynthesis.speak(u); };
         const saveAsHtml = () => { const d=JSON.stringify({users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, itinerary:itineraryData.value}); const b=new Blob([document.documentElement.outerHTML.replace('//PLACEHOLDER',`const savedData=${d};`)],{type:'text/html'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Trip_V14.00.html'; a.click(); };
         const resetItinerary = () => { if(confirm('重置?')) { localStorage.removeItem(STORAGE_KEY); location.reload(); }};
         const fetchWeather = async () => { try { const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true'); const d=await r.json(); tokyoWeather.value={temp:d.current_weather.temperature, icon:'☁️'}; } catch(e){} };
-
-        const startDrag = (e) => {
-            const el = e.target.closest('.fab-home'); const touch = e.touches?e.touches[0]:e;
-            const shiftX = touch.clientX - el.getBoundingClientRect().left;
-            const shiftY = touch.clientY - el.getBoundingClientRect().top;
-            const moveAt = (pageX, pageY) => {
-                el.style.left = pageX - shiftX + el.offsetWidth/2 + 'px';
-                el.style.top = pageY - shiftY + el.offsetHeight/2 + 'px';
-                el.style.transform = 'translate(-50%, -50%)';
-            };
-            const onMove = (event) => moveAt(event.touches?event.touches[0].pageX:event.pageX, event.touches?event.touches[0].pageY:event.pageY);
-            document.addEventListener('mousemove', onMove); document.addEventListener('touchmove', onMove, {passive:false});
-            const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('touchmove', onMove); };
-            document.addEventListener('mouseup', onUp); document.addEventListener('touchend', onUp);
-        };
+        const startDrag = (e) => { const el = e.target.closest('.fab-home'); const touch = e.touches?e.touches[0]:e; const shiftX = touch.clientX - el.getBoundingClientRect().left; const shiftY = touch.clientY - el.getBoundingClientRect().top; const moveAt = (pageX, pageY) => { el.style.left = pageX - shiftX + el.offsetWidth/2 + 'px'; el.style.top = pageY - shiftY + el.offsetHeight/2 + 'px'; el.style.transform = 'translate(-50%, -50%)'; }; const onMove = (event) => moveAt(event.touches?event.touches[0].pageX:event.pageX, event.touches?event.touches[0].pageY:event.pageY); document.addEventListener('mousemove', onMove); document.addEventListener('touchmove', onMove, {passive:false}); const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('touchmove', onMove); }; document.addEventListener('mouseup', onUp); document.addEventListener('touchend', onUp); };
 
         onMounted(() => {
-            const s=localStorage.getItem(STORAGE_KEY); 
-            if(s) { 
-                try{ 
-                    const d=JSON.parse(s); 
-                    if(d.users) users.value=d.users; 
-                    if(d.expenses) expenses.value=d.expenses; 
-                    if(d.shop) shoppingList.value=d.shop; 
-                    if(d.food) foodList.value=d.food; 
-                    if(d.photo) photoSpots.value=d.photo; 
-                    if(d.itinerary && d.itinerary.length > 0 && d.itinerary[0].length > 0) {
-                        itineraryData.value=d.itinerary; 
-                    } else {
-                        itineraryData.value = defaultItinerary;
-                    }
-                }catch(e){} 
+            const s=localStorage.getItem(STORAGE_KEY);
+            if(s) {
+                try {
+                    const d=JSON.parse(s);
+                    if(d.users) users.value=d.users;
+                    if(d.expenses) expenses.value=d.expenses;
+                    if(d.shop) shoppingList.value=d.shop;
+                    if(d.food) foodList.value=d.food;
+                    if(d.photo) photoSpots.value=d.photo;
+                    if(d.itinerary && d.itinerary.length > 0) itineraryData.value=d.itinerary;
+                } catch(e) { console.error('Data corrupted, using defaults'); }
             }
             daysUntilTrip.value = Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24));
             fetchWeather();
