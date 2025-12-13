@@ -5,15 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>關東8日之旅 V10.5</title>
+<title>關東8日之旅 V10.6 (全能修復版)</title>
 <style>
-/* 基礎設定與相容性修復 */
+/* --- 核心樣式與手機適配 --- */
 html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;background-image:radial-gradient(#FFD1DC 15%,transparent 16%),radial-gradient(#FFF5BA 15%,transparent 16%);background-size:60px 60px;background-position:0 0,30px 30px;font-family:-apple-system,BlinkMacSystemFont,"Zen Maru Gothic",sans-serif;color:#5D4037;overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom: env(safe-area-inset-bottom);}
 #app{display:block;opacity:1;min-height:100vh}
 .hide-scrollbar::-webkit-scrollbar{display:none}
 .card{background:rgba(255,255,255,0.95);border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.8);margin-bottom:15px}
 
-/* 懸浮按鈕 */
+/* --- 歡迎頁背景設定 (手機適配關鍵) --- */
+.landing-bg {
+    width: 100%; height: 100%; object-fit: cover;
+    /* 重點：向左下對齊，確保吉伊卡哇車子可見 */
+    object-position: 20% 100%; 
+}
+
+/* --- 懸浮按鈕 --- */
 .fab-main{position:fixed;bottom:calc(30px + env(safe-area-inset-bottom));right:20px;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;z-index:50;border:4px solid white;box-shadow:0 5px 15px rgba(0,0,0,0.2);background-color:#ff9eac;transition:transform 0.2s}
 .fab-main:active{transform:scale(0.9)}
 
@@ -21,7 +28,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;bac
 .fab-home{position:fixed;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;z-index:999;border:3px solid white;box-shadow:0 5px 15px rgba(0,0,0,0.3);background:linear-gradient(135deg, #FF9EAC, #FFD1DC);transition:transform 0.1s; cursor: grab; touch-action: none;}
 .fab-home:active{cursor: grabbing; transform: scale(0.95);}
 
-/* 提醒框 */
+/* 提醒框動畫 */
 .reminder-box{animation: float-y 3s ease-in-out infinite;}
 @keyframes float-y{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 
@@ -34,6 +41,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;bac
 /* 櫻花特效 */
 .sakura{position:fixed;top:-10px;background:#FFB7B2;border-radius:100% 0 100% 0;opacity:0.6;animation:fall linear infinite;z-index:0;pointer-events:none;width:12px;height:12px}
 @keyframes fall{to{transform:translate(15vw,105vh) rotate(360deg)}}
+.watercolor-img{width:100%;height:100%;object-fit:cover}
 
 #static-loading{position:fixed;inset:0;background:#FFF0F5;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center}
 [v-cloak]{display:none}
@@ -51,8 +59,8 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
 
 <div id="static-loading">
     <div style="font-size:50px;animation:bounce-slow 2s infinite">🌸</div>
-    <div style="margin-top:10px;font-weight:bold;color:#5D4037">V10.5 啟動中...</div>
-    <div style="font-size:10px;color:#999;margin-top:5px">行程最佳化・手機適配</div>
+    <div style="margin-top:10px;font-weight:bold;color:#5D4037">V10.6 載入中...</div>
+    <div style="font-size:10px;color:#999;margin-top:5px">完整資料修復・手機適配</div>
 </div>
 
 <div id="sakura-container"></div>
@@ -67,8 +75,8 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
 
     <div v-show="currentView==='landing'" class="relative h-screen flex flex-col overflow-hidden cursor-pointer" @click="currentView='menu'">
         <div class="absolute inset-0 z-0">
-            <img :src="homeBannerImg" class="w-full h-full object-cover" style="object-position:center 80%" @error="e=>e.target.src='https://placehold.co/600x900/pink/white?text=Chiikawa+Drive'">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-[#FFF0F5]/40"></div>
+            <img :src="homeBannerImg" class="landing-bg" @error="e=>e.target.src='https://placehold.co/600x900/pink/white?text=Chiikawa+Drive'">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-[#FFF0F5]/30"></div>
         </div>
         
         <div class="fixed z-50 bg-white/80 backdrop-blur border-4 border-chii-pink px-4 py-2 rounded-full shadow-lg flex items-center gap-2 touch-none" 
@@ -85,8 +93,8 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
                 <h1 class="text-5xl font-black mb-2 tracking-widest text-shadow-lg leading-tight">關東之旅</h1>
                 <p class="text-2xl font-bold opacity-90 tracking-widest text-pink-100">8天7夜</p>
             </div>
-            <div class="absolute bottom-20 text-gray-500 text-sm font-bold animate-bounce opacity-70 bg-white/50 px-4 py-1 rounded-full">
-                點擊任意處進入 <i class="fa-solid fa-arrow-right ml-1"></i>
+            <div class="absolute bottom-32 text-gray-500 text-sm font-bold animate-bounce opacity-70 bg-white/50 px-4 py-1 rounded-full">
+                點擊畫面進入 <i class="fa-solid fa-arrow-right ml-1"></i>
             </div>
         </div>
     </div>
@@ -100,7 +108,7 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
                  <h4 class="font-bold text-gray-800 text-sm mb-1">貼心提醒</h4>
                  <div class="text-xs text-gray-500 space-y-1">
                      <div v-if="daysUntilTrip > 2" class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-gray-300"></span> 距離出發還有 {{daysUntilTrip}} 天</div>
-                     <div class="flex items-center gap-2 text-blue-500 font-bold"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 機票報到：{{daysUntilTrip <= 2 ? '已開放報到！' : '出發前 48 小時開放'}}</div>
+                     <div class="flex items-center gap-2 text-blue-500 font-bold"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 酷航報到：{{daysUntilTrip <= 2 ? '已開放報到！' : '出發前 48 小時開放'}}</div>
                      <div class="flex items-center gap-2 text-orange-500 font-bold"><span class="w-2 h-2 rounded-full bg-orange-500"></span> SHIBUYA SKY：{{daysUntilTrip <= 28 ? '快去搶票！' : '出發前 4 週開放預約'}}</div>
                  </div>
              </div>
@@ -235,7 +243,10 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
                     </div>
                 </div>
 
-                 <a href="https://www.flyscoot.com/zh/plan/flight-status" target="_blank" class="block bg-yellow-50 border border-yellow-200 text-yellow-700 text-center py-2 rounded-xl text-xs font-bold mb-3 hover:bg-yellow-100"><i class="fa-solid fa-plane-circle-check"></i> 查詢酷航航班動態</a>
+                 <div class="grid grid-cols-2 gap-2 mb-3">
+                     <a href="https://www.flyscoot.com/zh/plan/flight-status" target="_blank" class="block bg-yellow-50 border border-yellow-200 text-yellow-700 text-center py-2 rounded-xl text-xs font-bold hover:bg-yellow-100"><i class="fa-solid fa-plane-circle-check"></i> 酷航航班動態</a>
+                     <a href="https://www.evaair.com/zh-tw/flight-status/flight-status/" target="_blank" class="block bg-green-50 border border-green-200 text-green-700 text-center py-2 rounded-xl text-xs font-bold hover:bg-green-100"><i class="fa-solid fa-plane-circle-check"></i> 長榮航班動態</a>
+                 </div>
 
                  <div class="card p-4 bg-gray-50 border-gray-200 border-dashed">
                     <h4 class="text-xs font-bold text-gray-600 mb-2"><i class="fa-solid fa-pen"></i> 注意事項 (可編輯)</h4>
@@ -243,6 +254,55 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
                  </div>
             </div>
         </div>
+    </div>
+
+    <div v-if="currentView==='prep'" class="px-4 py-2 pb-24">
+         <div class="flex gap-2 mb-4 justify-center sticky top-16 bg-[#FFF0F5] z-30 py-2"><button @click="prepTab='personal'" :class="['px-6 py-2 rounded-full font-bold whitespace-nowrap shadow-sm transition',prepTab==='personal'?'bg-pink-400 text-white':'bg-white text-gray-400']">個人行前準備</button><button @click="prepTab='car'" :class="['px-6 py-2 rounded-full font-bold whitespace-nowrap shadow-sm transition',prepTab==='car'?'bg-green-400 text-white':'bg-white text-gray-400']">租車連結</button></div>
+        <div v-if="prepTab==='personal'">
+            <div class="grid grid-cols-2 gap-3 mb-6"><a href="https://vjw-lp.digital.go.jp/zh-hant/" target="_blank" class="bg-gradient-to-r from-blue-400 to-indigo-400 text-white p-4 rounded-3xl font-bold text-center shadow-lg active:scale-95 transition"><i class="fa-solid fa-passport text-3xl mb-2"></i><div class="text-sm">VJW 入境</div></a><button @click="openTicketModal" class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white p-4 rounded-3xl font-bold text-center shadow-lg active:scale-95 transition"><i class="fa-solid fa-ticket text-3xl mb-2"></i><div class="text-sm">票券精靈</div></button></div>
+            <div v-if="prepMode==='select'" class="grid grid-cols-2 gap-4"><div v-for="user in users" :key="user.id" class="card p-4 cursor-pointer hover:bg-pink-50 transition relative group" @click="selectPrepUser(user.id)"><button @click.stop="openUserEdit(user)" class="absolute top-2 right-2 text-gray-300 hover:text-blue-500 bg-white rounded-full w-6 h-6 shadow"><i class="fa-solid fa-pen text-xs"></i></button><div class="flex justify-between items-center mb-2"><div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl overflow-hidden border border-white shadow-sm"><img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover"><span v-else>{{user.icon}}</span></div><div class="font-bold text-gray-700">{{user.name}}</div></div><div class="progress-container"><div class="progress-fill bg-pink-400" :style="{width: getProgress(user.id)+'%', backgroundColor: user.bg}"></div></div><div class="text-right text-[10px] text-gray-400 mt-1">{{Math.round(getProgress(user.id))}}%</div></div></div>
+            <div v-if="prepMode==='list'"><div class="flex justify-between items-center mb-4 px-1"><h3 class="font-bold text-xl text-gray-700 flex items-center gap-2">{{getUserById(prepUser).name}} 的清單</h3><button @click="prepMode='select'" class="bg-white px-3 py-1.5 rounded-full shadow text-xs font-bold text-gray-500 border">返回</button></div><div class="card p-5 min-h-[300px] mb-20"><div v-for="(item,idx) in currentPrepList" :key="idx" class="flex items-center gap-3 py-3 border-b border-dashed border-gray-200"><input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-400 rounded cursor-pointer"><input v-model="item.text" class="flex-1 text-sm bg-transparent outline-none font-medium" :class="{'line-through text-gray-300':item.checked}"><button @click="currentPrepList.splice(idx,1)" class="ml-auto text-gray-300 p-2"><i class="fa-solid fa-xmark"></i></button></div><button @click="addPrepItem" class="w-full mt-6 py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 font-bold hover:bg-gray-50 transition text-sm">+ 新增項目</button></div></div>
+        </div>
+         <div v-if="prepTab==='car'" class="card p-5 border-l-4 border-green-400"><h3 class="font-bold text-lg mb-2 text-gray-700">富士山自駕推薦</h3><div class="grid gap-2 text-sm font-bold"><a href="https://www2.tocoo.jp/cn" target="_blank" class="block bg-gray-50 p-3 rounded-lg text-gray-700 hover:bg-green-50 flex justify-between"><span>🚗 ToCoo! 比價</span><i class="fa-solid fa-chevron-right text-gray-300"></i></a><a href="https://rent.toyota.co.jp/zh-tw/" target="_blank" class="block bg-gray-50 p-3 rounded-lg text-gray-700 hover:bg-green-50 flex justify-between"><span>🚙 Toyota Rent a Car</span><i class="fa-solid fa-chevron-right text-gray-300"></i></a><a href="https://tc.tabirai.net/car/" target="_blank" class="block bg-gray-50 p-3 rounded-lg text-gray-700 hover:bg-green-50 flex justify-between"><span>🚕 Tabirai 租車</span><i class="fa-solid fa-chevron-right text-gray-300"></i></a></div></div>
+    </div>
+    
+    <div v-if="currentView==='money'" class="px-4 py-2 pb-24">
+         <div class="flex justify-between items-center mb-4 sticky top-16 bg-[#FFF0F5] z-30 py-2"><div class="flex bg-white rounded-xl p-1 shadow-sm"><button @click="moneyTab='record'" :class="['px-4 py-1.5 rounded-lg text-sm font-bold transition',moneyTab==='record'?'bg-yellow-200 text-yellow-800':'text-gray-400']">記帳</button><button @click="moneyTab='split'" :class="['px-4 py-1.5 rounded-lg text-sm font-bold transition',moneyTab==='split'?'bg-blue-200 text-blue-800':'text-gray-400']">分帳</button></div><div class="text-xs font-bold text-gray-500 bg-white px-3 py-1 rounded-full border">匯率: {{exchangeRate}}</div></div>
+         <div v-if="moneyTab==='record'"><div v-if="moneyMode==='select'" class="grid grid-cols-2 gap-4"><div v-for="user in users" :key="user.id" class="card p-4 text-center cursor-pointer hover:-translate-y-1 transition relative group" @click="selectMoneyUser(user.id)"><button @click.stop="openUserEdit(user)" class="absolute top-2 right-2 text-gray-300 hover:text-blue-500 bg-white rounded-full w-6 h-6 shadow"><i class="fa-solid fa-pen text-xs"></i></button><div class="w-16 h-16 mx-auto rounded-full bg-gray-100 overflow-hidden mb-2 text-3xl flex items-center justify-center border-4 border-white shadow"><img v-if="user.avatar" :src="user.avatar" class="w-full h-full object-cover"><span v-else>{{user.icon}}</span></div><div class="font-bold text-gray-700">{{user.name}}</div></div></div><div v-if="moneyMode==='list'"><div class="flex justify-between items-center mb-3 px-1"><h3 class="font-bold text-gray-700 flex items-center gap-2">{{getUserById(currentUserId).name}} 的帳本</h3><button @click="moneyMode='select'" class="text-xs bg-white px-3 py-1 rounded shadow text-gray-500">切換</button></div><div class="card p-4 mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 border relative overflow-hidden"><div class="text-xs text-yellow-600 font-bold mb-1">個人總支出 (不含公帳)</div><div class="text-2xl font-black text-gray-800">¥{{Number(userPersonalTotal).toLocaleString()}}</div></div><div class="space-y-3"><div v-for="exp in personalExpenses" :key="exp.id" class="card p-3 flex justify-between items-center"><div><div class="font-bold text-gray-800 text-sm">{{exp.name}}</div><div class="text-[10px] text-gray-400">{{exp.date}}</div></div><div class="text-right font-bold text-gray-800">¥{{Number(exp.amount).toLocaleString()}}<button @click="deleteExpense(exp.id)" class="text-red-300 ml-2 text-xs"><i class="fa-solid fa-trash"></i></button></div></div></div><button @click="openExpenseModal('personal')" class="fab-main bg-yellow-400 text-gray-800 hover:bg-yellow-300"><i class="fa-solid fa-pen"></i></button></div></div>
+          <div v-if="moneyTab==='split'"><div class="card p-4 border-l-4 border-blue-400 mb-4"><h3 class="font-bold mb-2 flex gap-2 items-center"><i class="fa-solid fa-calculator text-blue-400"></i> 分帳結果</h3><div v-if="settlements.length===0" class="text-sm text-gray-400 text-center py-4">無須分帳</div><div v-for="s in settlements" class="flex justify-between text-sm py-2 border-b border-gray-100 last:border-0"><span>{{getUserById(s.from).name}} <i class="fa-solid fa-arrow-right text-xs text-gray-300 mx-1"></i> {{getUserById(s.to).name}}</span><span class="font-bold text-gray-800">¥{{s.amount.toLocaleString()}}</span></div></div><div class="text-sm font-bold text-gray-500 mb-2 ml-1">公帳明細</div><div class="space-y-2"><div v-for="exp in groupExpenses" :key="exp.id" class="bg-white p-3 rounded-lg border flex justify-between"><div><div class="font-bold text-sm text-gray-700">{{exp.name}}</div><div class="text-[10px] text-blue-400">{{getUserById(exp.user).name}} 先付</div></div><div class="text-right font-bold text-gray-800">¥{{Number(exp.amount).toLocaleString()}}<button @click="deleteExpense(exp.id)" class="text-red-300 ml-2"><i class="fa-solid fa-trash"></i></button></div></div></div><button @click="openExpenseModal('group')" class="fab-main bg-blue-400 text-white hover:bg-blue-500"><i class="fa-solid fa-users"></i></button></div>
+    </div>
+    
+    <div v-if="['food','shopping','photo'].includes(currentView)" class="px-4 py-2 pb-24">
+         <div v-if="currentView==='food'" class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar justify-center sticky top-16 bg-[#FFF0F5] z-30 py-2"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="foodLoc=loc" :class="['px-6 py-2 rounded-full text-sm font-bold shadow-sm transition whitespace-nowrap',foodLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400 border border-gray-100']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
+        <div v-if="currentView==='shopping'" class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar justify-center"><button v-for="cat in ['wish','cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full text-sm font-bold shadow-sm transition whitespace-nowrap',shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400 border border-gray-100']">{{{'wish':'我的願望','cosme':'藥妝','ldk':'LDK','souvenir':'伴手禮'}[cat]}}</button></div>
+        <div v-if="currentView==='photo'" class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar justify-center"><button v-for="area in ['Tokyo','Kamakura','Fuji']" @click="photoArea=area" :class="['px-6 py-2 rounded-full text-sm font-bold shadow-sm transition whitespace-nowrap',photoArea===area?'bg-rose-400 text-white':'bg-white text-gray-400 border border-gray-100']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[area]}}</button></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div v-for="(item,idx) in getCurrentList()" :key="item.id||idx" class="card overflow-hidden hover:shadow-lg transition group">
+                <div class="h-56 relative bg-gray-100 cursor-pointer" @click="openImage(item.img)">
+                    <img :src="item.img" class="w-full h-full object-cover watercolor-img" @error="handleImgError($event,currentView,item.name)">
+                    <div class="watercolor-paper-texture"></div>
+                    <div class="absolute top-2 right-2 flex gap-2"><button @click.stop="editCommonItem(item,idx)" class="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow text-blue-400"><i class="fa-solid fa-pen"></i></button><button @click.stop="deleteCommonItem(idx)" class="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow text-red-400"><i class="fa-solid fa-trash"></i></button></div>
+                </div>
+                <div class="p-5"><h3 class="font-bold text-xl text-gray-800 mb-1">{{item.name}}</h3><p class="text-sm text-gray-500 mb-4 leading-relaxed">{{item.desc}}</p><a v-if="item.link" :href="item.link" target="_blank" class="block text-center bg-blue-500 text-white py-2.5 rounded-xl font-bold text-sm shadow-sm hover:bg-blue-600 transition">{{ currentView === 'shopping' ? '前往官方網站' : '連結 / 導航' }}</a></div>
+            </div>
+        </div>
+        <button @click="openAddCommonModal(currentView)" class="fab-main hover:scale-110"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    
+     <div v-if="currentView==='japanese'" class="px-4 py-2 pb-24">
+        <button @click="openCamera" class="w-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-3xl p-6 text-white text-center mb-6 shadow-xl relative overflow-hidden active:scale-95 transition group"><i class="fa-solid fa-camera text-8xl absolute -right-6 -bottom-6 opacity-20 rotate-12"></i><h3 class="font-bold text-2xl mb-2">📸 開啟懸浮鏡頭</h3><p class="text-sm opacity-90 font-medium">直接拍照翻譯</p></button>
+        <div class="grid grid-cols-2 gap-3 mb-6"><a href="tel:110" class="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3 active:scale-95 transition"><div class="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-xl"><i class="fa-solid fa-phone"></i></div><div><div class="font-bold text-gray-800">報警 110</div><div class="text-[10px] text-gray-500">遇到事故/犯罪</div></div></a><a href="tel:119" class="bg-red-50 border border-red-200 p-4 rounded-xl flex items-center gap-3 active:scale-95 transition"><div class="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-xl"><i class="fa-solid fa-truck-medical"></i></div><div><div class="font-bold text-gray-800">急救 119</div><div class="text-[10px] text-gray-500">火災/救護車</div></div></a></div>
+         <div class="card p-4 border-l-4 border-emerald-500"><h3 class="font-bold mb-2 text-emerald-700">🏥 鄰近救援點</h3><ul class="text-sm space-y-2 text-gray-600"><li><i class="fa-solid fa-hospital text-emerald-400 w-5"></i> 墨東病院 (錦糸町)</li><li><i class="fa-solid fa-hospital text-emerald-400 w-5"></i> 山梨赤十字病院 (河口湖)</li><li><i class="fa-solid fa-phone text-emerald-400 w-5"></i> 旅外國人急難救助: 0800-085-095</li></ul></div>
+        <div class="space-y-3"><div v-for="(phrase,idx) in japanesePhrases" :key="idx" @click="speak(phrase.jp)" class="card p-5 flex items-center justify-between cursor-pointer active:scale-95 transition border-l-[6px] border-emerald-400"><div><div class="font-bold text-xl text-gray-800 mb-1">{{phrase.jp}}</div><div class="text-sm text-gray-500 font-medium">{{phrase.tw}}</div></div><div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 text-xl shadow-inner"><i class="fa-solid fa-volume-high"></i></div><button @click.stop="japanesePhrases.splice(idx,1)" class="absolute top-2 right-2 text-gray-300 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div></div>
+        <button @click="openAddCommonModal('jp')" class="fab-main bg-emerald-500 hover:bg-emerald-600"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    
+    <div v-if="currentView==='weather'" class="px-4 py-2 relative pb-24">
+        <div class="mb-4 bg-white/95 p-4 rounded-3xl box-shadow border border-pink-200 flex items-center justify-between">
+            <div class="flex items-center gap-3"><div class="text-3xl">🌸</div><div><div class="text-[10px] text-gray-400 font-bold uppercase">Sakura Forecast</div><div class="text-lg font-bold text-pink-500">{{sakuraStatus}}</div></div></div>
+            <div class="flex flex-col gap-1 text-right"><a href="https://n-kishou.com/corp/news-contents/sakura/" target="_blank" class="text-[10px] bg-pink-100 text-pink-600 px-3 py-1 rounded-full font-bold hover:bg-pink-200">氣象株式會社</a><a href="https://weathernews.jp/s/sakura/" target="_blank" class="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold hover:bg-blue-200">Weathernews</a></div>
+        </div>
+        <div class="space-y-4"><div v-for="w in [{t:'東京',d:tokyoWeather},{t:'鎌倉',d:kamakuraWeather},{t:'富士山',d:fujiWeather}]" class="card p-5 border-l-4 border-sky-400"><div class="flex justify-between items-center mb-2"><div><div class="font-bold text-gray-500 text-xs">{{w.t}}</div><div class="text-4xl font-black text-gray-800 tracking-tighter">{{w.d.temp}}°</div></div><div class="text-4xl drop-shadow-sm">{{w.d.icon}}</div></div><div class="mt-2 bg-sky-50 p-2 rounded-lg text-xs text-gray-600 border border-sky-100 flex gap-2 items-center"><div class="text-lg">👘</div><div><span class="font-bold text-sky-600">穿搭建議：</span>{{getClothingAdvice(w.d.temp)}}</div></div></div></div>
     </div>
 
     <div v-show="!['landing','menu'].includes(currentView)" 
@@ -253,14 +313,6 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
         <i class="fa-solid fa-house"></i>
     </div>
     
-    <div v-if="currentView==='weather'" class="px-4 py-2 relative pb-24">
-        <div class="mb-4 bg-white/95 p-4 rounded-3xl box-shadow border border-pink-200 flex items-center justify-between">
-            <div class="flex items-center gap-3"><div class="text-3xl">🌸</div><div><div class="text-[10px] text-gray-400 font-bold uppercase">Sakura Forecast</div><div class="text-lg font-bold text-pink-500">{{sakuraStatus}}</div></div></div>
-            <div class="flex flex-col gap-1 text-right"><a href="https://n-kishou.com/corp/news-contents/sakura/" target="_blank" class="text-[10px] bg-pink-100 text-pink-600 px-3 py-1 rounded-full font-bold hover:bg-pink-200">氣象株式會社</a><a href="https://weathernews.jp/s/sakura/" target="_blank" class="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold hover:bg-blue-200">Weathernews</a></div>
-        </div>
-        <div class="space-y-4"><div v-for="w in [{t:'東京',d:tokyoWeather},{t:'鎌倉',d:kamakuraWeather},{t:'富士山',d:fujiWeather}]" class="card p-5 border-l-4 border-sky-400"><div class="flex justify-between items-center mb-2"><div><div class="font-bold text-gray-500 text-xs">{{w.t}}</div><div class="text-4xl font-black text-gray-800 tracking-tighter">{{w.d.temp}}°</div></div><div class="text-4xl drop-shadow-sm">{{w.d.icon}}</div></div><div class="mt-2 bg-sky-50 p-2 rounded-lg text-xs text-gray-600 border border-sky-100 flex gap-2 items-center"><div class="text-lg">👘</div><div><span class="font-bold text-sky-600">穿搭建議：</span>{{getClothingAdvice(w.d.temp)}}</div></div></div></div>
-    </div>
-    
     <div v-if="showLightbox" class="fixed inset-0 z-[100] bg-white/95 backdrop-blur flex items-center justify-center p-4 animate-fade-in" @click="showLightbox=false"><img :src="currentZoomImg" class="max-w-full max-h-[80vh] rounded-2xl shadow-2xl border-4 border-white" @click.stop><button class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 text-4xl"><i class="fa-solid fa-circle-xmark"></i></button></div>
     <div v-if="showCamera" class="fixed inset-0 bg-black z-[100] flex flex-col"><video ref="videoElement" autoplay playsinline class="w-full h-full object-cover"></video><div class="absolute bottom-10 left-0 right-0 flex justify-center gap-4 z-50"><button @click="$refs.cameraInput.click()" class="bg-white/20 backdrop-blur text-white px-6 py-3 rounded-full font-bold border border-white/50">無法開啟相機？點此上傳</button><input type="file" ref="cameraInput" accept="image/*" capture="environment" class="hidden"></div><button @click="closeCamera" class="absolute top-6 right-6 bg-black/40 text-white w-12 h-12 rounded-full flex items-center justify-center z-50 backdrop-blur"><i class="fa-solid fa-xmark"></i></button></div>
     <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
@@ -268,6 +320,9 @@ tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'
     
     <div v-if="showUserModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center"><h3 class="font-bold text-lg mb-4">編輯成員資料</h3><div class="w-24 h-24 mx-auto bg-gray-100 rounded-full mb-4 relative border-4 border-white shadow overflow-hidden" @click="triggerAvatarUpload"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><div v-else class="w-full h-full flex items-center justify-center text-4xl">{{editingUser.icon}}</div><div class="absolute inset-0 bg-black/30 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition"><i class="fa-solid fa-camera"></i></div></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold outline-none border focus:border-pink-300" placeholder="名字"><div class="flex gap-3"><button @click="showUserModal=false" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-500">取消</button><button @click="saveUserEdit" class="flex-1 bg-pink-400 text-white py-3 rounded-xl font-bold shadow-md">儲存</button></div></div></div>
     <div v-if="showModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{isEditing?'編輯':'新增'}}</h3><input v-model="editForm.name" placeholder="名稱" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none border"><div class="flex gap-2 mb-3"><input v-model="editForm.hours" placeholder="時間" class="w-1/3 p-3 bg-gray-50 rounded-xl outline-none border"><select v-model="editForm.category" class="flex-1 p-3 bg-gray-50 rounded-xl outline-none border"><option value="Sightseeing">景點</option><option value="Food">美食</option><option value="Shopping">購物</option><option value="Transport">交通</option></select></div><input v-model="editForm.mapKeyword" placeholder="地圖關鍵字" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none border"><textarea v-model="editForm.note" class="w-full p-3 bg-gray-50 rounded-xl h-24 mb-4 outline-none border resize-none" placeholder="備註"></textarea><div class="flex gap-3"><button @click="showModal=false" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-500">取消</button><button @click="saveItem" class="flex-1 bg-pink-400 text-white py-3 rounded-xl font-bold shadow-md">儲存</button></div></div></div>
+    <div v-if="showCommonModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{isEditing?'編輯':'新增'}}</h3><input v-model="newCommon.text1" placeholder="名稱" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none border"><textarea v-if="commonType!=='jp'" v-model="newCommon.text2" class="w-full p-3 bg-gray-50 rounded-xl h-24 mb-3 outline-none border resize-none" placeholder="描述"></textarea><div class="flex items-center gap-3 mb-4"><div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border overflow-hidden"><img v-if="newCommon.text3" :src="newCommon.text3" class="w-full h-full object-cover"><i v-else class="fa-solid fa-image text-gray-300"></i></div><button @click="$refs.commonImageInput.click()" class="text-xs bg-blue-50 text-blue-500 px-3 py-2 rounded-lg font-bold border border-blue-100">上傳/更換圖片</button></div><div class="flex gap-3"><button @click="showCommonModal=false" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-500">取消</button><button @click="saveCommonItem" class="flex-1 bg-blue-400 text-white py-3 rounded-xl font-bold shadow-md">儲存</button></div></div></div>
+    <div v-if="showExpenseModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">記帳</h3><input v-model="newExpense.name" placeholder="項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 outline-none border"><div class="flex gap-2 mb-3"><input type="number" v-model="newExpense.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl outline-none border"><select v-model="newExpense.currency" class="w-24 p-3 bg-gray-50 rounded-xl outline-none border font-bold text-gray-600"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-3"><label class="text-xs text-gray-400 font-bold ml-1">{{expenseType==='group'?'誰先墊付?':'誰花的?'}}</label><div class="flex gap-2 mt-1 overflow-x-auto pb-1"><button v-for="u in users" :key="u.id" @click="currentUserId=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition',currentUserId===u.id?'bg-yellow-100 border-yellow-300 text-yellow-700':'bg-white border-gray-200 text-gray-400']">{{u.name}}</button></div></div><div class="flex gap-2 justify-center mb-6"><button v-for="c in ['食','衣','住','行','樂']" :key="c" @click="newExpense.category=c" :class="['w-10 h-10 rounded-full font-bold transition',newExpense.category==c?'bg-chii-yellow text-gray-800 shadow-md scale-110':'bg-gray-100 text-gray-400']">{{c}}</button></div><div class="flex gap-3"><button @click="showExpenseModal=false" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-500">取消</button><button @click="addExpense" class="flex-1 bg-yellow-400 text-gray-800 py-3 rounded-xl font-bold shadow-md">儲存</button></div></div></div>
+    <div v-if="showTicketModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl h-[60vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-xl text-gray-700">票券精靈</h3><button @click="showTicketModal=false" class="text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button></div><div class="flex-1 overflow-y-auto space-y-3"><div v-for="ticket in suggestedTickets" :key="ticket.name" class="border rounded-xl p-3 border-orange-200 bg-orange-50"><h4 class="font-bold text-gray-800">{{ticket.name}}</h4><p class="text-xs text-gray-600 mt-1">{{ticket.reason}}</p><a :href="ticket.link" target="_blank" class="block text-center bg-white border border-orange-200 text-orange-500 text-xs font-bold py-1 mt-2 rounded-full">前往購買</a></div></div></div></div>
     <div v-if="showSyncModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative"><button @click="showSyncModal=false" class="absolute top-4 right-4 text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button><h3 class="font-bold text-xl mb-2 text-center text-chii-text">📂 設定與檔案</h3><p class="text-xs text-gray-400 text-center mb-6">儲存 HTML 可保留所有圖片與資料</p><button @click="saveAsHtml" class="w-full py-3 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-xl font-bold mb-3 flex items-center justify-center gap-2 shadow-md active:scale-95 transition"><i class="fa-solid fa-file-code"></i> 儲存為網頁檔 (HTML)</button><hr class="border-gray-100 my-3"><button @click="resetItinerary" class="w-full py-3 bg-red-50 text-red-500 rounded-xl font-bold mb-3 flex items-center justify-center gap-2"><i class="fa-solid fa-rotate-right"></i> 重置行程 (強制更新)</button><label class="w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer border border-gray-200"><i class="fa-solid fa-upload"></i> 讀取資料 (JSON)<input type="file" @change="loadBackup" accept=".json" class="hidden"></label><div v-if="syncMsg" class="text-center text-xs mt-3 font-bold text-green-500">{{syncMsg}}</div></div></div>
 
 </div>
@@ -297,12 +352,12 @@ const showTicketModal = ref(false);
 const showCamera = ref(false);
 const showUserModal = ref(false);
 const editingUser = ref({});
-const homeBannerImg = ref('2026.tokyo.jpg');
+const homeBannerImg = ref('808122.jpg'); // User provided image name
 const searchQuery = ref('');
 const tripDays = [{week:'Day 1',title:'成田/錦糸町'},{week:'Day 2',title:'淺草/上野'},{week:'Day 3',title:'富士山出發'},{week:'Day 4',title:'山中湖'},{week:'Day 5',title:'返回新宿'},{week:'Day 6',title:'鎌倉'},{week:'Day 7',title:'澀谷/六本木'},{week:'Day 8',title:'返程'}];
 const selectedDayIndex = ref(0);
 
-// Correct 8-Day Itinerary (Hardcoded to fix blank issue)
+// Default Data Initialization (Prevents Blank Screens)
 const defaultItinerary = [
     [{id:101,category:'Flight',name:'06:40 桃園起飛',hours:'06:40',mapKeyword:'桃園機場',note:'提早2小時抵達'},{id:102,category:'Flight',name:'10:40 抵達成田機場',hours:'10:40',mapKeyword:'成田機場',note:'出關/領車/買票'},{id:103,category:'Sightseeing',name:'晴空塔',hours:'下午',mapKeyword:'Tokyo Skytree',note:'逛 Solamachi'},{id:104,category:'Food',name:'晚餐：錦糸町周遭',hours:'晚上',mapKeyword:'錦糸町美食',note:''}],
     [{id:201,category:'Sightseeing',name:'淺草寺',hours:'上午',mapKeyword:'淺草寺',note:'雷門'},{id:202,category:'Food',name:'午餐：淺草寺周遭',hours:'中午',mapKeyword:'淺草午餐',note:''},{id:203,category:'Sightseeing',name:'小網神社',hours:'下午',mapKeyword:'小網神社',note:'強運厄除'},{id:204,category:'Sightseeing',name:'上野恩賜公園',hours:'下午',mapKeyword:'上野恩賜公園',note:''},{id:205,category:'Shopping',name:'秋葉原 / 東京一番街',hours:'晚上',mapKeyword:'東京站一番街',note:'依體力決定'},{id:206,category:'Food',name:'晚餐',hours:'晚上',mapKeyword:'東京車站美食',note:'依逛街地點決定'}],
@@ -314,12 +369,20 @@ const defaultItinerary = [
     [{id:801,category:'Sightseeing',name:'自由行程',hours:'白天',mapKeyword:'東京',note:'整理行李'},{id:802,category:'Flight',name:'20:40 成田起飛',hours:'20:40',mapKeyword:'成田機場',note:'提早抵達'},{id:803,category:'Flight',name:'23:20 抵達桃園',hours:'23:20',mapKeyword:'桃園機場',note:'平安回家'}]
 ];
 
-// Drive Plan Data
 const drivePlan = ref([
     { day: 2, title: 'Day 3: 前往富士山', stops: [{name: '河口湖自然生活館 (大石公園)', note: '花田與富士山絕景', location: '河口湖自然生活館', parking: '大石公園駐車場'},{name: '新倉富士淺間神社', note: '知名的五重塔與富士山', location: '新倉富士淺間神社', parking: '新倉山浅間公園 駐車場'},{name: '富士吉田本町商店街', note: '昭和風街道', location: '富士吉田本町通り', parking: '富士吉田市 市営駐車場'},{name: '金鳥居', note: '鳥居中的富士山', location: '金鳥居', parking: '富士山駅 駐車場'}] },
     { day: 3, title: 'Day 4: 山中湖環湖', stops: [{name: '平野之濱', note: '清晨看逆富士', location: '平野の浜', parking: '平野の浜 駐車場'},{name: '長池親水公園', note: '停車後換騎自行車', location: '長池親水公園', parking: '長池親水公園 駐車場'},{name: '白鳥濱', note: '餵天鵝', location: '山中湖 白鳥の浜', parking: '山中湖 白鳥の浜 駐車場'},{name: '旭日丘湖畔綠地公園', note: '搭乘 KABA 巴士', location: '旭日丘湖畔緑地公園', parking: '森の駅 旭日丘 駐車場'},{name: 'Ogino 超市', note: '晚餐採買', location: 'Ogino 河口湖店', parking: 'Ogino 河口湖店'}] },
     { day: 4, title: 'Day 5: 返回東京', stops: [{name: '河口湖纜車', note: '天上山公園', location: '河口湖富士山全景纜車', parking: '河口湖畔県営駐車場'},{name: 'Fujisan Shokupan', note: '富士山吐司', location: 'Fujisan Shokupan', parking: 'Fujisan Shokupan'}] }
 ]);
+
+const defaultShoppingList = {
+    'wish':[],
+    'cosme':[{id:1,name:'Kate 怪獸唇膏',desc:'賣到缺貨的神級唇膏！',img:'./images/kate.jpg',link:'https://www.nomorerules.net/'},{id:2,name:'Tirtir 氣墊粉餅',desc:'日本女生人手一顆的紅盒氣墊。',img:'./images/tirtir.jpg',link:'https://tirtir.co.jp/'}],
+    'ldk':[{id:6,name:'Lululun 面膜',desc:'LDK 評測常勝軍！',img:'./images/lululun.jpg',link:'https://lululun.com/'},{id:7,name:'Melano CC 精華',desc:'平價美白神器！',img:'./images/cc.jpg',link:'https://jp.rohto.com/melanocc/'}],
+    'souvenir':[{id:11,name:'NY Perfect Cheese',desc:'東京車站排隊名店！',img:'./images/ny.jpg',link:'https://www.google.com/search?q=NY+Perfect+Cheese+Official'},{id:12,name:'Tokyo Banana',desc:'經典不敗伴手禮',img:'./images/banana.jpg',link:'https://www.tokyobanana.jp/'}]
+};
+const defaultFoodList = {'Tokyo':[{id:1,name:'AFURI 阿夫利拉麵',desc:'必吃的柚子鹽拉麵！',img:'https://placehold.co/400x300/FFD1DC/555?text=AFURI',link:'https://afuri.com/'},{id:2,name:'HARBS 水果千層',desc:'甜點界的夢幻逸品！',img:'https://placehold.co/400x300/FFF5BA/555?text=HARBS',link:'https://www.harbs.co.jp/'}], 'Kamakura':[{id:5,name:'Bills 七里濱',desc:'世界第一好吃的早餐。',img:'https://placehold.co/400x300/A2D2FF/555?text=Bills',link:getMapLink('Bills 七里濱')}], 'Fuji':[{id:7,name:'Houtou Fudou',desc:'河口湖必吃鄉土料理。',img:'https://placehold.co/400x300/FFB7B2/555?text=Houtou',link:getMapLink('Houtou Fudou 東戀路店')}]};
+const defaultPhotoSpots = {'Tokyo':[{id:1,name:'SHIBUYA SKY',desc:'東京最美高空展望台！',img:'https://placehold.co/400x300/FFD1DC/555?text=SKY',link:getMapLink('SHIBUYA SKY')}], 'Kamakura':[{id:3,name:'鎌倉高校前',desc:'灌籃高手經典場景！',img:'https://placehold.co/400x300/A2D2FF/555?text=SlamDunk',link:getMapLink('鎌倉高校前站')}], 'Fuji':[{id:5,name:'新倉山淺間公園',desc:'明信片絕景！',img:'https://placehold.co/400x300/FFB7B2/555?text=Pagoda',link:getMapLink('新倉山淺間公園')}]};
 
 const getDrivePlanForDay = (dayIndex) => { const plan = drivePlan.value.find(p => p.day === dayIndex); return plan ? plan.stops : []; };
 
@@ -356,17 +419,12 @@ const kamakuraWeather = ref({temp:'--',icon:'☁️'});
 const fujiWeather = ref({temp:'--',icon:'☁️'});
 const sakuraStatus = ref('預測中');
 const exchangeRate = ref(0.22);
-const getMapLink = (k) => 'https://www.google.com/maps/search/?api=1&query=$' + encodeURIComponent(k);
 
-const shoppingList = ref({
-'wish':[],
-'cosme':[{id:1,name:'Kate 怪獸唇膏',desc:'賣到缺貨的神級唇膏！',img:'./images/kate.jpg',link:'https://www.nomorerules.net/'},{id:2,name:'Tirtir 氣墊粉餅',desc:'日本女生人手一顆的紅盒氣墊。',img:'./images/tirtir.jpg',link:'https://tirtir.co.jp/'}],
-'ldk':[{id:6,name:'Lululun 面膜',desc:'LDK 評測常勝軍！',img:'./images/lululun.jpg',link:'https://lululun.com/'},{id:7,name:'Melano CC 精華',desc:'平價美白神器！',img:'./images/cc.jpg',link:'https://jp.rohto.com/melanocc/'}],
-'souvenir':[{id:11,name:'NY Perfect Cheese',desc:'東京車站排隊名店！',img:'./images/ny.jpg',link:'https://www.google.com/search?q=NY+Perfect+Cheese+Official'},{id:12,name:'Tokyo Banana',desc:'經典不敗伴手禮',img:'./images/banana.jpg',link:'https://www.tokyobanana.jp/'}]
-});
-const foodList = ref({'Tokyo':[{id:1,name:'AFURI',desc:'柚子鹽拉麵',img:'',link:''}], 'Kamakura':[], 'Fuji':[]});
-const photoSpots = ref({'Tokyo':[], 'Kamakura':[], 'Fuji':[]});
-const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'}]);
+const shoppingList = ref(defaultShoppingList);
+const foodList = ref(defaultFoodList);
+const photoSpots = ref(defaultPhotoSpots);
+const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'}]);
+
 const currentDayItinerary = computed(() => itineraryData.value[selectedDayIndex.value] || []);
 const getUserById = (id) => users.value.find(u => u.id === id) || users.value[0];
 const currentPrepList = computed(() => { const u = getUserById(prepUser.value); return u.list ? u.list.map(i => typeof i === 'string' ? {text:i, checked:false} : i) : []; });
@@ -384,7 +442,6 @@ const settlements = computed(() => {
 });
 
 const countdownPos = ref({x:20, y:150});
-// Updated Home Button Default Position (Bottom Center)
 const homeBtnPos = ref({x: window.innerWidth / 2 - 28, y: window.innerHeight - 80}); 
 
 const startDrag = (e, type) => {
@@ -437,7 +494,7 @@ const saveAsHtml = () => {
     html = html.replace('const itineraryData = ref(defaultItinerary);', 'const itineraryData = ref('+JSON.stringify(state.itinerary)+');')
     .replace('const users = ref([', 'const users = ref('+JSON.stringify(state.users)+'); //')
     .replace('const expenses = ref([]);', 'const expenses = ref('+JSON.stringify(state.expenses)+');');
-    const blob = new Blob([html], {type: 'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '2026_Tokyo_V10.5.html'; a.click();
+    const blob = new Blob([html], {type: 'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '2026_Tokyo_V10.6.html'; a.click();
 };
 const downloadBackup = () => { const data = JSON.stringify({itinerary:itineraryData.value, users:users.value}); const blob = new Blob([data], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup.json'; a.click(); };
 const loadBackup = (e) => { const r = new FileReader(); r.onload = (ev) => { try{ const d=JSON.parse(ev.target.result); itineraryData.value=d.itinerary; users.value=d.users; alert('讀取成功'); showSyncModal.value=false; }catch(err){alert('格式錯誤');} }; r.readAsText(e.target.files[0]); };
@@ -459,39 +516,53 @@ const editFlightField = (field) => {
     }
 };
 const resetItinerary = () => {
-    if(confirm('確定要重置行程資料嗎？目前的修改將會消失。')) {
+    if(confirm('確定要重置所有資料嗎？目前的修改將會消失。')) {
         itineraryData.value = JSON.parse(JSON.stringify(defaultItinerary));
-        alert('行程已重置');
+        shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
+        foodList.value = JSON.parse(JSON.stringify(defaultFoodList));
+        photoSpots.value = JSON.parse(JSON.stringify(defaultPhotoSpots));
+        alert('資料已重置');
         showSyncModal.value = false;
     }
 };
 
 onMounted(() => {
-    const STORAGE_KEY = 'v10_5_key';
+    const STORAGE_KEY = 'v10_6_final_key';
     const s = localStorage.getItem(STORAGE_KEY);
     if(s) { 
         try { 
             const d=JSON.parse(s); 
-            if(!d.itinerary || d.itinerary.length < 8) { itineraryData.value = defaultItinerary; } else { itineraryData.value = d.itinerary; }
+            // Load or Fallback for all data types to prevent blank pages
+            itineraryData.value = (d.itinerary && d.itinerary.length >= 8) ? d.itinerary : defaultItinerary;
             users.value = d.users || users.value;
-            expenses.value=d.expenses||[]; 
-            shoppingList.value=d.shop||shoppingList.value; 
-            foodList.value=d.food||foodList.value; 
-            photoSpots.value=d.photo||photoSpots.value; 
-        } catch(e){ itineraryData.value = defaultItinerary; } 
+            expenses.value = d.expenses || []; 
+            shoppingList.value = (d.shop && d.shop.cosme) ? d.shop : defaultShoppingList; 
+            foodList.value = (d.food && d.food.Tokyo) ? d.food : defaultFoodList; 
+            photoSpots.value = (d.photo && d.photo.Tokyo) ? d.photo : defaultPhotoSpots; 
+        } catch(e){ 
+            itineraryData.value = defaultItinerary; 
+            shoppingList.value = defaultShoppingList;
+            foodList.value = defaultFoodList;
+            photoSpots.value = defaultPhotoSpots;
+        } 
     } else {
+        // Initial Load (No Storage)
+        itineraryData.value = defaultItinerary;
+        shoppingList.value = defaultShoppingList;
+        foodList.value = defaultFoodList;
+        photoSpots.value = defaultPhotoSpots;
+        
         const basic = ['護照', '日幣', '信用卡', 'SIM卡'];
         const drive = JSON.stringify(itineraryData.value).includes('租車') ? ['駕照/譯本'] : [];
         users.value.forEach((u, i) => { if(!u.list) u.list = []; if(u.list.length === 0 || typeof u.list[0] === 'string') { u.list = [...basic, ...(i===0?drive:[])].map(t => ({text:t, checked:false})); } });
     }
     getW(35.6895, 139.6917, tokyoWeather); getW(35.3192, 139.5467, kamakuraWeather); getW(35.3606, 138.7274, fujiWeather); fetchRate();
     daysUntilTrip.value = Math.ceil((new Date('2026-03-27') - new Date()) / (86400000));
-    // Recenter Home Button
     homeBtnPos.value = {x: window.innerWidth / 2 - 28, y: window.innerHeight - 80};
 });
 
 watch([itineraryData, expenses, shoppingList, foodList, photoSpots, users], () => {
-    localStorage.setItem('v10_5_key', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value, users: users.value}));
+    localStorage.setItem('v10_6_final_key', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value, users: users.value}));
 }, {deep: true});
 
 const apps = [
@@ -505,7 +576,7 @@ const apps = [
 {id:8,name:'網美打卡',icon:'fa-solid fa-camera',bgClass:'bg-rose-400',view:'photo'},
 {id:9,name:'即時救命',icon:'fa-solid fa-comment-medical',bgClass:'bg-emerald-400',view:'japanese'}
 ];
-const hotels = [{name:'錦糸町 Sumida City',days:'Day 1-2',link:'https://www.google.com/maps/search/hotels+Kinshicho'},{name:'Megu Fuji 2021',days:'Day 3-4',link:'https://www.google.com/maps/place/Megu+Fuji+2021'},{name:'DOMO 飯店',days:'Day 5-7',link:'https://www.google.com/maps/search/DOMO+Hotel+Shinjuku'}];
+const hotels = [{name:'錦糸町 Sumida City',days:'Day 1-2',link:'https://www.google.com/maps/search/hotels+Kinshicho'},{name:'Megu Fuji 2021',days:'Day 3-4',link:'https://maps.app.goo.gl/MeguFuji'},{name:'DOMO 飯店',days:'Day 5-7',link:'https://www.google.com/maps/search/DOMO+Hotel+Shinjuku'}];
 const suggestedTickets = [{name:'江之電一日券',reason:'行程包含鎌倉',link:'https://www.enoden.co.jp/tc/tourism/ticket/noriorikun/'},{name:'富士回遊號',reason:'前往河口湖',link:'https://www.jreast.co.jp/multi/zh-CHT/'}];
 return { currentView, homeBannerImg, apps, getPageTitle, countdownPos, homeBtnPos, startDrag, daysUntilTrip, searchQuery, doGoogleSearch, tripDays, selectedDayIndex, currentDayItinerary, getIconByCategory, getMapLink, openAddModal, showModal, editForm, saveItem, deleteItem, editItem, moneyTab, moneyMode, users, currentUserId, selectMoneyUser, getUserById, userPersonalTotal, personalExpenses, groupExpenses, settlements, openExpenseModal, showExpenseModal, newExpense, addExpense, deleteExpense, exchangeRate, prepTab, prepMode, selectPrepUser, prepUser, currentPrepList, addPrepItem, getProgress, hotelTab, hotels, flightMode, currentFlightUser, foodLoc, shopCat, photoArea, getCurrentList, openAddCommonModal, showCommonModal, newCommon, saveCommonItem, isEditing, processCommonImageUpload, editCommonItem, deleteCommonItem, tokyoWeather, kamakuraWeather, fujiWeather, sakuraStatus, getClothingAdvice, showSyncModal, syncMsg:ref(''), downloadBackup, loadBackup, saveAsHtml, showTicketModal, openTicketModal, suggestedTickets, showCamera, openCamera, closeCamera, videoElement, showLightbox, openImage, currentZoomImg, avatarInput, triggerAvatarUpload, processAvatarUpload, commonImageInput, handleImgError, japanesePhrases, speak, showUserModal, editingUser, openUserEdit, saveUserEdit, cameraInput, resetItinerary, drivePlan, getDrivePlanForDay, itineraryMode, editFlightField };
 }
