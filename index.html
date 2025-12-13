@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V10.12 終極版)</title>
+<title>關東之旅 2026 (V10.13 完美防禦版)</title>
 <style>
-    /* --- 核心基礎 --- */
+    /* --- 1. 核心基礎設定 --- */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         background-color: #FFF0F5;
@@ -20,39 +19,43 @@
         padding-bottom: env(safe-area-inset-bottom);
     }
     
-    #app { display: block; min-height: 100vh; }
-    [v-cloak] { display: none; }
+    /* 獨立載入層 (在 Vue 之外，保證可見) */
+    #static-loading {
+        position: fixed; inset: 0; z-index: 99999;
+        background: #FFF0F5; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        transition: opacity 0.5s ease;
+    }
+    .loading-spinner { font-size: 50px; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
     
+    /* 錯誤提示框 */
+    #error-box { display: none; margin-top: 20px; padding: 15px; background: #ffebee; color: #c62828; border: 1px solid #ef5350; border-radius: 10px; font-size: 12px; max-width: 80%; text-align: left; }
+
+    #app { display: block; min-height: 100vh; opacity: 0; transition: opacity 0.5s ease; }
+    #app.loaded { opacity: 1; }
+    [v-cloak] { display: none; } /* 備用，主要依賴 opacity */
+    
+    /* --- 2. UI 組件樣式 --- */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    /* 卡片優化 */
     .card { background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid rgba(255,255,255,0.8); margin-bottom: 15px; position: relative; overflow: hidden; }
     
     /* 歡迎頁 */
-    .welcome-screen { position: fixed; inset: 0; z-index: 9999; background: #FFF0F5; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .welcome-screen { position: fixed; inset: 0; z-index: 9000; background: #FFF0F5; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
     .welcome-screen.hidden-screen { transform: translateY(-100%); pointer-events: none; }
     .welcome-bg { position: absolute; inset: 0; z-index: 0; }
-    .welcome-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4)); }
-
+    
     /* 懸浮按鈕 */
     .fab-main { position: fixed; bottom: calc(90px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; z-index: 40; border: 3px solid white; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); background-color: #ff9eac; transition: all 0.2s; }
     .fab-main:active { transform: scale(0.9); }
-
-    /* Home 鍵 */
     .fab-home { position: fixed; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; z-index: 900; border: 4px solid white; box-shadow: 0 5px 20px rgba(0,0,0,0.2); background: linear-gradient(135deg, #FF9EAC, #FFD1DC); cursor: grab; touch-action: none; transition: transform 0.1s; }
-    .fab-home:active { transform: scale(0.9); cursor: grabbing; }
-
-    /* 機票與動畫 */
+    
+    /* 其他 */
     .boarding-pass { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #eee; position: relative; margin-bottom: 16px; }
     .dashed-line { border-top: 2px dashed #ddd; margin: 15px 0; position: relative; }
-    .sakura { position: fixed; top: -10px; background: #FFB7B2; border-radius: 100% 0 100% 0; opacity: 0.6; animation: fall linear infinite; z-index: 0; pointer-events: none; width: 12px; height: 12px; }
-    @keyframes fall { to { transform: translate(15vw, 105vh) rotate(360deg); } }
-    
     .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .watercolor-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-    .card:active .watercolor-img { transform: scale(1.05); }
     .editable-field:active { background-color: #FFF9C4; }
 </style>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -65,13 +68,30 @@
 </head>
 <body>
 
+<div id="static-loading">
+    <div class="loading-spinner">🌸</div>
+    <div style="margin-top:10px;font-weight:bold;color:#5D4037">V10.13 載入中...</div>
+    <div id="error-box"></div>
+</div>
+
+<script>
+    // 全局錯誤捕獲，防止白屏
+    window.onerror = function(msg, url, line) {
+        const box = document.getElementById('error-box');
+        box.style.display = 'block';
+        box.innerHTML = `<strong>⚠️ 發生錯誤：</strong><br>${msg}<br><br>請檢查代碼是否複製完整。`;
+        // 不隱藏 loading 以免顯示空白
+    };
+</script>
+
 <div id="sakura-container"></div>
 
-<div id="app" v-cloak>
+<div id="app" :class="{ 'loaded': isMounted }">
 
     <div :class="['welcome-screen flex flex-col items-center justify-between', isWelcomeClosed ? 'hidden-screen' : '']">
         <div class="welcome-bg">
             <img :src="welcomeImg" @error="handleWelcomeError" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/20"></div>
         </div>
         <div class="relative z-10 mt-32 text-center px-4">
             <h1 class="text-5xl font-black text-white drop-shadow-lg tracking-widest mb-3">關東之旅</h1>
@@ -93,7 +113,6 @@
 
     <div v-if="currentView==='menu'" class="min-h-screen p-6 pt-12 flex flex-col bg-[#FFF0F5] animate-fade-in">
         <h2 class="text-2xl font-black text-gray-700 mb-4 text-center pt-[env(safe-area-inset-top)]"><i class="fa-solid fa-grid-2"></i> 功能選單</h2>
-        
         <div class="mb-6 mx-1 bg-white/90 backdrop-blur border-l-4 border-yellow-400 rounded-xl p-4 shadow-sm relative overflow-hidden flex items-start gap-3">
              <div class="text-yellow-500 text-2xl pt-1"><i class="fa-solid fa-bell"></i></div>
              <div class="flex-1">
@@ -104,9 +123,7 @@
                      <div class="flex items-center gap-2 text-sm text-gray-600"><span class="w-2 h-2 rounded-full bg-orange-400"></span> SHIBUYA SKY：{{daysUntilTrip<=28?'搶票!':'4週前開放'}}</div>
                  </div>
              </div>
-             <div class="absolute -right-2 -bottom-4 text-yellow-100 text-8xl -z-10"><i class="fa-solid fa-clock"></i></div>
         </div>
-
         <div class="grid grid-cols-3 gap-y-8 gap-x-4 mb-24">
             <div v-for="app in apps" :key="app.id" class="flex flex-col items-center cursor-pointer active:scale-95 transition group" @click="currentView=app.view">
                 <div class="w-16 h-16 rounded-[24px] flex items-center justify-center text-3xl text-white shadow-lg border-4 border-white group-hover:shadow-xl transition-all" :class="app.bgClass"><i :class="app.icon"></i></div>
@@ -284,10 +301,11 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
 
 createApp({
     setup() {
-        const STORAGE_KEY = 'v10_12_final_lock'; // New Key
+        const STORAGE_KEY = 'v10_13_final_secure'; // NEW Key
         const currentView = ref('menu');
         const isWelcomeClosed = ref(false);
         const welcomeImg = ref('images/welcome.jpg');
+        const isMounted = ref(false);
         
         // --- 完整資料庫 (含連結) ---
         const defaultShopping = {
@@ -344,7 +362,12 @@ createApp({
         const users = ref(defaultUsers);
         const expenses = ref([]);
         const daysUntilTrip = ref(0);
+        const shoppingList = ref(defaultShopping);
+        const foodList = ref(defaultFood);
+        const photoSpots = ref(defaultPhoto);
+        const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'},{jp:'お会計お願いします',tw:'我要結帳'},{jp:'トイレはどこですか',tw:'廁所在哪裡'},{jp:'写真を撮ってもいいですか',tw:'可以拍照嗎'}]);
         
+        // UI
         const homeBtnPos = ref({x: window.innerWidth/2 - 28, y: window.innerHeight - 100});
         const selectedDayIndex = ref(0);
         const itineraryMode = ref('normal');
@@ -376,6 +399,7 @@ createApp({
         const foodLoc = ref('Tokyo');
         const shopCat = ref('wish');
         const photoArea = ref('Tokyo');
+        
         const tokyoWeather = ref({temp:'--',icon:'☁️'});
         const kamakuraWeather = ref({temp:'--',icon:'☁️'});
         const fujiWeather = ref({temp:'--',icon:'☁️'});
@@ -394,9 +418,7 @@ createApp({
             {id:8,name:'網美打卡',icon:'fa-solid fa-camera',bgClass:'bg-rose-400',view:'photo'},
             {id:9,name:'即時救命',icon:'fa-solid fa-comment-medical',bgClass:'bg-emerald-400',view:'japanese'}
         ];
-        const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'},{jp:'お会計お願いします',tw:'我要結帳'},{jp:'トイレはどこですか',tw:'廁所在哪裡'},{jp:'写真を撮ってもいいですか',tw:'可以拍照嗎'}]);
 
-        // Computed
         const currentItinerary = computed(() => itineraryData.value[selectedDayIndex.value] || []);
         const getDrivePlanForDay = (idx) => { const p = drivePlan.find(d => d.day === idx); return p ? p.stops : []; };
         const getUserById = (id) => users.value.find(u => u.id === id) || users.value[0];
@@ -415,7 +437,6 @@ createApp({
         });
         const getCurrentList = () => { if(currentView.value==='food') return foodList.value[foodLoc.value]||[]; if(currentView.value==='shopping') return shoppingList.value[shopCat.value]||[]; if(currentView.value==='photo') return photoSpots.value[photoArea.value]||[]; return []; };
 
-        // Methods
         const enterSite = () => { isWelcomeClosed.value = true; };
         const handleWelcomeError = () => { welcomeImg.value = 'https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=800'; };
         const getPageTitle = (v) => ({'itinerary':'行程表','money':'小財庫','menu':'功能選單','prep':'行前準備','weather':'天氣週報','food':'吃吃喝喝','shopping':'快樂Shop','photo':'網美打卡','hotel':'住宿與機票','japanese':'即時救命'}[v] || v);
@@ -472,6 +493,11 @@ createApp({
                 } catch(e) { console.error(e); } 
             }
             daysUntilTrip.value = Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24));
+            
+            // 移除 Loading 遮罩
+            isMounted.value = true;
+            document.getElementById('static-loading').style.opacity = '0';
+            setTimeout(() => document.getElementById('static-loading').style.display = 'none', 500);
         });
 
         watch([itineraryData, users, expenses, shoppingList, foodList, photoSpots], () => {
@@ -481,7 +507,7 @@ createApp({
 
         return {
             currentView, isWelcomeClosed, welcomeImg, enterSite, handleWelcomeError, apps, tripDays, selectedDayIndex, itineraryMode, currentItinerary,
-            getIconByCategory, getMapLink, getDrivePlanForDay, hotels, homeBtnPos, startDrag, getPageTitle, showSyncModal, 
+            getIconByCategory, getMapLink, getDrivePlanForDay, hotels, homeBtnPos, startDrag, getPageTitle, showSyncModal, isMounted,
             showModal, isEditing, editForm, openAddModal, editItem, saveItem, deleteItem,
             showCommonModal, newCommon, commonType, openAddCommonModal, editCommonItem, saveCommonItem, deleteCommonItem, processCommonImageUpload,
             moneyTab, moneyMode, users, currentUserId, expenses, selectMoneyUser, getUserById, userPersonalTotal, personalExpenses, groupExpenses, settlements, openExpenseModal, showExpenseModal, newExpense, addExpense, deleteExpense, exchangeRate, expenseType,
