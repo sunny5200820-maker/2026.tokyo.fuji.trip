@@ -16,41 +16,81 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { 'chii-pink': '#FFD1DC', 'chii-deep-pink': '#FF9EAC', 'chii-blue': '#A2D2FF', 'chii-yellow': '#FFF5BA', 'chii-text': '#5D4037' },
+                    colors: {
+                        'chii-pink': '#FFD1DC', 'chii-deep-pink': '#FF9EAC', 'chii-blue': '#A2D2FF', 'chii-yellow': '#FFF5BA', 'chii-text': '#5D4037',
+                    },
                     fontFamily: { sans: ['Zen Maru Gothic', 'sans-serif'] },
-                    animation: { 'float': 'float 3s ease-in-out infinite', 'bounce-slow': 'bounce 3s infinite', 'wiggle': 'wiggle 1s ease-in-out infinite' },
-                    keyframes: { float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } }, wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } } }
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' } },
+                        wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } }
+                    }
                 }
             }
         }
     </script>
+
     <style>
-        body { background-color: #FFF0F5; background-image: radial-gradient(#FFD1DC 15%, transparent 16%), radial-gradient(#FFF5BA 15%, transparent 16%); background-size: 60px 60px; background-position: 0 0, 30px 30px; font-family: 'Zen Maru Gothic', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; user-select: none; color: #5D4037; margin: 0; }
+        body { 
+            background-color: #FFF0F5; 
+            background-image: radial-gradient(#FFD1DC 15%, transparent 16%), radial-gradient(#FFF5BA 15%, transparent 16%);
+            background-size: 60px 60px; background-position: 0 0, 30px 30px;
+            font-family: 'Zen Maru Gothic', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; user-select: none; color: #5D4037; margin: 0;
+        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .sakura { position: fixed; top: -10px; background: #FFB7B2; border-radius: 100% 0 100% 0; opacity: 0.6; animation: fall linear infinite; z-index: 0; pointer-events: none; width: 12px; height: 12px; }
         @keyframes fall { to { transform: translate(15vw, 105vh) rotate(360deg); } }
-        .banner-img { width: 100%; height: 100%; object-fit: cover; object-position: center bottom; }
-        .draggable-countdown { position: fixed; z-index: 50; cursor: grab; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border: 3px solid #FFD1DC; padding: 8px 16px; border-radius: 50px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px; }
+
+        /* Banner Fix for Mobile */
+        .banner-img-container { position: absolute; inset: 0; z-index: 0; }
+        .banner-img { 
+            width: 100%; height: 100%; 
+            object-fit: cover; 
+            object-position: center bottom; /* 強制對齊下方 */
+        }
+
+        /* Draggable Countdown */
+        .draggable-countdown {
+            position: fixed; z-index: 50; cursor: grab; touch-action: none;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+            border: 3px solid #FFD1DC; padding: 8px 16px; border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px;
+        }
+        
+        /* UI Components */
         .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-radius: 24px; box-shadow: 0 8px 32px rgba(255, 182, 193, 0.25); border: 1px solid rgba(255, 255, 255, 0.8); transition: transform 0.2s; }
         .card:active { transform: scale(0.98); }
         .watercolor-img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(1.05) saturate(1.2); }
         .watercolor-paper-texture { position: absolute; inset: 0; opacity: 0.2; pointer-events: none; mix-blend-mode: multiply; background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiIG9wYWNpdHk9IjAuMSIvPgo8L3N2Zz4='); }
         .fab-main { position: fixed; bottom: 30px; right: 20px; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; z-index: 50; box-shadow: 0 10px 25px rgba(255, 107, 107, 0.5); border: 4px solid white; transition: transform 0.2s; }
+        
+        /* Timeline */
         .timeline-line { position: absolute; left: 24px; top: 20px; bottom: -20px; width: 2px; background: repeating-linear-gradient(to bottom, #FFD1DC 0, #FFD1DC 6px, transparent 6px, transparent 12px); z-index: 0; }
         .timeline-dot { position: relative; z-index: 10; background: white; border: 2px solid #FF9EAC; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 4px #FFF0F5; }
+        
+        /* Sakura Forecast */
         .sakura-forecast-float { position: fixed; top: 80px; right: 20px; z-index: 40; background: rgba(255,255,255,0.95); padding: 12px; border-radius: 20px; box-shadow: 0 10px 30px rgba(255,105,180,0.3); border: 2px solid #FFB7B2; text-align: center; animation: float 6s ease-in-out infinite; max-width: 160px; }
+        
+        /* Boarding Pass */
         .boarding-pass { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #eee; position: relative; margin-bottom: 16px; }
         .boarding-pass::before, .boarding-pass::after { content: ''; position: absolute; width: 20px; height: 20px; background: #FFF0F5; border-radius: 50%; top: 65%; z-index: 10; }
         .boarding-pass::before { left: -10px; } .boarding-pass::after { right: -10px; }
         .dashed-line { border-top: 2px dashed #ddd; margin: 15px 0; position: relative; }
+        
+        /* Progress Bar */
         .progress-container { height: 10px; background: #eee; border-radius: 5px; overflow: hidden; margin-top: 5px; }
         .progress-fill { height: 100%; transition: width 0.5s ease; }
         
-        /* Safe Loader Styles */
+        /* Safe Loader Styles (獨立於 Vue 之外) */
         #safe-loader { position: fixed; inset: 0; background: #FFF0F5; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        #app { opacity: 0; transition: opacity 0.5s; }
+        #app { opacity: 0; transition: opacity 0.5s; display: none; } /* 預設隱藏，等載入完才顯示 */
         .loader-content { text-align: center; }
-        .loader-error { display: none; color: #ef4444; margin-top: 20px; max-width: 80%; word-break: break-all; background: white; padding: 10px; border-radius: 10px; border: 1px solid #fecaca; }
+        .loader-error { display: none; color: #ef4444; margin-top: 20px; max-width: 80%; word-break: break-all; background: white; padding: 10px; border-radius: 10px; border: 1px solid #fecaca; font-size: 12px; font-family: monospace; }
+        
         [v-cloak] { display: none; }
     </style>
 </head>
@@ -63,8 +103,8 @@
         <div class="text-6xl animate-bounce-slow mb-4">🌸</div>
         <div id="loader-text" class="text-chii-text font-bold text-lg animate-pulse">V4.4 安全啟動中...</div>
         <div id="loader-error" class="loader-error"></div>
+        <button id="force-btn" onclick="forceEnter()" class="hidden mt-6 text-gray-400 text-sm underline hover:text-gray-600 transition">有點久？點此強制進入</button>
         <button id="retry-btn" onclick="location.reload()" class="hidden mt-4 bg-blue-500 text-white px-6 py-2 rounded-full shadow-lg">重新整理</button>
-        <button id="force-btn" onclick="forceEnter()" class="hidden mt-2 text-gray-400 text-sm underline">強制進入</button>
     </div>
 </div>
 
@@ -300,6 +340,7 @@
         document.getElementById('safe-loader').style.opacity = '0';
         setTimeout(() => document.getElementById('safe-loader').style.display = 'none', 500);
         document.getElementById('app').style.opacity = '1';
+        document.getElementById('app').style.display = 'block';
     }
 
     // 5秒後若還沒進入，顯示強制按鈕
@@ -319,7 +360,11 @@
             const searchQuery = ref('');
             const countdownEl = ref(null), countdownPos = ref({ x: 20, y: 150 });
             let isDragging = false, dragOffset = { x: 0, y: 0 };
+            const startDrag = (e) => { isDragging = true; const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY; dragOffset.x = cX - countdownPos.value.x; dragOffset.y = cY - countdownPos.value.y; document.addEventListener('mousemove', onDrag); document.addEventListener('touchmove', onDrag, { passive: false }); document.addEventListener('mouseup', stopDrag); document.addEventListener('touchend', stopDrag); };
+            const onDrag = (e) => { if (!isDragging) return; e.preventDefault(); const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY; countdownPos.value = { x: cX - dragOffset.x, y: cY - dragOffset.y }; };
+            const stopDrag = () => { isDragging = false; document.removeEventListener('mousemove', onDrag); document.removeEventListener('touchmove', onDrag); document.removeEventListener('mouseup', stopDrag); document.removeEventListener('touchend', stopDrag); };
             const sakuraStatus = ref('預測中...'); 
+
             const defaultUsers = [{id: 1, name: '吉伊', bg: '#FFD1DC', icon:'🐹', avatar:'', list: []}, {id: 2, name: '小八', bg: '#A2D2FF', icon:'🐱', avatar:'', list: []}, {id: 3, name: '兔兔', bg: '#FFF5BA', icon:'🐰', avatar:'', list: []}, {id: 4, name: '小桃', bg: '#FFB7B2', icon:'🍑', avatar:'', list: []}];
             const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
             const daysUntilTrip = computed(() => Math.ceil((new Date('2026-03-27') - new Date()) / (86400000)));
@@ -344,8 +389,6 @@
             const tripDays = [{ week: 'Day 1', title: '抵達/晴空塔' }, { week: 'Day 2', title: '淺草/上野' }, { week: 'Day 3', title: '租車/河口湖' }, { week: 'Day 4', title: '山中湖' }, { week: 'Day 5', title: '回新宿/池袋' }, { week: 'Day 6', title: '江之電鐮倉' }, { week: 'Day 7', title: '東京塔/澀谷' }, { week: 'Day 8', title: '返程' }];
             const searchMap = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
             
-            // --- DATA SAFETY CHECK ---
-            // 使用 try-catch 確保資料結構錯誤不會導致全站崩潰
             const defaultItinerary = [
                 [{ id: 101, category: 'Flight', name: '06:40 桃園起飛', hours: '06:40', mapKeyword: '桃園機場', note: '提早2小時抵達機場' }, { id: 102, category: 'Flight', name: '10:40 抵達成田機場', hours: '10:40', mapKeyword: '成田機場', note: '領取行李、購買交通卡' }, { id: 103, category: 'Sightseeing', name: '晴空塔 Tokyo Skytree', hours: '下午', mapKeyword: 'Tokyo Skytree', note: '可逛 Solamachi 商店街' }, { id: 104, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', mapKeyword: '錦糸町美食', note: '依照當下心情選擇' }],
                 [{ id: 201, category: 'Sightseeing', name: '淺草寺', hours: '上午', mapKeyword: '淺草寺', note: '雷門、仲見世通' }, { id: 202, category: 'Food', name: '午餐：淺草寺周遭', hours: '中午', mapKeyword: '淺草午餐', note: '推薦炸肉餅、鰻魚飯' }, { id: 203, category: 'Sightseeing', name: '小網神社', hours: '下午', mapKeyword: '小網神社', note: '強運厄除' }, { id: 204, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', mapKeyword: '上野恩賜公園', note: '散步、星巴克' }, { id: 205, category: 'Shopping', name: '秋葉原 或 東京一番街', hours: '晚上', mapKeyword: '東京站一番街', note: '動漫周邊 / 伴手禮' }],
@@ -362,7 +405,20 @@
             const personalExpenses = computed(() => expenses.value.filter(e => e.user === currentUserId.value && e.type === 'personal').sort((a,b)=>b.id-a.id));
             const groupExpenses = computed(() => expenses.value.filter(e => e.type === 'group').sort((a,b)=>b.id-a.id));
             const userPersonalTotal = computed(() => personalExpenses.value.reduce((s, e) => s + (e.currency === 'TWD' ? Math.round(e.amount / exchangeRate.value) : Number(e.amount)), 0));
-            const settlements = computed(() => { const bal = {}; users.value.forEach(u=>bal[u.id]=0); groupExpenses.value.forEach(e=>{ const amtJPY = e.currency === 'TWD' ? Math.round(e.amount / exchangeRate.value) : Number(e.amount); if(bal[e.user]!=undefined) bal[e.user]+=amtJPY; }); const total = Object.values(bal).reduce((a,b)=>a+b,0); const avg = total / users.value.length; const net = {}; users.value.forEach(u=>net[u.id]=bal[u.id]-avg); const debt=[], cred=[]; for(let uid in net) { if(net[uid]<-1) debt.push({u:uid,a:-net[uid]}); else if(net[uid]>1) cred.push({u:uid,a:net[uid]}); } const res=[]; let i=0,j=0; while(i<debt.length && j<cred.length){ let amt = Math.min(debt[i].a, cred[j].a); if(amt>0) res.push({from:debt[i].u, to:cred[j].u, amount:Math.round(amt)}); debt[i].a-=amt; cred[j].a-=amt; if(debt[i].a<1) i++; if(cred[j].a<1) j++; } return res; });
+            
+            const settlements = computed(() => {
+                const bal = {}; users.value.forEach(u=>bal[u.id]=0);
+                groupExpenses.value.forEach(e=>{ 
+                    const amtJPY = e.currency === 'TWD' ? Math.round(e.amount / exchangeRate.value) : Number(e.amount);
+                    if(bal[e.user]!=undefined) bal[e.user]+=amtJPY; 
+                });
+                const total = Object.values(bal).reduce((a,b)=>a+b,0);
+                const avg = total / users.value.length;
+                const net = {}; users.value.forEach(u=>net[u.id]=bal[u.id]-avg);
+                const debt=[], cred=[]; for(let uid in net) { if(net[uid]<-1) debt.push({u:uid,a:-net[uid]}); else if(net[uid]>1) cred.push({u:uid,a:net[uid]}); }
+                const res=[]; let i=0,j=0; while(i<debt.length && j<cred.length){ let amt = Math.min(debt[i].a, cred[j].a); if(amt>0) res.push({from:debt[i].u, to:cred[j].u, amount:Math.round(amt)}); debt[i].a-=amt; cred[j].a-=amt; if(debt[i].a<1) i++; if(cred[j].a<1) j++; } return res;
+            });
+
             const shoppingList = ref({ 'wish': [], 'cosme': [{id:1, name:'Kate 怪獸唇膏', desc:'賣到缺貨的神級唇膏！', img:'./images/kate.jpg', link:searchMap('Kate Monster Lip')}, {id:2, name:'Tirtir 氣墊粉餅', desc:'日本女生人手一顆的紅盒氣墊。', img:'./images/tirtir.jpg', link:searchMap('Tirtir Cushion')}], 'ldk': [{id:3, name:'Lululun 面膜', desc:'LDK 評測常勝軍！', img:'./images/lululun.jpg', link:searchMap('Lululun Mask')}, {id:4, name:'Melano CC 精華', desc:'平價美白神器！', img:'./images/cc.jpg', link:searchMap('Melano CC')}], 'souvenir': [{id:5, name:'NY Perfect Cheese', desc:'東京車站排隊名店！', img:'./images/ny.jpg', link:searchMap('NY Perfect Cheese')}] });
             const shopCat = ref('wish');
             const foodList = ref({ 'Tokyo': [{id:1, name:'AFURI 阿夫利拉麵', desc:'必吃的柚子鹽拉麵！', img:'./images/afuri-ramen.jpg', link:'https://afuri.com/'}, {id:2, name:'HARBS 水果千層蛋糕', desc:'東京甜點界的夢幻逸品！', img:'./images/harbs-fruit-crepe.jpg', link:'https://www.harbs.co.jp/'}, {id:3, name:'淺草炸肉餅', desc:'仲見世通必吃散步美食。', img:'./images/menchi.jpg', link:searchMap('淺草炸肉餅')}, {id:4, name:'牛かつもと村', desc:'人氣炸牛排定食。', img:'./images/beef.jpg', link:searchMap('牛かつもと村')}], 'Kamakura': [{id:5, name:'Bills 七里濱', desc:'世界第一好吃的早餐。', img:'./images/bills.jpg', link:searchMap('Bills 七里濱')}, {id:6, name:'豐島屋 鴿子餅乾', desc:'鎌倉最具代表性伴手禮。', img:'./images/dove.jpg', link:searchMap('豐島屋 本店')}], 'Fuji': [{id:7, name:'Houtou Fudou 餺飥麵', desc:'河口湖必吃鄉土料理。', img:'./images/houtou.jpg', link:searchMap('Houtou Fudou 東戀路店')}, {id:8, name:'Fujisan Shokupan', desc:'超可愛的富士山造型吐司！', img:'./images/toast.jpg', link:searchMap('Fujisan Shokupan')}] });
@@ -376,9 +432,6 @@
             const avatarInput = ref(null), commonImageInput = ref(null), editingAvatarUserId = ref(null);
 
             // Helpers
-            const startDrag = (e) => { isDragging = true; const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY; dragOffset.x = cX - countdownPos.value.x; dragOffset.y = cY - countdownPos.value.y; document.addEventListener('mousemove', onDrag); document.addEventListener('touchmove', onDrag, { passive: false }); document.addEventListener('mouseup', stopDrag); document.addEventListener('touchend', stopDrag); };
-            const onDrag = (e) => { if (!isDragging) return; e.preventDefault(); const cX = e.touches ? e.touches[0].clientX : e.clientX; const cY = e.touches ? e.touches[0].clientY : e.clientY; countdownPos.value = { x: cX - dragOffset.x, y: cY - dragOffset.y }; };
-            const stopDrag = () => { isDragging = false; document.removeEventListener('mousemove', onDrag); document.removeEventListener('touchmove', onDrag); document.removeEventListener('mouseup', stopDrag); document.removeEventListener('touchend', stopDrag); };
             const handleTouchStart = (e) => touchStartX.value = e.changedTouches[0].screenX;
             const handleTouchMove = (e) => {};
             const handleTouchEnd = (e) => { const diff = e.changedTouches[0].screenX - touchStartX.value; if (currentView.value !== 'home' && diff > 100 && !showLightbox.value && !showCamera.value && !isDragging) { if(currentView.value === 'prep' && prepMode.value === 'list') prepMode.value = 'select'; else if(currentView.value === 'money' && moneyMode.value === 'list') moneyMode.value = 'select'; else if(currentView.value === 'hotel' && flightMode.value === 'list') flightMode.value = 'select'; else goHome(); } };
@@ -468,6 +521,7 @@
                         loader.style.opacity = '0';
                         setTimeout(() => loader.style.display = 'none', 500);
                         document.getElementById('app').style.opacity = '1';
+                        document.getElementById('app').style.display = 'block';
                     }
                 }, 800);
             });
