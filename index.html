@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V15.00 絕對修復版)</title>
+<title>關東之旅 2026 (V16.00 終極防護版)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -21,7 +21,6 @@
     [v-cloak]{display:none !important}
     .hide-scrollbar::-webkit-scrollbar{display:none}.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
     
-    /* 錯誤攔截器 */
     #crash-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 100000; padding: 20px; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
     #loading-screen { position: fixed; inset: 0; background: #FFF0F5; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
 
@@ -62,7 +61,7 @@
 
 <div id="loading-screen">
     <div style="font-size: 60px;" class="animate-bounce">🌸</div>
-    <div class="mt-4 font-bold text-gray-600">Trip V15.00 Loading...</div>
+    <div class="mt-4 font-bold text-gray-600">Trip V16.00 Loading...</div>
 </div>
 
 <div id="sakura-container"></div>
@@ -309,178 +308,173 @@ const sc = document.getElementById('sakura-container'); for(let i=0;i<12;i++){le
 
 createApp({
     setup() {
-        const STORAGE_KEY = 'v15_00_FINAL_CLEAN';
+        const STORAGE_KEY = 'V14_FLAGSHIP'; // Unique key to force fresh data load
         const currentView = ref('menu');
         const isWelcomeClosed = ref(false);
         const showGoogleSearch = ref(false);
         
-        // --- 核心修正：資料庫語法嚴格檢查 (Fix Ln: 456) ---
+        // --- DATA SECTION: Strict JSON Format (No shorthand, double quotes) ---
         
-        // 1. 行程
         const defaultItinerary = [
             [
-                {id:101, category:'Flight', name:'06:40 桃園起飛 (TR898)', hours:'06:40', mapKeyword:'Taoyuan Airport', note:'T1航廈，提早2.5小時抵達'},
-                {id:102, category:'Flight', name:'10:40 抵達成田 (NRT)', hours:'10:40', mapKeyword:'Narita Airport', note:'入境審查 -> 領行李 -> 搭車'},
-                {id:103, category:'Transport', name:'前往錦糸町民宿', hours:'12:30', mapKeyword:'Kinshicho Station', note:'寄放行李 (連結請見住宿頁)'},
-                {id:104, category:'Sightseeing', name:'晴空塔 Solamachi', hours:'14:00', mapKeyword:'Tokyo Skytree', note:'逛街/水族館'},
-                {id:105, category:'Food', name:'晚餐：敘敘苑燒肉', hours:'18:00', mapKeyword:'Jojoen Skytree', note:'高空景觀燒肉'}
+                {id: 101, category: "Flight", name: "06:40 桃園起飛 (TR898)", hours: "06:40", mapKeyword: "Taoyuan Airport", note: "T1航廈，提早2.5小時抵達"},
+                {id: 102, category: "Flight", name: "10:40 抵達成田 (NRT)", hours: "10:40", mapKeyword: "Narita Airport", note: "入境審查 -> 領行李 -> 搭車"},
+                {id: 103, category: "Transport", name: "前往錦糸町民宿", hours: "12:30", mapKeyword: "Kinshicho Station", note: "寄放行李 (連結請見住宿頁)"},
+                {id: 104, category: "Sightseeing", name: "晴空塔 Solamachi", hours: "14:00", mapKeyword: "Tokyo Skytree", note: "逛街/水族館"},
+                {id: 105, category: "Food", name: "晚餐：敘敘苑燒肉", hours: "18:00", mapKeyword: "Jojoen Skytree", note: "高空景觀燒肉"}
             ],
             [
-                {id:201, category:'Sightseeing', name:'淺草寺 & 雷門', hours:'09:00', mapKeyword:'Senso-ji', note:'趁早去避開人潮'},
-                {id:202, category:'Food', name:'午餐：淺草今半', hours:'12:00', mapKeyword:'Asakusa Imahan', note:'壽喜燒老店'},
-                {id:203, category:'Sightseeing', name:'上野恩賜公園', hours:'14:00', mapKeyword:'Ueno Park', note:'賞櫻熱點'},
-                {id:204, category:'Shopping', name:'阿美橫町', hours:'16:00', mapKeyword:'Ameyoko', note:'藥妝/零食採買'},
-                {id:205, category:'Food', name:'晚餐：鳥貴族', hours:'19:00', mapKeyword:'Torikizoku Ueno', note:'平價串燒'}
+                {id: 201, category: "Sightseeing", name: "淺草寺 & 雷門", hours: "09:00", mapKeyword: "Senso-ji", note: "趁早去避開人潮"},
+                {id: 202, category: "Food", name: "午餐：淺草今半", hours: "12:00", mapKeyword: "Asakusa Imahan", note: "壽喜燒老店"},
+                {id: 203, category: "Sightseeing", name: "上野恩賜公園", hours: "14:00", mapKeyword: "Ueno Park", note: "賞櫻熱點"},
+                {id: 204, category: "Shopping", name: "阿美橫町", hours: "16:00", mapKeyword: "Ameyoko", note: "藥妝/零食採買"},
+                {id: 205, category: "Food", name: "晚餐：鳥貴族", hours: "19:00", mapKeyword: "Torikizoku Ueno", note: "平價串燒"}
             ],
             [
-                {id:301, category:'Transport', name:'富士回遊3號 (直達)', hours:'07:08', mapKeyword:'Kinshicho Station', note:'每日唯一班次，錦糸町直達河口湖'},
-                {id:302, category:'Transport', name:'抵達河口湖站', hours:'09:28', mapKeyword:'Kawaguchiko Station', note:'出站前往取車'},
-                {id:303, category:'Transport', name:'Toyota Rent a Car', hours:'09:40', mapKeyword:'Toyota Rent a Car Kawaguchiko Station', note:'站前店取車'},
-                {id:304, category:'Sightseeing', name:'新倉山淺間公園', hours:'10:30', mapKeyword:'Chureito Pagoda', note:'上午順光拍五重塔'},
-                {id:305, category:'Food', name:'午餐：不動茶屋 (東戀路)', hours:'12:30', mapKeyword:'Houtou Fudou Higashikoiji', note:'東戀路店，雲朵建築'},
-                {id:306, category:'Sightseeing', name:'河口湖自然生活館', hours:'14:30', mapKeyword:'Oishi Park', note:'大石公園賞花'},
-                {id:307, category:'Sightseeing', name:'下吉田本町通', hours:'17:00', mapKeyword:'Honcho Street Fujiyoshida', note:'昭和復古街景'},
-                {id:308, category:'Hotel', name:'Check-in: Megu Fuji', hours:'18:30', mapKeyword:'Megu Fuji 2021', note:'入住休息'}
+                {id: 301, category: "Transport", name: "富士回遊3號 (直達)", hours: "07:08", mapKeyword: "Kinshicho Station", note: "每日唯一班次，錦糸町直達河口湖"},
+                {id: 302, category: "Transport", name: "抵達河口湖站", hours: "09:28", mapKeyword: "Kawaguchiko Station", note: "出站前往取車"},
+                {id: 303, category: "Transport", name: "Toyota Rent a Car", hours: "09:40", mapKeyword: "Toyota Rent a Car Kawaguchiko Station", note: "站前店取車"},
+                {id: 304, category: "Sightseeing", name: "新倉山淺間公園", hours: "10:30", mapKeyword: "Chureito Pagoda", note: "上午順光拍五重塔"},
+                {id: 305, category: "Food", name: "午餐：不動茶屋 (東戀路)", hours: "12:30", mapKeyword: "Houtou Fudou Higashikoiji", note: "東戀路店，雲朵建築"},
+                {id: 306, category: "Sightseeing", name: "河口湖自然生活館", hours: "14:30", mapKeyword: "Oishi Park", note: "大石公園賞花"},
+                {id: 307, category: "Sightseeing", name: "下吉田本町通", hours: "17:00", mapKeyword: "Honcho Street Fujiyoshida", note: "昭和復古街景"},
+                {id: 308, category: "Hotel", name: "Check-in: Megu Fuji", hours: "18:30", mapKeyword: "Megu Fuji 2021", note: "入住休息"}
             ],
             [
-                {id:401, category:'Sightseeing', name:'山中湖平野之濱', hours:'06:00', mapKeyword:'Hirano no Hama', note:'看逆富士日出'},
-                {id:402, category:'Sightseeing', name:'長池親水公園', hours:'09:00', mapKeyword:'Nagaike Water Park', note:'餵天鵝/拍富士山'},
-                {id:403, category:'Sightseeing', name:'忍野八海', hours:'11:00', mapKeyword:'Oshino Hakkai', note:'名水百選'},
-                {id:404, category:'Food', name:'午餐：山麓園', hours:'13:00', mapKeyword:'Sanrokuen', note:'爐端燒體驗'},
-                {id:405, category:'Sightseeing', name:'KABA 水陸巴士', hours:'15:00', mapKeyword:'Yamanakako KABA', note:'遊湖體驗'},
-                {id:406, category:'Shopping', name:'Ogino 超市', hours:'17:00', mapKeyword:'Ogino Kawaguchiko', note:'採買晚餐食材'}
+                {id: 401, category: "Sightseeing", name: "山中湖平野之濱", hours: "06:00", mapKeyword: "Hirano no Hama", note: "看逆富士日出"},
+                {id: 402, category: "Sightseeing", name: "長池親水公園", hours: "09:00", mapKeyword: "Nagaike Water Park", note: "餵天鵝/拍富士山"},
+                {id: 403, category: "Sightseeing", name: "忍野八海", hours: "11:00", mapKeyword: "Oshino Hakkai", note: "名水百選"},
+                {id: 404, category: "Food", name: "午餐：山麓園", hours: "13:00", mapKeyword: "Sanrokuen", note: "爐端燒體驗"},
+                {id: 405, category: "Sightseeing", name: "KABA 水陸巴士", hours: "15:00", mapKeyword: "Yamanakako KABA", note: "遊湖體驗"},
+                {id: 406, category: "Shopping", name: "Ogino 超市", hours: "17:00", mapKeyword: "Ogino Kawaguchiko", note: "採買晚餐食材"}
             ],
             [
-                {id:501, category:'Sightseeing', name:'河口湖纜車 / 盪鞦韆', hours:'09:00', mapKeyword:'Mt. Fuji Panoramic Ropeway', note:'絕景鞦韆'},
-                {id:502, category:'Shopping', name:'富士山吐司', hours:'11:00', mapKeyword:'Fujisan Shokupan', note:'伴手禮'},
-                {id:503, category:'Transport', name:'河口湖站還車', hours:'13:30', mapKeyword:'Toyota Rent a Car Kawaguchiko Station', note:'結束自駕'},
-                {id:504, category:'Transport', name:'返回新宿 (巴士/鐵路)', hours:'14:00', mapKeyword:'Shinjuku Station', note:'搭乘高速巴士或電車'},
-                {id:505, category:'Hotel', name:'Check-in: DOMO Hotel', hours:'16:30', mapKeyword:'DOMO Hotel Shinjuku', note:'入住新宿'},
-                {id:506, category:'Food', name:'晚餐/逛街：池袋太陽城', hours:'18:00', mapKeyword:'Sunshine City', note:'寶可夢中心'}
+                {id: 501, category: "Sightseeing", name: "河口湖纜車 / 盪鞦韆", hours: "09:00", mapKeyword: "Mt. Fuji Panoramic Ropeway", note: "絕景鞦韆"},
+                {id: 502, category: "Shopping", name: "富士山吐司", hours: "11:00", mapKeyword: "Fujisan Shokupan", note: "伴手禮"},
+                {id: 503, category: "Transport", name: "河口湖站還車", hours: "13:30", mapKeyword: "Toyota Rent a Car Kawaguchiko Station", note: "結束自駕"},
+                {id: 504, category: "Transport", name: "返回新宿 (巴士/鐵路)", hours: "14:00", mapKeyword: "Shinjuku Station", note: "搭乘高速巴士或電車"},
+                {id: 505, category: "Hotel", name: "Check-in: DOMO Hotel", hours: "16:30", mapKeyword: "DOMO Hotel Shinjuku", note: "入住新宿"},
+                {id: 506, category: "Food", name: "晚餐/逛街：池袋太陽城", hours: "18:00", mapKeyword: "Sunshine City", note: "寶可夢中心"}
             ],
             [
-                {id:601, category:'Transport', name:'搭乘江之電', hours:'09:00', mapKeyword:'Fujisawa Station', note:'前往鎌倉'},
-                {id:602, category:'Sightseeing', name:'鎌倉高校前', hours:'10:00', mapKeyword:'Kamakura Kokomae', note:'灌籃高手平交道'},
-                {id:603, category:'Food', name:'午餐：Bills', hours:'12:00', mapKeyword:'Bills Shichirigahama', note:'海邊鬆餅'},
-                {id:604, category:'Sightseeing', name:'鎌倉大佛 & 長谷寺', hours:'14:00', mapKeyword:'Kotoku-in', note:'參拜'},
-                {id:605, category:'Sightseeing', name:'江之島夕陽', hours:'17:00', mapKeyword:'Enoshima Sea Candle', note:'稚兒之淵'},
-                {id:606, category:'Food', name:'晚餐：新宿歌舞伎町', hours:'19:30', mapKeyword:'Kabukicho', note:'居酒屋'}
+                {id: 601, category: "Transport", name: "搭乘江之電", hours: "09:00", mapKeyword: "Fujisawa Station", note: "前往鎌倉"},
+                {id: 602, category: "Sightseeing", name: "鎌倉高校前", hours: "10:00", mapKeyword: "Kamakura Kokomae", note: "灌籃高手平交道"},
+                {id: 603, category: "Food", name: "午餐：Bills", hours: "12:00", mapKeyword: "Bills Shichirigahama", note: "海邊鬆餅"},
+                {id: 604, category: "Sightseeing", name: "鎌倉大佛 & 長谷寺", hours: "14:00", mapKeyword: "Kotoku-in", note: "參拜"},
+                {id: 605, category: "Sightseeing", name: "江之島夕陽", hours: "17:00", mapKeyword: "Enoshima Sea Candle", note: "稚兒之淵"},
+                {id: 606, category: "Food", name: "晚餐：新宿歌舞伎町", hours: "19:30", mapKeyword: "Kabukicho", note: "居酒屋"}
             ],
             [
-                {id:701, category:'Sightseeing', name:'東京鐵塔', hours:'10:00', mapKeyword:'Tokyo Tower', note:'芝公園野餐'},
-                {id:702, category:'Sightseeing', name:'麻布台之丘', hours:'13:00', mapKeyword:'Azabudai Hills', note:'新地標逛街'},
-                {id:703, category:'Shopping', name:'澀谷 Parco / Loft', hours:'15:00', mapKeyword:'Shibuya Parco', note:'任天堂/寶可夢中心'},
-                {id:704, category:'Sightseeing', name:'SHIBUYA SKY', hours:'17:30', mapKeyword:'SHIBUYA SKY', note:'預約夕陽時段'},
-                {id:705, category:'Food', name:'晚餐：澀谷橫丁', hours:'19:30', mapKeyword:'Miyashita Park', note:'宮下公園'}
+                {id: 701, category: "Sightseeing", name: "東京鐵塔", hours: "10:00", mapKeyword: "Tokyo Tower", note: "芝公園野餐"},
+                {id: 702, category: "Sightseeing", name: "麻布台之丘", hours: "13:00", mapKeyword: "Azabudai Hills", note: "新地標逛街"},
+                {id: 703, category: "Shopping", name: "澀谷 Parco / Loft", hours: "15:00", mapKeyword: "Shibuya Parco", note: "任天堂/寶可夢中心"},
+                {id: 704, category: "Sightseeing", name: "SHIBUYA SKY", hours: "17:30", mapKeyword: "SHIBUYA SKY", note: "預約夕陽時段"},
+                {id: 705, category: "Food", name: "晚餐：澀谷橫丁", hours: "19:30", mapKeyword: "Miyashita Park", note: "宮下公園"}
             ],
             [
-                {id:801, category:'Shopping', name:'最後補貨', hours:'10:00', mapKeyword:'Shinjuku', note:'唐吉訶德/藥妝'},
-                {id:802, category:'Transport', name:'前往成田機場', hours:'13:00', mapKeyword:'Narita Express', note:'搭乘 NEX'},
-                {id:803, category:'Flight', name:'20:40 起飛 (BR197)', hours:'20:40', mapKeyword:'Narita Airport', note:'再見東京'},
-                {id:804, category:'Flight', name:'23:20 抵達桃園', hours:'23:20', mapKeyword:'Taoyuan Airport', note:'平安回家'}
+                {id: 801, category: "Shopping", name: "最後補貨", hours: "10:00", mapKeyword: "Shinjuku", note: "唐吉訶德/藥妝"},
+                {id: 802, category: "Transport", name: "前往成田機場", hours: "13:00", mapKeyword: "Narita Express", note: "搭乘 NEX"},
+                {id: 803, category: "Flight", name: "20:40 起飛 (BR197)", hours: "20:40", mapKeyword: "Narita Airport", note: "再見東京"},
+                {id: 804, category: "Flight", name: "23:20 抵達桃園", hours: "23:20", mapKeyword: "Taoyuan Airport", note: "平安回家"}
             ]
         ];
         
-        // 2. 自駕地圖
         const drivePlan = [
-            { day: 2, stops: [{name: 'Toyota Rent a Car', note: '河口湖站前取車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''},{name: '新倉山淺間公園', note: '五重塔(上午順光)', location: 'Chureito Pagoda', parking: 'Arakurayama Sengen Park Parking'},{name: '不動茶屋 (東戀路)', note: '午餐', location: 'Houtou Fudou Higashikoiji', parking: 'Houtou Fudou Parking'},{name: '大石公園', note: '河口湖畔散步', location: 'Oishi Park', parking: 'Oishi Park Parking'}] },
-            { day: 3, stops: [{name: '平野之濱', note: '車拍逆富士', location: 'Hirano no Hama', parking: 'Hirano no Hama Parking'},{name: '長池親水公園', note: '拍天鵝', location: 'Nagaike Water Park', parking: 'Nagaike Water Park Parking'},{name: '忍野八海', note: '觀光名所', location: 'Oshino Hakkai', parking: 'Oshino Hakkai Parking'},{name: 'Ogino 超市', note: '採買晚餐', location: 'Ogino Kawaguchiko', parking: 'Ogino Kawaguchiko'}] },
-            { day: 4, stops: [{name: '河口湖纜車', note: '天上山公園', location: 'Mt. Fuji Panoramic Ropeway', parking: 'Ropeway Parking'},{name: '富士山吐司', note: '伴手禮', location: 'Fujisan Shokupan', parking: 'Fujisan Shokupan'},{name: 'Toyota Rent a Car', note: '河口湖站前還車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''}] }
+            { day: 2, stops: [{name: "Toyota Rent a Car", note: "河口湖站前取車", location: "Toyota Rent a Car Kawaguchiko Station", parking: ""},{name: "新倉山淺間公園", note: "五重塔(上午順光)", location: "Chureito Pagoda", parking: "Arakurayama Sengen Park Parking"},{name: "不動茶屋 (東戀路)", note: "午餐", location: "Houtou Fudou Higashikoiji", parking: "Houtou Fudou Parking"},{name: "大石公園", note: "河口湖畔散步", location: "Oishi Park", parking: "Oishi Park Parking"}] },
+            { day: 3, stops: [{name: "平野之濱", note: "車拍逆富士", location: "Hirano no Hama", parking: "Hirano no Hama Parking"},{name: "長池親水公園", note: "拍天鵝", location: "Nagaike Water Park", parking: "Nagaike Water Park Parking"},{name: "忍野八海", note: "觀光名所", location: "Oshino Hakkai", parking: "Oshino Hakkai Parking"},{name: "Ogino 超市", note: "採買晚餐", location: "Ogino Kawaguchiko", parking: "Ogino Kawaguchiko"}] },
+            { day: 4, stops: [{name: "河口湖纜車", note: "天上山公園", location: "Mt. Fuji Panoramic Ropeway", parking: "Ropeway Parking"},{name: "富士山吐司", note: "伴手禮", location: "Fujisan Shokupan", parking: "Fujisan Shokupan"},{name: "Toyota Rent a Car", note: "河口湖站前還車", location: "Toyota Rent a Car Kawaguchiko Station", parking: ""}] }
         ];
 
-        // 3. 基礎資料
-        const commonItems = ['護照', '日幣', 'SIM卡', '信用卡', '充電器', '常備藥', '牙刷牙膏', '轉接頭'];
+        const commonItems = ["護照", "日幣", "SIM卡", "信用卡", "充電器", "常備藥", "牙刷牙膏", "轉接頭"];
         const defaultUsers = [
-            {id:1,name:'吉伊',icon:'🐹',list:[...commonItems,'駕照'].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
-            {id:2,name:'小八',icon:'🐱',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
-            {id:3,name:'兔兔',icon:'🐰',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
-            {id:4,name:'小桃',icon:'🍑',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'}
+            {id: 1, name: "吉伊", icon: "🐹", list: commonItems.map(t => ({text: t, checked: false})), flightOutCode: "TR 898", flightOutDep: "06:40", flightOutArr: "10:40", flightInCode: "BR197", flightInDep: "20:40", flightInArr: "23:20"},
+            {id: 2, name: "小八", icon: "🐱", list: commonItems.map(t => ({text: t, checked: false})), flightOutCode: "TR 898", flightOutDep: "06:40", flightOutArr: "10:40", flightInCode: "BR197", flightInDep: "20:40", flightInArr: "23:20"},
+            {id: 3, name: "兔兔", icon: "🐰", list: commonItems.map(t => ({text: t, checked: false})), flightOutCode: "TR 898", flightOutDep: "06:40", flightOutArr: "10:40", flightInCode: "BR197", flightInDep: "20:40", flightInArr: "23:20"},
+            {id: 4, name: "小桃", icon: "🍑", list: commonItems.map(t => ({text: t, checked: false})), flightOutCode: "TR 898", flightOutDep: "06:40", flightOutArr: "10:40", flightInCode: "BR197", flightInDep: "20:40", flightInArr: "23:20"}
         ];
+        
         const hotels = [
-            {name:'錦糸町民宿',days:'Day 1-2',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA', img:'https://placehold.co/400x300/333/fff?text=BnB'},
-            {name:'Megu Fuji 2021',days:'Day 3-4',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Megu+Fuji+2021', img:'https://placehold.co/400x300/333/fff?text=Megu'},
-            {name:'DOMO Hotel Shinjuku',days:'Day 5-7',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=DOMO+Hotel+Shinjuku', img:'https://placehold.co/400x300/333/fff?text=DOMO'}
+            {name: "錦糸町民宿", days: "Day 1-2", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA", img: "https://placehold.co/400x300/333/fff?text=BnB"},
+            {name: "Megu Fuji 2021", days: "Day 3-4", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Megu+Fuji+2021", img: "https://placehold.co/400x300/333/fff?text=Megu"},
+            {name: "DOMO Hotel Shinjuku", days: "Day 5-7", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=DOMO+Hotel+Shinjuku", img: "https://placehold.co/400x300/333/fff?text=DOMO"}
         ];
 
-        // 4. 購物清單 (修復冒號引號錯誤)
         const defaultShopping = {
             wish: [
-                {name: 'Chiikawa Land', desc: '原宿/東京車站限定', link: 'https://www.google.com/search?q=Kiddy+Land+Harajuku', img: 'welcome.jpg'}, 
-                {name: '富士山杯', desc: '星巴克/田島硝子', link: 'https://www.google.com/search?q=Starbucks+Japan+Fuji+Mug', img: '2026.tokyo.jpg'},
-                {name: 'Le Labo', desc: '東京限定 Gaiac 10', link: 'https://www.google.com/search?q=Le+Labo+Tokyo', img: ''},
-                {name: 'Porter', desc: '吉田包 (表參道)', link: 'https://www.google.com/search?q=Porter+Omotesando', img: ''},
-                {name: 'Human Made', desc: '藍瓶聯名周邊', link: 'https://www.google.com/search?q=Human+Made+Offline+Store', img: ''}
+                {name: "Chiikawa Land", desc: "原宿/東京車站限定", link: "https://www.google.com/search?q=Kiddy+Land+Harajuku", img: "welcome.jpg"}, 
+                {name: "富士山杯", desc: "星巴克/田島硝子", link: "https://www.google.com/search?q=Starbucks+Japan+Fuji+Mug", img: "2026.tokyo.jpg"},
+                {name: "Le Labo", desc: "東京限定 Gaiac 10", link: "https://www.google.com/search?q=Le+Labo+Tokyo", img: ""},
+                {name: "Porter", desc: "吉田包 (表參道)", link: "https://www.google.com/search?q=Porter+Omotesando", img: ""},
+                {name: "Human Made", desc: "藍瓶聯名周邊", link: "https://www.google.com/search?q=Human+Made+Offline+Store", img: ""}
             ],
             cosme: [
-                {name: 'Tirtir 氣墊', desc: '紅盒高遮瑕', link: 'https://www.google.com/search?q=Tirtir+Cushion', img: ''}, 
-                {name: 'Kate 怪獸唇膏', desc: '色號 03/05/103', link: 'https://www.google.com/search?q=Kate+Lip+Monster', img: ''},
-                {name: '&Honey 髮油', desc: 'Melty 修護系列', link: 'https://www.google.com/search?q=and+honey+hair+oil', img: ''},
-                {name: 'Canmake', desc: '棉花糖蜜粉餅', link: 'https://www.google.com/search?q=Canmake+Tokyo', img: ''},
-                {name: 'Takami 小藍瓶', desc: '角質代謝精華', link: 'https://www.google.com/search?q=Takami+Skin+Peel', img: ''}
+                {name: "Tirtir 氣墊", desc: "紅盒高遮瑕", link: "https://www.google.com/search?q=Tirtir+Cushion", img: ""}, 
+                {name: "Kate 怪獸唇膏", desc: "色號 03/05/103", link: "https://www.google.com/search?q=Kate+Lip+Monster", img: ""},
+                {name: "&Honey 髮油", desc: "Melty 修護系列", link: "https://www.google.com/search?q=and+honey+hair+oil", img: ""},
+                {name: "Canmake", desc: "棉花糖蜜粉餅", link: "https://www.google.com/search?q=Canmake+Tokyo", img: ""},
+                {name: "Takami 小藍瓶", desc: "角質代謝精華", link: "https://www.google.com/search?q=Takami+Skin+Peel", img: ""}
             ],
             ldk: [
-                {name: 'Lululun 面膜', desc: '東京/富士山限定', link: 'https://www.google.com/search?q=Lululun+Mask', img: ''},
-                {name: 'Fino 髮膜', desc: '高 CP 值必囤', link: 'https://www.google.com/search?q=Fino+Hair+Mask', img: ''},
-                {name: 'Excel 眉筆', desc: 'PD01 / PD02', link: 'https://www.google.com/search?q=Excel+Makeup', img: ''},
-                {name: 'Biore 防曬', desc: '水感防曬精華', link: 'https://www.google.com/search?q=Biore+UV', img: ''},
-                {name: 'Nivea 藍罐', desc: '日版成分不同', link: 'https://www.google.com/search?q=Nivea+Japan', img: ''}
+                {name: "Lululun 面膜", desc: "東京/富士山限定", link: "https://www.google.com/search?q=Lululun+Mask", img: ""},
+                {name: "Fino 髮膜", desc: "高 CP 值必囤", link: "https://www.google.com/search?q=Fino+Hair+Mask", img: ""},
+                {name: "Excel 眉筆", desc: "PD01 / PD02", link: "https://www.google.com/search?q=Excel+Makeup", img: ""},
+                {name: "Biore 防曬", desc: "水感防曬精華", link: "https://www.google.com/search?q=Biore+UV", img: ""},
+                {name: "Nivea 藍罐", desc: "日版成分不同", link: "https://www.google.com/search?q=Nivea+Japan", img: ""}
             ],
             souvenir: [
-                {name: 'NY Perfect Cheese', desc: '東京站必排起司脆餅', link: 'https://www.google.com/search?q=New+York+Perfect+Cheese', img: ''},
-                {name: 'Tokyo Banana', desc: '皮卡丘/哆啦A夢版', link: 'https://www.google.com/search?q=Tokyo+Banana', img: ''},
-                {name: 'Press Butter Sand', desc: '焦糖奶油夾心', link: 'https://www.google.com/search?q=Press+Butter+Sand', img: ''},
-                {name: 'Sugar Butter Tree', desc: '砂糖奶油樹', link: 'https://www.google.com/search?q=Sugar+Butter+Tree', img: ''},
-                {name: 'Audrey', desc: '草莓花束餅乾', link: 'https://www.google.com/search?q=Audrey+Tokyo', img: ''}
+                {name: "NY Perfect Cheese", desc: "東京站必排起司脆餅", link: "https://www.google.com/search?q=New+York+Perfect+Cheese", img: ""},
+                {name: "Tokyo Banana", desc: "皮卡丘/哆啦A夢版", link: "https://www.google.com/search?q=Tokyo+Banana", img: ""},
+                {name: "Press Butter Sand", desc: "焦糖奶油夾心", link: "https://www.google.com/search?q=Press+Butter+Sand", img: ""},
+                {name: "Sugar Butter Tree", desc: "砂糖奶油樹", link: "https://www.google.com/search?q=Sugar+Butter+Tree", img: ""},
+                {name: "Audrey", desc: "草莓花束餅乾", link: "https://www.google.com/search?q=Audrey+Tokyo", img: ""}
             ]
         };
 
-        // 5. 美食清單 (修復冒號引號錯誤)
         const defaultFood = {
             Tokyo: [
-                {name: 'AFURI 拉麵', desc: '柚子鹽味 (原宿/六本木)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=AFURI+Harajuku',img:'afuri-ramen.jpg'}, 
-                {name: 'HARBS', desc: '水果千層蛋糕', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=HARBS+Lumine+Est',img:'harbs-fruit-crepe.jpg'},
-                {name: '牛卡滋本村', desc: '炸牛排 (澀谷/新宿)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson4'},
-                {name: '六厘舍', desc: '濃厚沾麵 (東京一番街)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson5'},
-                {name: 'Shake Shack', desc: '明治神宮外苑店 (絕美)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson6'}
+                {name: "AFURI 拉麵", desc: "柚子鹽味 (原宿/六本木)", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=AFURI+Harajuku',img:'afuri-ramen.jpg"}, 
+                {name: "HARBS", desc: "水果千層蛋糕", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=HARBS+Lumine+Est',img:'harbs-fruit-crepe.jpg"},
+                {name: "牛卡滋本村", desc: "炸牛排 (澀谷/新宿)", link: "https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson4"},
+                {name: "六厘舍", desc: "濃厚沾麵 (東京一番街)", link: "https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson5"},
+                {name: "Shake Shack", desc: "明治神宮外苑店 (絕美)", link: "https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson6"}
             ],
             Kamakura: [
-                {name: 'Bills', desc: '世界第一早餐 (七里濱)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Bills+Shichirigahama',img'}, 
-                {name: 'Pacific Drive-In', desc: '海景咖啡廳', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson7'},
-                {name: 'Caraway', desc: '排隊咖哩名店', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson8'},
-                {name: 'Yoridocoro', desc: '江之電窗景定食', link: 'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson9'},
-                {name: '豐島屋', desc: '鴿子餅乾本店', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street0'}
+                {name: "Bills", desc: "世界第一早餐 (七里濱)", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Bills+Shichirigahama',img"}, 
+                {name: "Pacific Drive-In", desc: "海景咖啡廳", link: "https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson7"},
+                {name: "Caraway", desc: "排隊咖哩名店", link: "https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson8"},
+                {name: "Yoridocoro", desc: "江之電窗景定食", link: "https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson9"},
+                {name: "豐島屋", desc: "鴿子餅乾本店", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street0"}
             ],
             Fuji: [
-                {name: 'Houtou Fudou', desc: '不動茶屋 (東戀路店)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Houtou+Fudou+Higashikoiji',img'},
-                {name: 'Fuji Tempura Idaten', desc: '富士天婦羅', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street1'},
-                {name: 'Lake Bake', desc: '湖畔麵包 (大石公園旁)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street2'},
-                {name: 'Sanrokuen', desc: '山麓園 (圍爐裏燒烤)', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street3'},
-                {name: '7-11 河口湖', desc: '便利商店景觀店', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street4'}
+                {name: "Houtou Fudou", desc: "不動茶屋 (東戀路店)", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Houtou+Fudou+Higashikoiji',img"},
+                {name: "Fuji Tempura Idaten", desc: "富士天婦羅", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street1"},
+                {name: "Lake Bake", desc: "湖畔麵包 (大石公園旁)", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street2"},
+                {name: "Sanrokuen", desc: "山麓園 (圍爐裏燒烤)", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street3"},
+                {name: "7-11 河口湖", desc: "便利商店景觀店", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street4"}
             ]
         };
 
-        // 6. 打卡清單 (修復冒號引號錯誤)
         const defaultPhoto = {
             Tokyo: [
-                {name: 'SHIBUYA SKY', desc: '高空展望台 (需預約)', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=SHIBUYA+SKY',img'},
-                {name: '東京鐵塔', desc: '芝公園/地下停車場視角', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street5'},
-                {name: '豪德寺', desc: '招財貓發源地', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street6'},
-                {name: 'TeamLab Planets', desc: '豐洲沉浸式藝術', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street7'},
-                {name: '淺草雷門', desc: '經典觀光地標', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street8'}
+                {name: "SHIBUYA SKY", desc: "高空展望台 (需預約)", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=SHIBUYA+SKY',img"},
+                {name: "東京鐵塔", desc: "芝公園/地下停車場視角", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street5"},
+                {name: "豪德寺", desc: "招財貓發源地", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street6"},
+                {name: "TeamLab Planets", desc: "豐洲沉浸式藝術", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street7"},
+                {name: "淺草雷門", desc: "經典觀光地標", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street8"}
             ],
             Kamakura: [
-                {name: '鎌倉高校前', desc: '灌籃高手平交道', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Kamakura+Kokomae',img'},
-                {name: '長谷寺', desc: '眺望湘南海岸', link: 'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street9'},
-                {name: '高德院', desc: '鎌倉大佛', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan0'},
-                {name: '報國寺', desc: '夢幻竹林', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan1'},
-                {name: '七里濱海岸', desc: '夕陽與江之島', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan2'}
+                {name: "鎌倉高校前", desc: "灌籃高手平交道", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Kamakura+Kokomae',img"},
+                {name: "長谷寺", desc: "眺望湘南海岸", link: "https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street9"},
+                {name: "高德院", desc: "鎌倉大佛", link: "https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan0"},
+                {name: "報國寺", desc: "夢幻竹林", link: "https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan1"},
+                {name: "七里濱海岸", desc: "夕陽與江之島", link: "https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan2"}
             ],
             Fuji: [
-                {name: '新倉山淺間公園', desc: '五重塔 + 富士山', link: 'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Chureito+Pagoda',img'},
-                {name: '羅森河口湖站前', desc: '經典便利商店景', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan3'},
-                {name: '大石公園', desc: '河口湖花海', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan4'},
-                {name: '本町商店街', desc: '昭和復古街道', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan5'},
-                {name: '山中湖平野之濱', desc: '逆富士絕景', link: 'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan6'}
+                {name: "新倉山淺間公園", desc: "五重塔 + 富士山", link: "https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Chureito+Pagoda',img"},
+                {name: "羅森河口湖站前", desc: "經典便利商店景", link: "https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan3"},
+                {name: "大石公園", desc: "河口湖花海", link: "https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan4"},
+                {name: "本町商店街", desc: "昭和復古街道", link: "https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan5"},
+                {name: "山中湖平野之濱", desc: "逆富士絕景", link: "https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan6"}
             ]
         };
 
