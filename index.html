@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>關東8日之旅 V4.9 (完整重製版)</title>
+    <title>關東8日之旅 V4.9 (絕對顯示版)</title>
     
     <style>
         body { 
@@ -16,33 +16,16 @@
             font-family: sans-serif; 
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
+            color: #5D4037;
         }
         
         /* 櫻花特效 */
         .sakura { position: fixed; top: -10px; background: #FFB7B2; border-radius: 100% 0 100% 0; opacity: 0.6; animation: fall linear infinite; z-index: 0; pointer-events: none; width: 12px; height: 12px; }
         @keyframes fall { to { transform: translate(15vw, 105vh) rotate(360deg); } }
 
-        /* 載入遮罩 */
-        #static-loading {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 240, 245, 0.98); z-index: 99999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; backdrop-filter: blur(5px); transition: opacity 0.5s;
-        }
-        .loading-icon { font-size: 50px; animation: spin 2s infinite linear; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* 錯誤顯示區 (Debug) */
-        #global-error {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; background: #fee2e2; color: #b91c1c; 
-            padding: 10px; font-size: 12px; z-index: 999999; border-bottom: 2px solid red; word-break: break-all;
-        }
-
-        #app { display: none; opacity: 0; transition: opacity 0.5s; }
-        
         /* UI 元件 CSS */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); }
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); margin-bottom: 15px; }
         .fab-main { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; z-index: 50; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: transform 0.2s; }
         .fab-main:active { transform: scale(0.9); }
         
@@ -58,10 +41,16 @@
         
         /* 圖片 */
         .watercolor-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* 初始化狀態：預設顯示內容，不再隱藏 */
+        #app { display: block; opacity: 1; }
+        
+        /* 錯誤訊息 */
+        #error-banner { display:none; position:fixed; top:0; left:0; width:100%; background:red; color:white; font-size:12px; padding:5px; z-index:999999; text-align:center; }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 
@@ -80,45 +69,8 @@
 </head>
 <body>
 
-    <div id="global-error"></div>
-
+    <div id="error-banner"></div>
     <div id="sakura-container"></div>
-
-    <div id="static-loading">
-        <div class="loading-icon">🌸</div>
-        <div class="loading-text">V4.9 系統啟動中...</div>
-        <button id="reset-btn" onclick="clearDataAndReload()" style="display:none; margin-top:20px; padding:8px 16px; border-radius:20px; border:1px solid #999; color:#555;">重置資料並修復</button>
-    </div>
-
-    <script>
-        // 櫻花生成
-        const sc = document.getElementById('sakura-container');
-        for(let i=0; i<20; i++){ const e = document.createElement('div'); e.className = 'sakura'; e.style.left = Math.random()*100+'vw'; e.style.animationDuration = Math.random()*3+4+'s'; sc.appendChild(e); }
-
-        function clearDataAndReload() {
-            localStorage.clear();
-            window.location.reload();
-        }
-
-        window.onerror = function(msg, url, line) {
-            const errDiv = document.getElementById('global-error');
-            errDiv.style.display = 'block';
-            errDiv.innerHTML = `<strong>錯誤:</strong> ${msg} (Line: ${line}) <button onclick="clearDataAndReload()" style="margin-left:10px; border:1px solid red;">重置修復</button>`;
-            document.getElementById('reset-btn').style.display = 'inline-block';
-            // 嘗試強制顯示 App
-            document.getElementById('static-loading').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            document.getElementById('app').style.opacity = '1';
-        };
-
-        // 3秒後若沒反應，顯示重置按鈕
-        setTimeout(() => {
-            if(document.getElementById('static-loading').style.display !== 'none') {
-                document.getElementById('reset-btn').style.display = 'inline-block';
-                document.querySelector('.loading-text').innerText = "載入稍慢，可嘗試重置";
-            }
-        }, 3000);
-    </script>
 
     <div id="app" class="min-h-screen pb-24">
         
@@ -373,6 +325,18 @@
 </div>
 
 <script>
+    // 錯誤攔截器
+    window.onerror = function(msg, url, line) {
+        const eb = document.getElementById('error-banner');
+        if(eb){ eb.style.display='block'; eb.innerText=`Error: ${msg}`; }
+    };
+    
+    // JS 載入失敗備援
+    window.addEventListener('unhandledrejection', event => {
+        const eb = document.getElementById('error-banner');
+        if(eb){ eb.style.display='block'; eb.innerText=`Promise Error: ${event.reason}`; }
+    });
+
     const { createApp, ref, computed, onMounted, watch } = Vue;
 
     createApp({
@@ -391,7 +355,7 @@
             const tripDays = [{ week: 'Day 1', title: '抵達' }, { week: 'Day 2', title: '淺草' }, { week: 'Day 3', title: '河口湖' }, { week: 'Day 4', title: '山中湖' }, { week: 'Day 5', title: '新宿' }, { week: 'Day 6', title: '鎌倉' }, { week: 'Day 7', title: '澀谷' }, { week: 'Day 8', title: '返程' }];
             const selectedDayIndex = ref(0);
             
-            // 完整資料結構 (不再使用簡易版)
+            // 完整資料結構 (解鎖所有功能)
             const defaultItinerary = [
                 [{ id: 101, category: 'Flight', name: '06:40 桃園起飛', hours: '06:40', mapKeyword: '桃園機場', note: '提早2小時抵達機場' }, { id: 102, category: 'Flight', name: '10:40 抵達成田機場', hours: '10:40', mapKeyword: '成田機場', note: '領取行李、購買交通卡' }, { id: 103, category: 'Sightseeing', name: '晴空塔 Tokyo Skytree', hours: '下午', mapKeyword: 'Tokyo Skytree', note: '可逛 Solamachi 商店街' }, { id: 104, category: 'Food', name: '晚餐：錦糸町周遭', hours: '晚上', mapKeyword: '錦糸町美食', note: '依照當下心情選擇' }],
                 [{ id: 201, category: 'Sightseeing', name: '淺草寺', hours: '上午', mapKeyword: '淺草寺', note: '雷門、仲見世通' }, { id: 202, category: 'Food', name: '午餐：淺草寺周遭', hours: '中午', mapKeyword: '淺草午餐', note: '推薦炸肉餅、鰻魚飯' }, { id: 203, category: 'Sightseeing', name: '小網神社', hours: '下午', mapKeyword: '小網神社', note: '強運厄除' }, { id: 204, category: 'Sightseeing', name: '上野恩賜公園', hours: '下午', mapKeyword: '上野恩賜公園', note: '散步、星巴克' }, { id: 205, category: 'Shopping', name: '秋葉原 或 東京一番街', hours: '晚上', mapKeyword: '東京站一番街', note: '動漫周邊 / 伴手禮' }],
@@ -545,9 +509,15 @@
             const fetchRate = async () => { try { const r=await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const d=await r.json(); if(d.rates.TWD) exchangeRate.value = (1/d.rates.TWD).toFixed(3); } catch(e){} };
 
             onMounted(() => {
-                const STORAGE_KEY = 'v49_fresh_data'; // 改金鑰避開舊錯誤
+                const STORAGE_KEY = 'v49_clean_start'; // 全新資料庫金鑰，強制避開舊快取
                 const s = localStorage.getItem(STORAGE_KEY);
                 if(s) { try { const d=JSON.parse(s); itineraryData.value=d.itinerary||defaultItinerary; expenses.value=d.expenses||[]; shoppingList.value=d.shop||shoppingList.value; foodList.value=d.food||foodList.value; photoSpots.value=d.photo||photoSpots.value; } catch(e){} }
+                else {
+                    // 自動加入自駕清單
+                    const basic = ['護照', '日幣', '信用卡', 'SIM卡'];
+                    const drive = JSON.stringify(itineraryData.value).includes('租車') ? ['駕照/譯本'] : [];
+                    users.value.forEach((u, i) => u.list = [...basic, ...(i===0?drive:[])].map(t => ({text:t, checked:false}))); 
+                }
                 
                 // 天氣與匯率
                 getW(35.6895, 139.6917, tokyoWeather); getW(35.3192, 139.5467, kamakuraWeather); getW(35.3606, 138.7274, fujiWeather); fetchRate();
@@ -562,7 +532,7 @@
             });
 
             watch([itineraryData, expenses, shoppingList, foodList, photoSpots], () => {
-                localStorage.setItem('v49_fresh_data', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value}));
+                localStorage.setItem('v49_clean_start', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value}));
             }, {deep: true});
 
             const apps = [
