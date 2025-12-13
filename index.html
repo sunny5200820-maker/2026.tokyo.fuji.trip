@@ -5,14 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V23.00 Identity Evolved)</title>
+<title>關東之旅 2026 (V24.00 Final Fix)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <script>
-    tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},fontFamily:{sans:['Zen Maru Gothic','sans-serif']},animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards','spin-slow':'spin 8s linear infinite','pulse-slow':'pulse 3s infinite'},keyframes:{wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},float:{'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},fadeIn:{from:{opacity:0,transform:'translateY(10px)'},to:{opacity:1,transform:'translateY(0)'}}}}}}
+    // 安全載入 Tailwind 設定，避免報錯
+    try {
+        tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},fontFamily:{sans:['Zen Maru Gothic','sans-serif']},animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards','spin-slow':'spin 8s linear infinite','pulse-slow':'pulse 3s infinite'},keyframes:{wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},float:{'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},fadeIn:{from:{opacity:0,transform:'translateY(10px)'},to:{opacity:1,transform:'translateY(0)'}}}}}};
+    } catch(e) { console.error("Tailwind Config Error", e); }
 </script>
 
 <style>
@@ -48,10 +51,12 @@
 
 <div id="crash-screen" style="display:none; position:fixed; inset:0; background:#fff; z-index:100000; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;">
     <div class="text-6xl mb-4">😿</div>
-    <h2 class="text-2xl font-black mb-2 text-red-500">連線異常</h2>
-    <button onclick="localStorage.clear();location.reload()" class="bg-red-500 text-white px-8 py-3 rounded-full font-bold shadow-lg">重置修復</button>
+    <h2 class="text-2xl font-black mb-2 text-red-500">程式發生錯誤</h2>
+    <p class="text-gray-500 text-sm mb-4">這可能是網路不穩或資料衝突造成的。</p>
+    <button onclick="localStorage.removeItem('V24_LOCAL');location.reload()" class="bg-red-500 text-white px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition">重置修復 (Reset)</button>
+    <pre id="error-log" class="mt-4 text-[10px] text-gray-400 bg-gray-100 p-2 rounded text-left overflow-auto max-w-xs border"></pre>
 </div>
-<script>window.onerror=function(){document.getElementById('crash-screen').style.display='flex';return false;}</script>
+<script>window.onerror=function(m,u,l){document.getElementById('crash-screen').style.display='flex';document.getElementById('error-log').innerText=`Error: ${m}\nLn: ${l}`;return false;}</script>
 
 <div id="sakura-container"></div>
 
@@ -79,7 +84,7 @@
     <div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[64px] bg-[#FFF0F5]/85 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
         <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-90 transition"><i class="fa-solid fa-chevron-left"></i></button>
         <h1 class="font-black text-gray-700 text-lg flex items-center gap-2"><i class="fa-solid fa-sakura text-pink-300"></i> {{getPageTitle(currentView)}}</h1>
-        <div v-if="currentUser" class="w-10 h-10 rounded-full bg-white border border-pink-200 overflow-hidden shadow-sm flex items-center justify-center text-xl" @click="showPersonaModal=true">
+        <div v-if="currentUser" class="w-10 h-10 rounded-full bg-white border border-pink-200 overflow-hidden shadow-sm flex items-center justify-center text-xl cursor-pointer" @click="showPersonaModal=true">
             <img v-if="currentUser.avatar" :src="currentUser.avatar" class="w-full h-full object-cover">
             <span v-else>{{currentUser.icon}}</span>
         </div>
@@ -230,9 +235,9 @@
         <button v-if="isLoggedIn" @click="openAddSpotModal" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
     </div>
 
-    <div v-if="currentView==='japanese'" class="px-5 py-4 pb-40 animate-fade-in"><button @click="$refs.cameraInput.click()" class="w-full bg-gray-900 text-white rounded-2xl p-4 mb-6 shadow-lg flex items-center justify-center gap-3 active:scale-95 transition"><i class="fa-solid fa-camera text-2xl"></i><span class="font-bold">開啟相機翻譯</span></button><input type="file" ref="cameraInput" accept="image/*" capture="environment" class="hidden"><div class="space-y-3"><div v-for="(p,idx) in japanesePhrases" :key="idx" class="card p-5 flex justify-between items-center cursor-pointer hover:shadow-md transition border-l-4 border-emerald-400" @click="expandCard(p)"><div><div class="font-bold text-lg text-gray-800">{{p.jp}}</div><div class="text-xs text-gray-500">{{p.zh}}</div></div><i class="fa-solid fa-expand text-gray-300"></i></div></div></div>
-    
     <div v-if="currentView==='weather'" class="px-5 py-4 pb-40 animate-fade-in"><div class="bg-pink-50 p-4 rounded-2xl border border-pink-200 mb-6 shadow-sm text-center relative overflow-hidden"><i class="fa-solid fa-fan text-pink-200 text-6xl absolute -right-4 -bottom-4 animate-spin-slow"></i><h3 class="font-black text-pink-500 mb-3 text-sm">🌸 2026 櫻花預測</h3><div class="grid grid-cols-3 gap-2"><div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">東京</div><div class="font-bold text-pink-600">3/22</div></div><div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">鎌倉</div><div class="font-bold text-pink-600">3/25</div></div><div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">富士山</div><div class="font-bold text-pink-600">4/10</div></div></div></div><div class="space-y-4"><div v-for="w in weatherData" class="card p-6 text-white relative" :class="w.bg"><div class="relative z-10"><div class="font-bold opacity-80 uppercase text-xs">{{w.name}}</div><div class="text-5xl font-black my-2">{{w.temp}}°C</div><div class="text-sm bg-white/20 backdrop-blur inline-block px-3 py-1 rounded-full">👕 {{getClothingAdvice(w.temp)}}</div></div></div></div></div>
+
+    <div v-if="currentView==='japanese'" class="px-5 py-4 pb-40 animate-fade-in"><button @click="$refs.cameraInput.click()" class="w-full bg-gray-900 text-white rounded-2xl p-4 mb-6 shadow-lg flex items-center justify-center gap-3 active:scale-95 transition"><i class="fa-solid fa-camera text-2xl"></i><span class="font-bold">開啟相機翻譯</span></button><input type="file" ref="cameraInput" accept="image/*" capture="environment" class="hidden"><div class="space-y-3"><div v-for="(p,idx) in japanesePhrases" :key="idx" class="card p-5 flex justify-between items-center cursor-pointer hover:shadow-md transition border-l-4 border-emerald-400" @click="expandCard(p)"><div><div class="font-bold text-lg text-gray-800">{{p.jp}}</div><div class="text-xs text-gray-500">{{p.zh}}</div></div><i class="fa-solid fa-expand text-gray-300"></i></div></div><button v-if="isLoggedIn" @click="openAddPhraseModal" class="fab-main bg-emerald-500 text-white"><i class="fa-solid fa-plus"></i></button></div>
 
     <div v-show="currentView!=='menu'" class="fab-home" @click="currentView='menu'"><i class="fa-solid fa-house"></i></div>
 
@@ -280,7 +285,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { createApp, ref, computed, onMounted, watch } from "https://unpkg.com/vue@3.3.4/dist/vue.esm-browser.js";
 
@@ -340,7 +345,18 @@ createApp({
         const modalHasImg = ref(false);
         const modalCallback = ref(null);
 
-        const apps = [{id:1,name:'行程',icon:'fa-solid fa-map',view:'itinerary'},{id:2,name:'小財庫',icon:'fa-solid fa-yen-sign',view:'money'},{id:3,name:'住宿交通',icon:'fa-solid fa-hotel',view:'hotel'},{id:4,name:'行前準備',icon:'fa-solid fa-suitcase',view:'prep'},{id:5,name:'吃吃喝喝',icon:'fa-solid fa-utensils',view:'food'},{id:6,name:'網美打卡',icon:'fa-solid fa-camera',view:'photo'},{id:7,name:'快樂購',icon:'fa-solid fa-bag-shopping',view:'shopping'},{id:8,name:'天氣',icon:'fa-solid fa-cloud-sun',view:'weather'},{id:9,name:'翻譯',icon:'fa-solid fa-language',view:'japanese'}];
+        // Apps Grid (Fixed bgClass)
+        const apps = [
+            {id:1,name:'行程',icon:'fa-solid fa-map',view:'itinerary',bgClass:'bg-pink-400'},
+            {id:2,name:'小財庫',icon:'fa-solid fa-yen-sign',view:'money',bgClass:'bg-yellow-400'},
+            {id:3,name:'住宿交通',icon:'fa-solid fa-hotel',view:'hotel',bgClass:'bg-indigo-400'},
+            {id:4,name:'行前準備',icon:'fa-solid fa-suitcase',view:'prep',bgClass:'bg-blue-400'},
+            {id:5,name:'吃吃喝喝',icon:'fa-solid fa-utensils',view:'food',bgClass:'bg-orange-400'},
+            {id:6,name:'網美打卡',icon:'fa-solid fa-camera',view:'photo',bgClass:'bg-rose-400'},
+            {id:7,name:'快樂購',icon:'fa-solid fa-bag-shopping',view:'shopping',bgClass:'bg-purple-400'},
+            {id:8,name:'天氣',icon:'fa-solid fa-cloud-sun',view:'weather',bgClass:'bg-sky-400'},
+            {id:9,name:'翻譯',icon:'fa-solid fa-language',view:'japanese',bgClass:'bg-emerald-400'}
+        ];
         const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'}];
         const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
         const smartReminders = computed(() => { const l=[]; if(daysUntilTrip.value<=30)l.push("富士回遊號該搶票了！"); if(daysUntilTrip.value<=2)l.push("線上報到 (48hr前)"); return l; });
@@ -373,10 +389,10 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
 
         const handleAuthClick = () => isLoggedIn.value ? (confirm('登出?')&&signOut(auth)) : showLoginModal.value=true;
-        const doLogin = async () => { try{await signInWithEmailAndPassword(auth,loginForm.value.email,loginForm.value.password);showLoginModal.value=false;}catch(e){alert(e.message);} };
-        const saveData = async () => { if(db&&isLoggedIn.value) await setDoc(doc(db,"trips","kanto2026"),{reminder:reminderText.value,users:users.value,itinerary:itinerary.value,drivePlan:drivePlan.value,expenses:expenses.value,spots:spots.value,shopping:shopping.value,phrases:japanesePhrases.value},{merge:true}); else localStorage.setItem('V23_LOCAL',JSON.stringify({reminder:reminderText.value,users:users.value,itinerary:itinerary.value,drivePlan:drivePlan.value,expenses:expenses.value,spots:spots.value,shopping:shopping.value,phrases:japanesePhrases.value})); };
+        const doLogin = async () => { try{await setPersistence(auth, browserLocalPersistence); await signInWithEmailAndPassword(auth,loginForm.value.email,loginForm.value.password);showLoginModal.value=false;}catch(e){alert(e.message);} };
+        const saveData = async () => { if(db&&isLoggedIn.value) await setDoc(doc(db,"trips","kanto2026"),{reminder:reminderText.value,users:users.value,itinerary:itinerary.value,drivePlan:drivePlan.value,expenses:expenses.value,spots:spots.value,shopping:shopping.value,phrases:japanesePhrases.value},{merge:true}); else localStorage.setItem('V24_LOCAL',JSON.stringify({reminder:reminderText.value,users:users.value,itinerary:itinerary.value,drivePlan:drivePlan.value,expenses:expenses.value,spots:spots.value,shopping:shopping.value,phrases:japanesePhrases.value})); };
 
-        // CRUD Modals
+        // CRUD Modals (Fixed: Now properly exported)
         const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; modalCallback.value=()=>{shopping.value[shopCat.value].push(modalData.value); saveData();}; showModal.value=true; };
         const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖'}]; modalData.value={name:'',desc:'',link:'',img:''}; modalHasImg.value=true; modalCallback.value=()=>{spots.value[currentView.value][currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
         const openAddPhraseModal = () => { modalTitle.value='新增翻譯'; modalFields.value=[{key:'zh',label:'中文'},{key:'jp',label:'日文'}]; modalData.value={zh:'',jp:''}; modalHasImg.value=false; modalCallback.value=()=>{japanesePhrases.value.push(modalData.value); saveData();}; showModal.value=true; };
@@ -388,7 +404,9 @@ createApp({
 
         onMounted(() => {
             if(auth) onAuthStateChanged(auth, u=>{ isLoggedIn.value=!!u; if(u&&db) onSnapshot(doc(db,"trips","kanto2026"),d=>{if(d.exists()){const dt=d.data(); users.value=dt.users||users.value; itinerary.value=dt.itinerary||itinerary.value; expenses.value=dt.expenses||[]; spots.value=dt.spots||spots.value; shopping.value=dt.shopping||shopping.value; japanesePhrases.value=dt.phrases||japanesePhrases.value; reminderText.value=dt.reminder||reminderText.value; drivePlan.value=dt.drivePlan||drivePlan.value; }}) });
-            const l=localStorage.getItem('V23_LOCAL'); if(l&&!auth){ const d=JSON.parse(l); users.value=d.users; itinerary.value=d.itinerary; expenses.value=d.expenses; spots.value=d.spots; shopping.value=d.shopping; japanesePhrases.value=d.phrases; reminderText.value=d.reminder; drivePlan.value=d.drivePlan; }
+            const l=localStorage.getItem('V24_LOCAL'); if(l&&!auth){ const d=JSON.parse(l); users.value=d.users; itinerary.value=d.itinerary; expenses.value=d.expenses; spots.value=d.spots; shopping.value=d.shopping; japanesePhrases.value=d.phrases; reminderText.value=d.reminder; drivePlan.value=d.drivePlan; }
+            // 確保 users 永遠有資料
+            if(users.value.length === 0) users.value = defaultData.users;
             fetchWeather();
         });
 
