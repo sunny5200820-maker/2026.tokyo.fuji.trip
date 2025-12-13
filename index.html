@@ -5,18 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V10.15 絕對完整版)</title>
+<title>關東之旅 2026 (V10.20 修復優化版)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 <script>
-    tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},fontFamily:{sans:['Zen Maru Gothic','sans-serif']},animation:{'wiggle':'wiggle 1s ease-in-out infinite'},keyframes:{wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}}}}}}
+    tailwind.config={
+        theme:{
+            extend:{
+                colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},
+                fontFamily:{sans:['Zen Maru Gothic','sans-serif']},
+                animation:{'wiggle':'wiggle 1s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards'},
+                keyframes:{
+                    wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},
+                    fadeIn:{from:{opacity:0,transform:'translateY(10px)'},to:{opacity:1,transform:'translateY(0)'}}
+                }
+            }
+        }
+    }
 </script>
 <style>
     html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;background-image:radial-gradient(#FFD1DC 15%,transparent 16%),radial-gradient(#FFF5BA 15%,transparent 16%);background-size:60px 60px;background-position:0 0,30px 30px;font-family:-apple-system,BlinkMacSystemFont,"Zen Maru Gothic",sans-serif;color:#5D4037;overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
     #app{display:block;min-height:100vh}
-    [v-cloak]{display:none}
+    [v-cloak]{display:none !important}
     .hide-scrollbar::-webkit-scrollbar{display:none}.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
     .card{background:rgba(255,255,255,0.95);border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.06);border:1px solid rgba(255,255,255,0.8);margin-bottom:15px;position:relative;overflow:hidden}
     .welcome-screen{position:fixed;inset:0;z-index:9999;background:#FFF0F5;transition:transform 0.8s cubic-bezier(0.4,0,0.2,1)}.welcome-screen.hidden-screen{transform:translateY(-100%);pointer-events:none}
@@ -25,7 +37,6 @@
     .fab-home{position:fixed;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;z-index:900;border:4px solid white;box-shadow:0 5px 20px rgba(0,0,0,0.2);background:linear-gradient(135deg,#FF9EAC,#FFD1DC);cursor:grab;touch-action:none;transition:transform 0.1s}.fab-home:active{transform:scale(0.9);cursor:grabbing}
     .boarding-pass{background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #eee;position:relative;margin-bottom:16px}.dashed-line{border-top:2px dashed #ddd;margin:15px 0;position:relative}
     .sakura{position:fixed;top:-10px;background:#FFB7B2;border-radius:100% 0 100% 0;opacity:0.6;animation:fall linear infinite;z-index:0;pointer-events:none;width:12px;height:12px}@keyframes fall{to{transform:translate(15vw,105vh) rotate(360deg)}}
-    .animate-fade-in{animation:fadeIn 0.4s ease-out forwards}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .watercolor-img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s}.card:active .watercolor-img{transform:scale(1.05)}
     .editable-field:active{background-color:#FFF9C4}
     
@@ -38,20 +49,22 @@
 
 <div id="crash-screen">
     <h2 class="text-2xl font-bold mb-4">⚠️ 程式發生錯誤</h2>
-    <p class="mb-4">請截圖此畫面並檢查程式碼複製是否完整。</p>
+    <p class="mb-4">程式執行遇到問題，請截圖給開發者。</p>
     <pre id="error-log" class="text-left bg-white p-4 rounded border text-xs overflow-auto h-64"></pre>
 </div>
 
 <div id="loading-screen">
     <div style="font-size: 50px;" class="animate-bounce">🌸</div>
-    <div class="mt-4 font-bold text-gray-600">V10.15 啟動中...</div>
+    <div class="mt-4 font-bold text-gray-600">V10.20 啟動中...</div>
 </div>
 
 <script>
     window.onerror = function(msg, url, line, col, error) {
-        document.getElementById('loading-screen').style.display = 'none';
+        const loading = document.getElementById('loading-screen');
+        if(loading) loading.style.display = 'none';
         document.getElementById('crash-screen').style.display = 'block';
         document.getElementById('error-log').innerText = `${msg}\nLine: ${line}:${col}\n${error ? error.stack : ''}`;
+        return false;
     };
 </script>
 
@@ -154,7 +167,7 @@
             <div v-for="h in hotels" class="card p-5 border border-indigo-100 relative overflow-hidden group hover:shadow-lg transition">
                 <div class="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl shadow-sm">{{h.days}}</div>
                 <h3 class="font-bold text-xl mt-2 text-gray-800 pr-12">{{h.name}}</h3>
-                <a :href="h.link" target="_blank" class="block mt-4 bg-gradient-to-r from-indigo-500 to-blue-500 text-white py-3 text-center rounded-xl font-bold shadow-md hover:shadow-lg transition active:scale-95"><i class="fa-solid fa-map-location-dot mr-2"></i> 開啟地圖導航</a>
+                <a :href="getMapLink(h.name)" target="_blank" class="block mt-4 bg-gradient-to-r from-indigo-500 to-blue-500 text-white py-3 text-center rounded-xl font-bold shadow-md hover:shadow-lg transition active:scale-95"><i class="fa-solid fa-map-location-dot mr-2"></i> 開啟地圖導航</a>
             </div>
         </div>
         <div v-if="hotelTab==='flight'">
@@ -266,88 +279,75 @@ for(let i=0; i<15; i++){ const e=document.createElement('div'); e.className='sak
 </script>
 
 <script>
-const { createApp, ref, computed, onMounted, watch } = Vue;
+const { createApp, ref, computed, onMounted, watch, reactive } = Vue;
 
 createApp({
     setup() {
-        const STORAGE_KEY = 'v10_15_final_fix';
+        const STORAGE_KEY = 'v10_20_final_fix'; // 更新 Key 避免舊資料衝突
         const currentView = ref('menu');
         const isWelcomeClosed = ref(false);
         const isMounted = ref(false);
         
-        // --- 圖片路徑轉換器 (關鍵修復) ---
+        // --- 圖片路徑轉換器 ---
         const BASE_RAW_URL = 'https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/';
         const getImg = (path) => {
             if (!path) return 'https://placehold.co/200/FFD1DC/555?text=No+Image';
-            if (path.startsWith('http')) return path;
-            if (path.startsWith('data:image')) return path;
-            // 移除可能存在的 images/ 前綴，強制使用根目錄 raw 連結
+            if (path.startsWith('http') || path.startsWith('data:image')) return path;
             const cleanName = path.replace(/^images\//, ''); 
-            return BASE_RAW_URL + (cleanName === '2026.tokyo.jpg' ? 'images/' + cleanName : (cleanName.includes('/') ? cleanName : 'images/' + cleanName)); 
-            // 根據截圖，大部份圖在 images 資料夾內，除了 index.html 在外。
-            // 但使用者說 "2026.tokyo.jpg" 在外面? 
-            // 修正策略：統一假設圖片都在 images/ 下，如果連結失效會 fallback。
-            // 根據截圖，圖片其實是在 images 資料夾內 (Add files via upload 1 hour ago)，
-            // 只有 2026.tokyo.jpg 和 banner.jpg 似乎在根目錄。
-            // 為了保險，這裡做個簡單判斷：
             if(cleanName === '2026.tokyo.jpg' || cleanName === 'banner.jpg') return BASE_RAW_URL + cleanName;
             return BASE_RAW_URL + 'images/' + cleanName;
         };
         const handleImgError = (e) => { e.target.src = 'https://placehold.co/400x300/FFD1DC/555?text=Image+Load+Fail'; };
 
-        // --- 完整資料庫 ---
+        // --- 預設資料 (定義在 setup 內部以確保順序正確) ---
         const defaultShopping = {
-            wish: [{name:'Chiikawa玩偶',desc:'原宿KiddyLand',link:'https://www.google.com/search?q=KiddyLand+Harajuku+Chiikawa',img:'welcome.jpg'}, {name:'富士山杯',desc:'星巴克限定',link:'https://www.starbucks.co.jp/',img:'2026.tokyo.jpg'}, {name:'Le Labo香水',desc:'東京限定Gaiac 10',link:'https://www.lelabofragrances.com/',img:'https://placehold.co/200/EEE/555?text=LeLabo'}, {name:'Porter包',desc:'吉田包',link:'https://www.yoshidakaban.com/',img:'https://placehold.co/200/333/FFF?text=Porter'}, {name:'Blue Bottle豆',desc:'清澄白河',link:'https://store.bluebottlecoffee.jp/',img:'https://placehold.co/200/FFF/333?text=Coffee'}],
-            cosme: [{name:'Tirtir紅盒氣墊',desc:'遮瑕力強',link:'https://www.cosme.net/products/10222830/',img:'https://placehold.co/200/FF0000/FFF?text=Tirtir'}, {name:'Kate怪獸唇膏',desc:'色號:03/05',link:'https://www.nomorerules.net/pickup/lip_monster/',img:'https://placehold.co/200/000/FFF?text=Kate'}, {name:'&Honey髮油',desc:'保濕修護',link:'https://www.and-honey.com/',img:'https://placehold.co/200/FFD700/FFF?text=Honey'}, {name:'Canmake蜜粉',desc:'棉花糖蜜粉',link:'https://www.canmake.com/',img:'https://placehold.co/200/FFC0CB/555?text=Canmake'}, {name:'Melano CC',desc:'美白精華',link:'https://jp.rohto.com/melanocc/',img:'https://placehold.co/200/FFA500/FFF?text=CC'}],
-            ldk: [{name:'Lululun面膜',desc:'地區限定版',link:'https://lululun.com/',img:'https://placehold.co/200/FF69B4/FFF?text=Mask'}, {name:'Fino髮膜',desc:'高CP值',link:'https://www.shiseido.co.jp/fino/',img:'https://placehold.co/200/C0C0C0/000?text=Fino'}, {name:'Excel眉筆',desc:'新手友善',link:'https://noevirgroup.jp/excel/',img:'https://placehold.co/200/8B4513/FFF?text=Excel'}, {name:'Biore防曬',desc:'水感防曬',link:'https://www.kao.co.jp/bioreuv/',img:'https://placehold.co/200/87CEEB/FFF?text=Biore'}, {name:'Nivea藍罐',desc:'萬用保濕',link:'https://www.nivea.co.jp/',img:'https://placehold.co/200/00008B/FFF?text=Nivea'}],
-            souvenir: [{name:'NY Cheese',desc:'東京站排隊',link:'https://www.google.com/search?q=New+York+Perfect+Cheese',img:'https://placehold.co/200/FFA500/FFF?text=NY'}, {name:'Tokyo Banana',desc:'經典不敗',link:'https://www.tokyobanana.jp/',img:'https://placehold.co/200/FFFF00/000?text=Banana'}, {name:'Press Butter Sand',desc:'焦糖奶油',link:'https://buttersand.com/',img:'https://placehold.co/200/A52A2A/FFF?text=Sand'}, {name:'Sugar Butter Tree',desc:'砂糖奶油樹',link:'https://www.sugarbuttertree.jp/',img:'https://placehold.co/200/FFFACD/555?text=Tree'}, {name:'小雞饅頭',desc:'Hiyoko',link:'http://www.tokyo-hiyoko.co.jp/',img:'https://placehold.co/200/FFFFE0/555?text=Hiyoko'}]
+            wish: [{name:'Chiikawa玩偶',desc:'原宿KiddyLand',link:'KiddyLand Harajuku',img:'welcome.jpg'}, {name:'富士山杯',desc:'星巴克限定',link:'Starbucks Japan',img:'2026.tokyo.jpg'}],
+            cosme: [{name:'Tirtir紅盒氣墊',desc:'遮瑕力強',link:'Tirtir',img:''}, {name:'Kate怪獸唇膏',desc:'色號:03/05',link:'Kate Lip Monster',img:''}],
+            ldk: [{name:'Lululun面膜',desc:'地區限定版',link:'Lululun',img:''}, {name:'Fino髮膜',desc:'高CP值',link:'Fino Hair Mask',img:''}],
+            souvenir: [{name:'NY Cheese',desc:'東京站排隊',link:'New York Perfect Cheese',img:''}, {name:'Tokyo Banana',desc:'經典不敗',link:'Tokyo Banana',img:''}]
         };
         const defaultFood = {
-            Tokyo: [{name:'AFURI拉麵',desc:'柚子鹽味',link:'https://afuri.com/',img:'afuri-ramen.jpg'}, {name:'HARBS',desc:'水果千層',link:'https://www.harbs.co.jp/',img:'harbs-fruit-crepe.jpg'}, {name:'牛卡滋',desc:'炸牛排',link:'https://www.gyukatsu-motomura.com/',img:'https://placehold.co/200/8B0000/FFF?text=Beef'}, {name:'六厘舍',desc:'沾麵',link:'https://www.rokurinsha.com/',img:'https://placehold.co/200/A52A2A/FFF?text=Ramen'}, {name:'Shake Shack',desc:'明治神宮外苑',link:'https://www.shakeshack.jp/',img:'https://placehold.co/200/006400/FFF?text=Burger'}],
-            Kamakura: [{name:'Bills',desc:'世界第一早餐',link:'https://billsjapan.com/jp',img:'https://placehold.co/200/FFF/000?text=Bills'}, {name:'Pacific Drive-In',desc:'海景咖啡',link:'http://pacificdrivein.com/',img:'https://placehold.co/200/87CEFA/FFF?text=DriveIn'}, {name:'Caraway',desc:'排隊咖哩',link:'https://tabelog.com/kanagawa/A1404/A140402/14000589/',img:'https://placehold.co/200/8B4513/FFF?text=Curry'}, {name:'吻仔魚丼',desc:'江之島名產',link:'https://www.google.com/search?q=江之島+吻仔魚丼',img:'https://placehold.co/200/F0F8FF/000?text=Fish'}, {name:'豐島屋',desc:'鴿子餅乾',link:'https://www.hato.co.jp/',img:'https://placehold.co/200/FFFFF0/555?text=Cookie'}],
-            Fuji: [{name:'Houtou Fudou',desc:'不動茶屋',link:'http://www.houtou-fudou.jp/',img:'https://placehold.co/200/FFF/000?text=Noodle'}, {name:'富士天婦羅',desc:'Idaten',link:'https://fuji-tempura-idaten.jp/',img:'https://placehold.co/200/FFA500/FFF?text=Tempura'}, {name:'Lake Bake',desc:'湖畔麵包',link:'http://www.lakebake-kawaguchiko.com/',img:'https://placehold.co/200/8B4513/FFF?text=Bread'}, {name:'Shaw s Sushi',desc:'壽司',link:'https://tabelog.com/yamanashi/A1903/A190303/19000305/',img:'https://placehold.co/200/FA8072/FFF?text=Sushi'}, {name:'7-11河口湖',desc:'便利商店',link:'https://www.google.com/maps',img:'https://placehold.co/200/008000/FFF?text=711', img: 'https://placehold.co/200/008000/FFF?text=711'}]
+            Tokyo: [{name:'AFURI拉麵',desc:'柚子鹽味',link:'AFURI',img:'afuri-ramen.jpg'}, {name:'HARBS',desc:'水果千層',link:'HARBS',img:'harbs-fruit-crepe.jpg'}],
+            Kamakura: [{name:'Bills',desc:'世界第一早餐',link:'Bills Kamakura',img:''}, {name:'Pacific Drive-In',desc:'海景咖啡',link:'Pacific Drive-In',img:''}],
+            Fuji: [{name:'Houtou Fudou',desc:'不動茶屋',link:'Houtou Fudou',img:''}, {name:'富士天婦羅',desc:'Idaten',link:'Fuji Tempura Idaten',img:''}]
         };
         const defaultPhoto = {
-            Tokyo: [{name:'SHIBUYA SKY',desc:'高空展望',link:'https://www.shibuya-scramble-square.com/sky/',img:'https://placehold.co/200/87CEEB/FFF?text=SKY'}, {name:'東京鐵塔',desc:'芝公園',link:'https://www.tokyotower.co.jp/',img:'https://placehold.co/200/FF0000/FFF?text=Tower'}, {name:'豪德寺',desc:'招財貓',link:'https://gotokuji.jp/',img:'https://placehold.co/200/FFF/000?text=Cat'}, {name:'淺草雷門',desc:'經典地標',link:'https://www.senso-ji.jp/',img:'https://placehold.co/200/FF4500/FFF?text=Gate'}, {name:'TeamLab',desc:'豐洲',link:'https://www.teamlab.art/',img:'https://placehold.co/200/000/FFF?text=Lab'}],
-            Kamakura: [{name:'鎌倉高校前',desc:'灌籃高手',link:'https://www.google.com/maps',img:'https://placehold.co/200/00BFFF/FFF?text=SlamDunk',img:'https://placehold.co/200/00BFFF/FFF?text=SlamDunk'}, {name:'長谷寺',desc:'紫陽花',link:'https://www.hasedera.jp/',img:'https://placehold.co/200/9370DB/FFF?text=Flower'}, {name:'高得院',desc:'大佛',link:'https://www.kotoku-in.jp/',img:'https://placehold.co/200/808080/FFF?text=Buddha'}, {name:'報國寺',desc:'竹林',link:'https://houkokuji.or.jp/',img:'https://placehold.co/200/228B22/FFF?text=Bamboo'}, {name:'七里濱',desc:'海岸線',link:'https://www.google.com/maps',img:'https://placehold.co/200/1E90FF/FFF?text=Beach',img:'https://placehold.co/200/1E90FF/FFF?text=Beach'}],
-            Fuji: [{name:'新倉山淺間公園',desc:'五重塔+富士山',link:'https://www.arakurayama-sakura.com/',img:'https://placehold.co/200/FF6347/FFF?text=Pagoda'}, {name:'羅森河口湖',desc:'便利店景',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson'}, {name:'大石公園',desc:'花海',link:'http://www.fkchannel.jp/naturelivingcenter/oishipark/',img:'https://placehold.co/200/FF69B4/FFF?text=Park'}, {name:'本町商店街',desc:'昭和街道',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street'}, {name:'山中湖天鵝',desc:'白鳥之濱',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan'}]
+            Tokyo: [{name:'SHIBUYA SKY',desc:'高空展望',link:'SHIBUYA SKY',img:''}, {name:'東京鐵塔',desc:'芝公園',link:'Tokyo Tower',img:''}],
+            Kamakura: [{name:'鎌倉高校前',desc:'灌籃高手',link:'Kamakura Kokomae',img:''}, {name:'長谷寺',desc:'紫陽花',link:'Hasedera Kamakura',img:''}],
+            Fuji: [{name:'新倉山淺間公園',desc:'五重塔+富士山',link:'Arakurayama Sengen Park',img:''}, {name:'羅森河口湖',desc:'便利店景',link:'Lawson Kawaguchiko',img:''}]
         };
-
         const defaultItinerary = [
-            [{id:101,category:'Flight',name:'06:40 桃園起飛',hours:'06:40',mapKeyword:'桃園機場',note:'提早2小時抵達'},{id:102,category:'Flight',name:'10:40 抵達成田機場',hours:'10:40',mapKeyword:'成田機場',note:'出關/領車/買票'},{id:103,category:'Sightseeing',name:'晴空塔',hours:'下午',mapKeyword:'Tokyo Skytree',note:'逛 Solamachi'},{id:104,category:'Food',name:'晚餐：錦糸町周遭',hours:'晚上',mapKeyword:'錦糸町美食',note:''}],
-            [{id:201,category:'Sightseeing',name:'淺草寺',hours:'上午',mapKeyword:'淺草寺',note:'雷門'},{id:202,category:'Food',name:'午餐：淺草寺周遭',hours:'中午',mapKeyword:'淺草午餐',note:''},{id:203,category:'Sightseeing',name:'小網神社',hours:'下午',mapKeyword:'小網神社',note:'強運厄除'},{id:204,category:'Sightseeing',name:'上野恩賜公園',hours:'下午',mapKeyword:'上野恩賜公園',note:''},{id:205,category:'Shopping',name:'秋葉原 / 東京一番街',hours:'晚上',mapKeyword:'東京站一番街',note:'依體力決定'},{id:206,category:'Food',name:'晚餐',hours:'晚上',mapKeyword:'東京車站美食',note:'依逛街地點決定'}],
-            [{id:301,category:'Transport',name:'前往富士山 (租車)',hours:'上午',mapKeyword:'河口湖',note:'錦糸町出發，3天2夜自駕開始'},{id:302,category:'Sightseeing',name:'河口湖自然生活館',hours:'下午',mapKeyword:'河口湖自然生活館',note:'大石公園'},{id:303,category:'Sightseeing',name:'新倉富士淺間神社',hours:'下午',mapKeyword:'新倉富士淺間神社',note:'爬樓梯看五重塔'},{id:304,category:'Sightseeing',name:'金鳥居 & 本町商店街',hours:'傍晚',mapKeyword:'富士吉田本町通り',note:'拍街景'},{id:305,category:'Food',name:'晚餐',hours:'晚上',mapKeyword:'富士吉田美食',note:'自炊或外食'}],
-            [{id:401,category:'Sightseeing',name:'平野之濱日出',hours:'清晨',mapKeyword:'平野之濱',note:'逆富士'},{id:402,category:'Sightseeing',name:'長池親水公園 & 白鳥濱',hours:'上午',mapKeyword:'長池親水公園',note:'租自行車遊湖'},{id:403,category:'Food',name:'午餐：山中湖',hours:'中午',mapKeyword:'山中湖午餐',note:''},{id:404,category:'Sightseeing',name:'KABA 水陸巴士',hours:'下午',mapKeyword:'山中湖KABA',note:'旭日丘湖畔'},{id:405,category:'Shopping',name:'Ogino 超市',hours:'傍晚',mapKeyword:'Ogino 河口湖店',note:'買晚餐食材'}],
-            [{id:501,category:'Sightseeing',name:'金鳥居 / 纜車 / 鞦韆',hours:'早上',mapKeyword:'河口湖富士山全景纜車',note:'絕景鞦韆'},{id:502,category:'Shopping',name:'Fujisan Shokupan',hours:'中午',mapKeyword:'Fujisan Shokupan',note:'買伴手禮'},{id:503,category:'Transport',name:'搭富士回遊返新宿',hours:'下午',mapKeyword:'新宿站',note:'還車後搭車'},{id:504,category:'Shopping',name:'池袋太陽城',hours:'晚上',mapKeyword:'池袋太陽城',note:'放行李後前往'},{id:505,category:'Food',name:'晚餐：太陽城內',hours:'晚上',mapKeyword:'池袋太陽城美食',note:''}],
-            [{id:601,category:'Transport',name:'前往藤澤 (江之電)',hours:'上午',mapKeyword:'藤澤站',note:'鎌倉一日遊'},{id:602,category:'Sightseeing',name:'江之島 / 鎌倉高校前',hours:'上午',mapKeyword:'江之島',note:''},{id:603,category:'Sightseeing',name:'七里濱 / 鎌倉',hours:'下午',mapKeyword:'鎌倉小町通',note:''},{id:604,category:'Food',name:'午餐：七里濱',hours:'中午',mapKeyword:'七里濱美食',note:''},{id:605,category:'Transport',name:'返回新宿',hours:'傍晚',mapKeyword:'新宿站',note:''},{id:606,category:'Food',name:'晚餐',hours:'晚上',mapKeyword:'新宿美食',note:'外食或自炊'}],
-            [{id:701,category:'Sightseeing',name:'東京鐵塔',hours:'上午',mapKeyword:'芝公園',note:'拍照'},{id:702,category:'Sightseeing',name:'六本木 / 麻布台',hours:'中午',mapKeyword:'麻布台之丘',note:''},{id:703,category:'Food',name:'午餐：六本木周遭',hours:'中午',mapKeyword:'六本木美食',note:''},{id:704,category:'Sightseeing',name:'澀谷 / SHIBUYA SKY',hours:'下午',mapKeyword:'SHIBUYA SKY',note:'傍晚看夕陽'},{id:705,category:'Shopping',name:'澀谷十字路口 / 採買',hours:'晚上',mapKeyword:'澀谷十字路口',note:'最後補貨'},{id:706,category:'Food',name:'晚餐：澀谷',hours:'晚上',mapKeyword:'澀谷美食',note:''}],
-            [{id:801,category:'Sightseeing',name:'自由行程',hours:'白天',mapKeyword:'東京',note:'整理行李'},{id:802,category:'Flight',name:'20:40 成田起飛',hours:'20:40',mapKeyword:'成田機場',note:'提早抵達'},{id:803,category:'Flight',name:'23:20 抵達桃園',hours:'23:20',mapKeyword:'桃園機場',note:'平安回家'}]
+            [{id:101,category:'Flight',name:'06:40 桃園起飛',hours:'06:40',mapKeyword:'桃園機場',note:'提早2小時抵達'},{id:102,category:'Flight',name:'10:40 抵達成田機場',hours:'10:40',mapKeyword:'成田機場',note:'出關/領車/買票'}],
+            [{id:201,category:'Sightseeing',name:'淺草寺',hours:'上午',mapKeyword:'淺草寺',note:'雷門'},{id:202,category:'Food',name:'午餐：淺草寺周遭',hours:'中午',mapKeyword:'淺草午餐',note:''}],
+            [{id:301,category:'Transport',name:'前往富士山 (租車)',hours:'上午',mapKeyword:'河口湖',note:'錦糸町出發，3天2夜自駕開始'}],
+            [{id:401,category:'Sightseeing',name:'平野之濱日出',hours:'清晨',mapKeyword:'平野之濱',note:'逆富士'}],
+            [{id:501,category:'Sightseeing',name:'金鳥居 / 纜車 / 鞦韆',hours:'早上',mapKeyword:'河口湖富士山全景纜車',note:'絕景鞦韆'}],
+            [{id:601,category:'Transport',name:'前往藤澤 (江之電)',hours:'上午',mapKeyword:'藤澤站',note:'鎌倉一日遊'}],
+            [{id:701,category:'Sightseeing',name:'東京鐵塔',hours:'上午',mapKeyword:'芝公園',note:'拍照'}],
+            [{id:801,category:'Sightseeing',name:'自由行程',hours:'白天',mapKeyword:'東京',note:'整理行李'}]
         ];
         
         const commonItems = ['護照', '日幣', 'SIM卡', '信用卡', '充電器', '常備藥'];
         const defaultUsers = [
-            {id:1,name:'吉伊',bg:'#FFD1DC',icon:'🐹',list:[...commonItems, '駕照/日文譯本'].map(t=>({text:t,checked:false})),flightNote:''},
-            {id:2,name:'小八',bg:'#A2D2FF',icon:'🐱',list:[...commonItems].map(t=>({text:t,checked:false})),flightNote:''},
-            {id:3,name:'兔兔',bg:'#FFF5BA',icon:'🐰',list:[...commonItems].map(t=>({text:t,checked:false})),flightNote:''},
-            {id:4,name:'小桃',bg:'#FFB7B2',icon:'🍑',list:[...commonItems].map(t=>({text:t,checked:false})),flightNote:''}
+            {id:1,name:'吉伊',bg:'#FFD1DC',icon:'🐹',list:[...commonItems, '駕照/日文譯本'].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
+            {id:2,name:'小八',bg:'#A2D2FF',icon:'🐱',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
+            {id:3,name:'兔兔',bg:'#FFF5BA',icon:'🐰',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
+            {id:4,name:'小桃',bg:'#FFB7B2',icon:'🍑',list:[...commonItems].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'}
         ];
         
-        const hotels = [
-            {name:'錦糸町 Sumida City',days:'Day 1-2',link:'https://www.google.com/maps/search/錦糸町+飯店'},
-            {name:'Megu Fuji 2021',days:'Day 3-4',link:'https://www.google.com/maps/search/Megu+Fuji+2021'},
-            {name:'DOMO Hotel (新宿)',days:'Day 5-7',link:'https://www.google.com/maps/search/DOMO+Hotel+Shinjuku'} 
-        ];
-
         const drivePlan = [
-            { day: 2, title: 'Day 3: 前往富士山', stops: [{name: '河口湖自然生活館', note: '大石公園花田', location: '河口湖自然生活館', parking: '大石公園駐車場'},{name: '新倉富士淺間神社', note: '五重塔', location: '新倉富士淺間神社', parking: '新倉山浅間公園 駐車場'},{name: '金鳥居', note: '商店街街景', location: '金鳥居', parking: '富士山駅 駐車場'}] },
-            { day: 3, title: 'Day 4: 山中湖', stops: [{name: '平野之濱', note: '逆富士', location: '平野の浜', parking: '平野の浜 駐車場'},{name: '長池親水公園', note: '騎車遊湖', location: '長池親水公園', parking: '長池親水公園 駐車場'},{name: 'KABA 水陸巴士', note: '旭日丘', location: '旭日丘湖畔緑地公園', parking: '森の駅 旭日丘 駐車場'}] },
-            { day: 4, title: 'Day 5: 返程', stops: [{name: '河口湖纜車', note: '天上山公園', location: '河口湖富士山全景纜車', parking: '河口湖畔県営駐車場'},{name: 'Fujisan Shokupan', note: '吐司伴手禮', location: 'Fujisan Shokupan', parking: 'Fujisan Shokupan'}] }
+            { day: 2, stops: [{name: '河口湖自然生活館', note: '大石公園花田', location: '河口湖自然生活館', parking: '大石公園駐車場'},{name: '新倉富士淺間神社', note: '五重塔', location: '新倉富士淺間神社', parking: '新倉山浅間公園 駐車場'}] },
+            { day: 3, stops: [{name: '平野之濱', note: '逆富士', location: '平野の浜', parking: '平野の浜 駐車場'},{name: 'KABA 水陸巴士', note: '旭日丘', location: '旭日丘湖畔緑地公園', parking: '森の駅 旭日丘 駐車場'}] },
+            { day: 4, stops: [{name: '河口湖纜車', note: '天上山公園', location: '河口湖富士山全景纜車', parking: '河口湖畔県営駐車場'}] }
         ];
 
-        // Reactive State
+        // --- Reactive State (關鍵修復：定義所有響應式變數) ---
         const itineraryData = ref(defaultItinerary);
         const users = ref(defaultUsers);
         const expenses = ref([]);
+        const shoppingList = ref(defaultShopping); // Fix: 之前未定義
+        const foodList = ref(defaultFood);         // Fix: 之前未定義
+        const photoSpots = ref(defaultPhoto);      // Fix: 之前未定義
         const daysUntilTrip = ref(0);
         
         const homeBtnPos = ref({x: window.innerWidth/2 - 28, y: window.innerHeight - 100});
@@ -365,7 +365,6 @@ createApp({
         const commonType = ref('');
         const editIndex = ref(-1);
         const editingUser = ref({});
-        const searchQuery = ref('');
         const showLightbox = ref(false);
         const currentZoomImg = ref('');
         const moneyTab = ref('record');
@@ -389,6 +388,11 @@ createApp({
         const exchangeRate = ref(0.22);
         
         const tripDays = [{week:'Day 1',title:'成田/錦糸町'},{week:'Day 2',title:'淺草/上野'},{week:'Day 3',title:'富士山出發'},{week:'Day 4',title:'山中湖'},{week:'Day 5',title:'返回新宿'},{week:'Day 6',title:'鎌倉'},{week:'Day 7',title:'澀谷/六本木'},{week:'Day 8',title:'返程'}];
+        const hotels = [
+            {name:'錦糸町 Sumida City',days:'Day 1-2',link:'Sumida City Hotel'},
+            {name:'Megu Fuji 2021',days:'Day 3-4',link:'Megu Fuji 2021'},
+            {name:'DOMO Hotel (新宿)',days:'Day 5-7',link:'DOMO Hotel Shinjuku'} 
+        ];
         const apps = [
             {id:1,name:'行程表',icon:'fa-solid fa-map-location-dot',bgClass:'bg-pink-400',view:'itinerary'},
             {id:2,name:'小財庫',icon:'fa-solid fa-sack-dollar',bgClass:'bg-yellow-400',view:'money'},
@@ -400,11 +404,10 @@ createApp({
             {id:8,name:'網美打卡',icon:'fa-solid fa-camera',bgClass:'bg-rose-400',view:'photo'},
             {id:9,name:'即時救命',icon:'fa-solid fa-comment-medical',bgClass:'bg-emerald-400',view:'japanese'}
         ];
-        const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'},{jp:'お会計お願いします',tw:'我要結帳'},{jp:'トイレはどこですか',tw:'廁所在哪裡'},{jp:'写真を撮ってもいいですか',tw:'可以拍照嗎'}]);
+        const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'},{jp:'お会計お願いします',tw:'我要結帳'},{jp:'トイレはどこですか',tw:'廁所在哪裡'}]);
 
-        // Computed
+        // --- Computed ---
         const currentItinerary = computed(() => itineraryData.value[selectedDayIndex.value] || []);
-        // FIX: Ensure getDrivePlanForDay handles undefined gracefully
         const getDrivePlanForDay = (idx) => { const p = drivePlan.find(d => d.day === idx); return p ? p.stops : []; };
         const getUserById = (id) => users.value.find(u => u.id === id) || users.value[0];
         const currentPrepList = computed(() => getUserById(prepUser.value).list || []);
@@ -422,9 +425,10 @@ createApp({
         });
         const getCurrentList = () => { if(currentView.value==='food') return foodList.value[foodLoc.value]||[]; if(currentView.value==='shopping') return shoppingList.value[shopCat.value]||[]; if(currentView.value==='photo') return photoSpots.value[photoArea.value]||[]; return []; };
 
-        // Methods
+        // --- Methods ---
         const enterSite = () => { isWelcomeClosed.value = true; };
         const getPageTitle = (v) => ({'itinerary':'行程表','money':'小財庫','menu':'功能選單','prep':'行前準備','weather':'天氣週報','food':'吃吃喝喝','shopping':'快樂Shop','photo':'網美打卡','hotel':'住宿與機票','japanese':'即時救命'}[v] || v);
+        // Fix: 正確的 Google Maps 搜尋連結格式
         const getMapLink = (k) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k)}`;
         const getIconByCategory = (c) => ({'Flight':'fa-plane','Sightseeing':'fa-camera','Food':'fa-utensils','Shopping':'fa-bag-shopping','Transport':'fa-train'}[c]||'fa-star');
         
@@ -435,7 +439,7 @@ createApp({
         
         const openAddCommonModal = (t) => { commonType.value=t; isEditing.value=false; newCommon.value={text1:'',text2:'',text3:''}; showCommonModal.value=true; };
         const editCommonItem = (item,idx) => { commonType.value=currentView.value==='japanese'?'jp':currentView.value; isEditing.value=true; editIndex.value=idx; newCommon.value={text1:item.name||item.jp, text2:item.desc||item.tw, text3:item.img}; showCommonModal.value=true; };
-        const saveCommonItem = () => { const list = commonType.value==='jp' ? japanesePhrases.value : getCurrentList(); const item = commonType.value==='jp' ? {jp:newCommon.value.text1, tw:newCommon.value.text2} : {name:newCommon.value.text1, desc:newCommon.value.text2, img:newCommon.value.text3, link:getMapLink(newCommon.value.text1)}; if(isEditing.value) Object.assign(list[editIndex.value], item); else list.push(item); showCommonModal.value=false; };
+        const saveCommonItem = () => { const list = commonType.value==='jp' ? japanesePhrases.value : getCurrentList(); const item = commonType.value==='jp' ? {jp:newCommon.value.text1, tw:newCommon.value.text2} : {name:newCommon.value.text1, desc:newCommon.value.text2, img:newCommon.value.text3, link:newCommon.value.text1}; if(isEditing.value) Object.assign(list[editIndex.value], item); else list.push(item); showCommonModal.value=false; };
         const deleteCommonItem = (idx) => { if(confirm('確定刪除?')) getCurrentList().splice(idx,1); };
         const processCommonImageUpload = (e) => { const r = new FileReader(); r.onload=ev=>newCommon.value.text3=ev.target.result; r.readAsDataURL(e.target.files[0]); };
         
@@ -455,19 +459,15 @@ createApp({
         
         const editFlightField = (field) => { const u = getUserById(currentFlightUser.value); const keyMap = {'out_code':'flightOutCode','out_dep':'flightOutDep','out_arr':'flightOutArr','in_code':'flightInCode','in_dep':'flightInDep','in_arr':'flightInArr'}; const val = prompt('輸入資訊', u[keyMap[field]]||''); if(val!==null) u[keyMap[field]] = val; };
         
-        const openImage = (src) => { currentZoomImg.value = src; showLightbox.value = true; };
+        const openImage = (src) => { currentZoomImg.value = getImg(src); showLightbox.value = true; };
         const startDrag = (e) => { const el = e.target.closest('.fab-home'); const touch = e.touches ? e.touches[0] : e; const offX = touch.clientX - homeBtnPos.value.x; const offY = touch.clientY - homeBtnPos.value.y; const move = ev => { const t = ev.touches?ev.touches[0]:ev; homeBtnPos.value = {x:t.clientX-offX, y:t.clientY-offY}; }; const stop = () => { document.removeEventListener('touchmove',move); document.removeEventListener('mousemove',move); }; document.addEventListener('touchmove',move); document.addEventListener('mousemove',move); document.addEventListener('touchend',stop); document.addEventListener('mouseup',stop); };
         const getClothingAdvice = (t) => (t<15?'大衣+圍巾':t<20?'薄外套':'短袖');
         const speak = (t) => { const u=new SpeechSynthesisUtterance(t); u.lang='ja-JP'; speechSynthesis.speak(u); };
 
-        const saveAsHtml = () => { const data = { itinerary: itineraryData.value, users: users.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value }; let html = document.documentElement.outerHTML; const inject = `const injectedData = ${JSON.stringify(data)};`; html = html.replace('// --- 完整資料庫 (含連結)', inject + '\n // --- 完整資料庫 (含連結)'); const blob = new Blob([html], {type:'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '2026_Kanto_Trip_Backup.html'; a.click(); };
+        const saveAsHtml = () => { const data = { itinerary: itineraryData.value, users: users.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value }; let html = document.documentElement.outerHTML; const inject = `const injectedData = ${JSON.stringify(data)};`; html = html.replace('// --- 預設資料', inject + '\n // --- 預設資料'); const blob = new Blob([html], {type:'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '2026_Kanto_Trip_Backup.html'; a.click(); };
         const resetItinerary = () => { if(confirm('⚠️ 這將強制重置資料。確定嗎？')) { localStorage.removeItem(STORAGE_KEY); location.reload(); } };
         
-        // Mock Camera (since no HTTPS in drop)
-        const showCamera = ref(false);
-        const videoElement = ref(null);
-        const openCamera = () => { alert('網頁版相機需 HTTPS 環境，此為演示功能。'); };
-        const closeCamera = () => { showCamera.value = false; };
+        const openCamera = () => { alert('網頁版相機需 HTTPS 環境 (此為演示功能)'); };
 
         onMounted(() => {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -484,10 +484,14 @@ createApp({
             }
             daysUntilTrip.value = Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24));
             
-            // 移除 Loading
-            isMounted.value = true;
-            document.getElementById('static-loading').style.opacity = '0';
-            setTimeout(() => document.getElementById('static-loading').style.display = 'none', 500);
+            // Fix: 正確關閉 Loading 畫面
+            const loader = document.getElementById('loading-screen');
+            if(loader) {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }, 800);
+            }
         });
 
         watch([itineraryData, users, expenses, shoppingList, foodList, photoSpots], () => {
@@ -496,9 +500,9 @@ createApp({
         }, {deep: true});
 
         return {
-            currentView, isWelcomeClosed, welcomeImg, enterSite, handleWelcomeError, apps, tripDays, selectedDayIndex, itineraryMode, currentItinerary,
+            currentView, isWelcomeClosed, enterSite, apps, tripDays, selectedDayIndex, itineraryMode, currentItinerary,
             getIconByCategory, getMapLink, getDrivePlanForDay, hotels, homeBtnPos, startDrag, getPageTitle, showSyncModal, isMounted,
-            daysUntilTrip, sakuraStatus: ref('預測中'), getClothingAdvice,
+            daysUntilTrip, sakuraStatus, getClothingAdvice,
             showModal, isEditing, editForm, openAddModal, editItem, saveItem, deleteItem,
             saveAsHtml, resetItinerary,
             users, expenses, shoppingList, foodList, photoSpots, japanesePhrases,
@@ -510,7 +514,7 @@ createApp({
             showUserModal, editingUser, openUserEdit, saveUserEdit, triggerAvatarUpload, processAvatarUpload,
             showCommonModal, newCommon, commonType, openAddCommonModal, editCommonItem, saveCommonItem, deleteCommonItem, processCommonImageUpload,
             showExpenseModal, newExpense, addExpense, deleteExpense, exchangeRate, editFlightField,
-            openCamera, closeCamera, showCamera, videoElement
+            openCamera, userPersonalTotal, settlements, personalExpenses, groupExpenses
         };
     }
 }).mount('#app');
