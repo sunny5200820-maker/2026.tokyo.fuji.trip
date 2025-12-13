@@ -6,7 +6,18 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>關東8日之旅 V4.9 (絕對顯示版)</title>
     
+    <script>
+        window.onerror = function(msg, url, line) {
+            const errDiv = document.getElementById('error-display');
+            if (errDiv) {
+                errDiv.style.display = 'block';
+                errDiv.innerHTML += "⛔ " + msg + " (Line: " + line + ")<br>";
+            }
+        };
+    </script>
+
     <style>
+        /* 基礎設定 */
         body { 
             margin: 0; padding: 0; 
             background-color: #FFF0F5; 
@@ -19,11 +30,22 @@
             color: #5D4037;
         }
         
+        /* 錯誤顯示區 (預設隱藏，有錯才顯示) */
+        #error-display {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; 
+            background: #fee2e2; color: #b91c1c; padding: 15px; 
+            font-size: 14px; z-index: 999999; border-bottom: 2px solid red; 
+            word-break: break-all; font-weight: bold;
+        }
+
+        /* 內容區域 (絕對不設 display: none) */
+        #app { opacity: 1; transition: opacity 0.5s; }
+
         /* 櫻花特效 */
         .sakura { position: fixed; top: -10px; background: #FFB7B2; border-radius: 100% 0 100% 0; opacity: 0.6; animation: fall linear infinite; z-index: 0; pointer-events: none; width: 12px; height: 12px; }
         @keyframes fall { to { transform: translate(15vw, 105vh) rotate(360deg); } }
 
-        /* UI 元件 CSS */
+        /* UI 元件 */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); margin-bottom: 15px; }
         .fab-main { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; z-index: 50; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: transform 0.2s; }
@@ -38,15 +60,10 @@
         /* 櫻花懸浮框 */
         .sakura-float { position: fixed; top: 80px; right: 20px; z-index: 40; background: rgba(255,255,255,0.95); padding: 12px; border-radius: 20px; box-shadow: 0 10px 30px rgba(255,105,180,0.3); border: 2px solid #FFB7B2; text-align: center; animation: float 6s ease-in-out infinite; width: 140px; }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
         
         /* 圖片 */
         .watercolor-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* 初始化狀態：預設顯示內容，不再隱藏 */
-        #app { display: block; opacity: 1; }
-        
-        /* 錯誤訊息 */
-        #error-banner { display:none; position:fixed; top:0; left:0; width:100%; background:red; color:white; font-size:12px; padding:5px; z-index:999999; text-align:center; }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -59,9 +76,7 @@
             theme: {
                 extend: {
                     colors: { 'chii-pink': '#FFD1DC', 'chii-deep-pink': '#FF9EAC', 'chii-blue': '#A2D2FF', 'chii-yellow': '#FFF5BA', 'chii-text': '#5D4037' },
-                    fontFamily: { sans: ['Zen Maru Gothic', 'sans-serif'] },
-                    animation: { 'bounce-slow': 'bounce 3s infinite', 'wiggle': 'wiggle 1s ease-in-out infinite' },
-                    keyframes: { wiggle: { '0%, 100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } } }
+                    fontFamily: { sans: ['Zen Maru Gothic', 'sans-serif'] }
                 }
             }
         }
@@ -69,7 +84,8 @@
 </head>
 <body>
 
-    <div id="error-banner"></div>
+    <div id="error-display"></div>
+
     <div id="sakura-container"></div>
 
     <div id="app" class="min-h-screen pb-24">
@@ -90,7 +106,7 @@
             <div ref="countdownEl" class="fixed z-50 cursor-grab bg-white/90 backdrop-blur border-4 border-chii-pink px-4 py-2 rounded-full shadow-lg flex items-center gap-2" 
                  :style="{ top: countdownPos.y + 'px', left: countdownPos.x + 'px' }" 
                  @touchstart="startDrag" @mousedown="startDrag">
-                <div class="text-2xl animate-wiggle">🐹</div>
+                <div class="text-2xl" style="animation: wiggle 1s infinite;">🐹</div>
                 <div class="flex flex-col"><div class="text-[10px] text-gray-500 font-bold uppercase">Countdown</div><div class="text-xl font-black text-pink-500 leading-none">{{ daysUntilTrip }} <span class="text-xs text-gray-400">天</span></div></div>
             </div>
 
@@ -325,18 +341,6 @@
 </div>
 
 <script>
-    // 錯誤攔截器
-    window.onerror = function(msg, url, line) {
-        const eb = document.getElementById('error-banner');
-        if(eb){ eb.style.display='block'; eb.innerText=`Error: ${msg}`; }
-    };
-    
-    // JS 載入失敗備援
-    window.addEventListener('unhandledrejection', event => {
-        const eb = document.getElementById('error-banner');
-        if(eb){ eb.style.display='block'; eb.innerText=`Promise Error: ${event.reason}`; }
-    });
-
     const { createApp, ref, computed, onMounted, watch } = Vue;
 
     createApp({
@@ -509,11 +513,10 @@
             const fetchRate = async () => { try { const r=await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const d=await r.json(); if(d.rates.TWD) exchangeRate.value = (1/d.rates.TWD).toFixed(3); } catch(e){} };
 
             onMounted(() => {
-                const STORAGE_KEY = 'v49_clean_start'; // 全新資料庫金鑰，強制避開舊快取
+                const STORAGE_KEY = 'v49_final_fix'; // 強制全新金鑰
                 const s = localStorage.getItem(STORAGE_KEY);
                 if(s) { try { const d=JSON.parse(s); itineraryData.value=d.itinerary||defaultItinerary; expenses.value=d.expenses||[]; shoppingList.value=d.shop||shoppingList.value; foodList.value=d.food||foodList.value; photoSpots.value=d.photo||photoSpots.value; } catch(e){} }
                 else {
-                    // 自動加入自駕清單
                     const basic = ['護照', '日幣', '信用卡', 'SIM卡'];
                     const drive = JSON.stringify(itineraryData.value).includes('租車') ? ['駕照/譯本'] : [];
                     users.value.forEach((u, i) => u.list = [...basic, ...(i===0?drive:[])].map(t => ({text:t, checked:false}))); 
@@ -532,7 +535,7 @@
             });
 
             watch([itineraryData, expenses, shoppingList, foodList, photoSpots], () => {
-                localStorage.setItem('v49_clean_start', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value}));
+                localStorage.setItem('v49_final_fix', JSON.stringify({itinerary: itineraryData.value, expenses: expenses.value, shop: shoppingList.value, food: foodList.value, photo: photoSpots.value}));
             }, {deep: true});
 
             const apps = [
