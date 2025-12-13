@@ -4,38 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V13.00 終極穩定版)</title>
+<title>關東之旅 2026 (V14.00 究極無錯版)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
-
 <script>
-    tailwind.config={theme:{extend:{colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},fontFamily:{sans:['Zen Maru Gothic','sans-serif']},animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards'},keyframes:{wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},float:{'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},fadeIn:{from:{opacity:0,transform:'translateY(15px)'},to:{opacity:1,transform:'translateY(0)'}}}}}}
+    tailwind.config={
+        theme:{
+            extend:{
+                colors:{'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},
+                fontFamily:{sans:['Zen Maru Gothic','sans-serif']},
+                animation:{'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards'},
+                keyframes:{
+                    wiggle:{'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},
+                    float:{'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},
+                    fadeIn:{from:{opacity:0,transform:'translateY(15px)'},to:{opacity:1,transform:'translateY(0)'}}
+                }
+            }
+        }
+    }
 </script>
-
 <style>
-    /* 全局樣式 */
+    /* 全局樣式設定 */
     html,body{margin:0;padding:0;width:100%;height:100%;background-color:#FFF0F5;background-image:radial-gradient(#FFD1DC 15%,transparent 16%),radial-gradient(#FFF5BA 15%,transparent 16%);background-size:60px 60px;background-position:0 0,30px 30px;font-family:-apple-system,BlinkMacSystemFont,"Zen Maru Gothic",sans-serif;color:#5D4037;overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
     input, textarea, select { font-size: 16px !important; } /* iOS 防縮放 */
     #app{display:block;min-height:100vh}
-    [v-cloak]{display:none !important} /* Vue 加載前隱藏 */
+    [v-cloak]{display:none !important} /* 隱藏未編譯的 Vue 模板 */
     .hide-scrollbar::-webkit-scrollbar{display:none}.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
     
     /* 錯誤攔截器樣式 */
-    #crash-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 100000; padding: 20px; text-align: center; color: #b71c1c; overflow: auto; }
+    #crash-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 100000; padding: 20px; text-align: center; color: #b71c1c; overflow: auto; flex-direction: column; justify-content: center; align-items: center; }
     #loading-screen { position: fixed; inset: 0; background: #FFF0F5; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
 
     /* UI 組件 */
     .card{background:rgba(255,255,255,0.94);border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,0.05);border:1px solid rgba(255,255,255,0.8);margin-bottom:16px;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
     
-    /* 懸浮按鈕定位 */
+    /* 懸浮按鈕 - 下方置中 (Home) */
     .fab-home{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;z-index:900;border:4px solid white;box-shadow:0 8px 25px rgba(255,105,180,0.4);background:linear-gradient(135deg,#FF9EAC,#FFD1DC);cursor:grab;touch-action:none;transition:transform 0.1s}
     .fab-home:active{transform:translateX(-50%) scale(0.9);cursor:grabbing}
+    
+    /* 懸浮按鈕 - 右下角 (Add/Edit) */
     .fab-main{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));right:20px;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;z-index:40;border:3px solid white;box-shadow:0 8px 20px rgba(0,0,0,0.15);background-color:#ff9eac;transition:all 0.2s}
     
-    /* Google 搜尋懸浮 (右下角) */
+    /* Google 搜尋懸浮 (右下角固定) */
     .google-float { position: fixed; bottom: 25px; right: 20px; z-index: 800; display: flex; align-items: center; justify-content: flex-end; }
     .google-btn { width: 48px; height: 48px; border-radius: 50%; background: white; border: 2px solid #eee; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #4285F4; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; }
     .google-bar { width: 0; overflow: hidden; height: 48px; background: white; border-radius: 24px; display: flex; align-items: center; transition: width 0.3s, opacity 0.3s; opacity: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-right: 10px; }
@@ -56,22 +70,24 @@
 <body>
 
 <div id="crash-screen">
-    <h2 class="text-2xl font-bold mb-4">⚠️ 發生錯誤</h2>
-    <p class="mb-2">若看到此畫面，請截圖給開發者。</p>
-    <pre id="error-log" class="text-left bg-gray-100 p-4 rounded text-xs"></pre>
+    <h2 class="text-3xl font-bold mb-4">⚠️ 發生錯誤</h2>
+    <p class="mb-2 text-gray-600">請截圖給開發者。</p>
+    <pre id="error-log" class="text-left bg-gray-100 p-4 rounded text-xs w-full max-w-md overflow-auto"></pre>
+    <button onclick="localStorage.clear();location.reload()" class="mt-4 bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow">清除快取並重試</button>
 </div>
 <script>
     window.onerror = function(msg, url, line, col, error) {
         document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('crash-screen').style.display = 'block';
-        document.getElementById('error-log').innerText = `${msg}\nLine: ${line}`;
+        const crash = document.getElementById('crash-screen');
+        crash.style.display = 'flex';
+        document.getElementById('error-log').innerText = `${msg}\nLocation: ${url}:${line}:${col}\n${error ? error.stack : ''}`;
         return false;
     };
 </script>
 
 <div id="loading-screen">
     <div style="font-size: 60px;" class="animate-bounce">🌸</div>
-    <div class="mt-4 font-bold text-gray-600">V13.00 啟動中...</div>
+    <div class="mt-4 font-bold text-gray-600">Trip V14.00 啟動中...</div>
 </div>
 
 <div id="sakura-container"></div>
@@ -110,7 +126,7 @@
              <div class="flex-1 text-sm space-y-1">
                  <div class="font-bold text-gray-800 text-lg mb-1">倒數 {{daysUntilTrip}} 天</div>
                  <div class="text-gray-600">📅 <span class="text-pink-500 font-bold">3/27</span> 出發</div>
-                 <div class="text-gray-500 text-xs">✅ <b>07:08 錦糸町發</b> (Day 3)</div>
+                 <div class="text-gray-500 text-xs">✅ <b>07:08 錦糸町發</b> 直達車</div>
                  <div class="text-gray-500 text-xs">✅ 預約 <b>河口湖租車</b></div>
              </div>
         </div>
@@ -119,47 +135,6 @@
                 <div class="w-[72px] h-[72px] rounded-[28px] flex items-center justify-center text-3xl text-white shadow-lg border-[4px] border-white relative overflow-hidden" :class="app.bgClass"><i :class="app.icon"></i></div>
                 <span class="text-sm font-bold mt-2 text-gray-700">{{app.name}}</span>
             </div>
-        </div>
-    </div>
-
-    <div v-if="currentView==='itinerary'" class="px-4 py-2 pb-32 animate-fade-in">
-        <div class="flex overflow-x-auto gap-2 mb-6 hide-scrollbar sticky top-[76px] bg-[#FFF0F5]/95 z-20 py-2 -mx-4 px-4">
-             <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-5 py-2.5 rounded-full text-sm font-bold border transition shrink-0',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow':'bg-white text-gray-400 border-white']">{{d.week}}<span class="ml-1 text-[10px] opacity-80">{{d.title}}</span></button>
-        </div>
-        
-        <div v-if="[2,3,4].includes(selectedDayIndex)" class="mb-4 flex justify-center">
-            <div class="bg-white p-1 rounded-full border border-gray-200 flex shadow-sm">
-                <button @click="itineraryMode='normal'" :class="['px-4 py-1 rounded-full text-xs font-bold transition', itineraryMode==='normal'?'bg-pink-400 text-white':'text-gray-400']">一般行程</button>
-                <button @click="itineraryMode='drive'" :class="['px-4 py-1 rounded-full text-xs font-bold transition', itineraryMode==='drive'?'bg-green-500 text-white':'text-gray-400']"><i class="fa-solid fa-car"></i> 自駕地圖</button>
-            </div>
-        </div>
-
-        <div v-if="itineraryMode==='drive' && [2,3,4].includes(selectedDayIndex)" class="animate-fade-in space-y-4">
-             <div class="bg-green-50 border border-green-200 p-4 rounded-2xl flex items-start gap-3">
-                <i class="fa-solid fa-circle-info text-green-500 mt-1"></i>
-                <div><h3 class="font-bold text-green-800 text-sm">今日駕駛重點</h3><p class="text-xs text-green-600 mt-1">點擊下方按鈕可直接開啟導航。</p></div>
-            </div>
-            <div class="pl-4 border-l-2 border-green-200 space-y-6 py-2">
-                <div v-for="(stop, sIdx) in getDrivePlanForDay(selectedDayIndex)" :key="sIdx" class="card p-5 relative !overflow-visible !mb-0">
-                     <div class="absolute -left-[25px] top-6 w-4 h-4 rounded-full border-2 border-green-400 bg-white z-10 shadow-sm"></div>
-                     <div class="flex justify-between items-start gap-2">
-                         <div><h5 class="font-bold text-gray-800 text-lg">{{stop.name}}</h5><p class="text-sm text-gray-500 mt-1 font-medium">{{stop.note}}</p></div>
-                         <div class="flex flex-col gap-2 shrink-0">
-                             <a :href="getMapLink(stop.location)" target="_blank" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold border border-blue-100 flex items-center gap-2 hover:bg-blue-100"><i class="fa-solid fa-location-dot"></i> 導航</a>
-                             <a v-if="stop.parking" :href="getMapLink(stop.parking)" target="_blank" class="bg-green-50 text-green-600 px-4 py-2 rounded-xl text-xs font-bold border border-green-200 flex items-center gap-2 hover:bg-green-100"><i class="fa-solid fa-square-parking"></i> 停車</a>
-                         </div>
-                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div v-else class="space-y-4">
-            <div v-for="(item,idx) in currentItinerary" :key="idx" class="card p-5 border-0 shadow-sm relative" @click="editItem(item,idx)">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-300 to-pink-100"></div>
-                <div class="flex gap-4"><div class="flex flex-col items-center pt-1"><span class="text-xs font-bold text-gray-400 mb-1">{{item.hours}}</span><div class="w-8 h-8 rounded-full bg-pink-50 text-pink-400 flex items-center justify-center"><i :class="getIconByCategory(item.category)"></i></div></div>
-                <div><h3 class="font-bold text-gray-800 text-lg">{{item.name}}</h3><p class="text-sm text-gray-500 mt-1 line-clamp-2">{{item.note}}</p></div></div>
-            </div>
-            <button @click="openAddModal" class="fab-main"><i class="fa-solid fa-plus"></i></button>
         </div>
     </div>
 
@@ -218,7 +193,7 @@
                             <div class="text-right"><div class="text-xs text-gray-400">河口湖 Kawaguchiko</div><div class="text-4xl font-black text-gray-800">09:28</div></div>
                         </div>
                         <div class="text-xs text-gray-500 bg-gray-50 p-2 rounded border border-dashed border-gray-200">
-                            <i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> 直達車。
+                            <i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> 直達不需轉乘，請提前購票。
                         </div>
                     </div>
                 </div>
@@ -299,6 +274,47 @@
         </div>
         <div class="space-y-3"><div v-for="(phrase,idx) in japanesePhrases" :key="idx" @click="speak(phrase.jp)" class="card p-4 flex justify-between items-center cursor-pointer active:bg-gray-50"><div><div class="font-bold text-lg">{{phrase.jp}}</div><div class="text-xs text-gray-500">{{phrase.tw}}</div></div><i class="fa-solid fa-volume-high text-emerald-500"></i></div></div>
     </div>
+    
+    <div v-if="currentView==='itinerary'" class="px-4 py-2 pb-32 animate-fade-in">
+        <div class="flex overflow-x-auto gap-2 mb-6 hide-scrollbar sticky top-[76px] bg-[#FFF0F5]/95 z-20 py-2 -mx-4 px-4">
+             <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-5 py-2.5 rounded-full text-sm font-bold border transition shrink-0',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow':'bg-white text-gray-400 border-white']">{{d.week}}<span class="ml-1 text-[10px] opacity-80">{{d.title}}</span></button>
+        </div>
+        
+        <div v-if="[2,3,4].includes(selectedDayIndex)" class="mb-4 flex justify-center">
+            <div class="bg-white p-1 rounded-full border border-gray-200 flex shadow-sm">
+                <button @click="itineraryMode='normal'" :class="['px-4 py-1 rounded-full text-xs font-bold transition', itineraryMode==='normal'?'bg-pink-400 text-white':'text-gray-400']">一般行程</button>
+                <button @click="itineraryMode='drive'" :class="['px-4 py-1 rounded-full text-xs font-bold transition', itineraryMode==='drive'?'bg-green-500 text-white':'text-gray-400']"><i class="fa-solid fa-car"></i> 自駕地圖</button>
+            </div>
+        </div>
+
+        <div v-if="itineraryMode==='drive' && [2,3,4].includes(selectedDayIndex)" class="animate-fade-in space-y-4">
+             <div class="bg-green-50 border border-green-200 p-4 rounded-2xl flex items-start gap-3">
+                <i class="fa-solid fa-circle-info text-green-500 mt-1"></i>
+                <div><h3 class="font-bold text-green-800 text-sm">今日駕駛重點</h3><p class="text-xs text-green-600 mt-1">點擊下方按鈕可直接開啟導航。</p></div>
+            </div>
+            <div class="pl-4 border-l-2 border-green-200 space-y-6 py-2">
+                <div v-for="(stop, sIdx) in getDrivePlanForDay(selectedDayIndex)" :key="sIdx" class="card p-5 relative !overflow-visible !mb-0">
+                     <div class="absolute -left-[25px] top-6 w-4 h-4 rounded-full border-2 border-green-400 bg-white z-10 shadow-sm"></div>
+                     <div class="flex justify-between items-start gap-2">
+                         <div><h5 class="font-bold text-gray-800 text-lg">{{stop.name}}</h5><p class="text-sm text-gray-500 mt-1 font-medium">{{stop.note}}</p></div>
+                         <div class="flex flex-col gap-2 shrink-0">
+                             <a :href="getMapLink(stop.location)" target="_blank" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold border border-blue-100 flex items-center gap-2 hover:bg-blue-100"><i class="fa-solid fa-location-dot"></i> 導航</a>
+                             <a v-if="stop.parking" :href="getMapLink(stop.parking)" target="_blank" class="bg-green-50 text-green-600 px-4 py-2 rounded-xl text-xs font-bold border border-green-200 flex items-center gap-2 hover:bg-green-100"><i class="fa-solid fa-square-parking"></i> 停車</a>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else class="space-y-4">
+            <div v-for="(item,idx) in currentItinerary" :key="idx" class="card p-5 border-0 shadow-sm relative" @click="editItem(item,idx)">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-300 to-pink-100"></div>
+                <div class="flex gap-4"><div class="flex flex-col items-center pt-1"><span class="text-xs font-bold text-gray-400 mb-1">{{item.hours}}</span><div class="w-8 h-8 rounded-full bg-pink-50 text-pink-400 flex items-center justify-center"><i :class="getIconByCategory(item.category)"></i></div></div>
+                <div><h3 class="font-bold text-gray-800 text-lg">{{item.name}}</h3><p class="text-sm text-gray-500 mt-1 line-clamp-2">{{item.note}}</p></div></div>
+            </div>
+            <button @click="openAddModal" class="fab-main"><i class="fa-solid fa-plus"></i></button>
+        </div>
+    </div>
 
     <div v-show="currentView!=='menu'" class="fab-home" @click="currentView='menu'" @touchstart.prevent="startDrag" @mousedown.prevent="startDrag"><i class="fa-solid fa-house"></i></div>
 
@@ -318,12 +334,14 @@ const sc = document.getElementById('sakura-container'); for(let i=0;i<10;i++){le
 
 createApp({
     setup() {
-        const STORAGE_KEY = 'v12_50_KINSHICHO_FINAL';
+        const STORAGE_KEY = 'v14_00_BUG_FREE';
         const currentView = ref('menu');
         const isWelcomeClosed = ref(false);
         const showGoogleSearch = ref(false);
         
-        // --- 核心修正：Day 3 錦糸町 07:08 直達 (V12.50) ---
+        // --- 核心資料庫 (嚴格語法檢查：確保逗號與閉合) ---
+        
+        // 1. 行程
         const defaultItinerary = [
             [{id:101,category:'Flight',name:'06:40 桃園起飛 (TR898)',hours:'06:40',mapKeyword:'Taoyuan Airport',note:'T1航廈，提早2.5小時抵達'},{id:102,category:'Flight',name:'10:40 抵達成田 (NRT)',hours:'10:40',mapKeyword:'Narita Airport',note:'入境審查 -> 領行李 -> 搭車'},{id:103,category:'Transport',name:'前往錦糸町民宿',hours:'12:30',mapKeyword:'Kinshicho Station',note:'寄放行李 (連結請見住宿頁)'},{id:104,category:'Sightseeing',name:'晴空塔 Solamachi',hours:'14:00',mapKeyword:'Tokyo Skytree',note:'逛街/水族館'},{id:105,category:'Food',name:'晚餐：敘敘苑燒肉',hours:'18:00',mapKeyword:'Jojoen Skytree',note:'高空景觀燒肉'}],
             [{id:201,category:'Sightseeing',name:'淺草寺 & 雷門',hours:'09:00',mapKeyword:'Senso-ji',note:'趁早去避開人潮'},{id:202,category:'Food',name:'午餐：淺草今半',hours:'12:00',mapKeyword:'Asakusa Imahan',note:'壽喜燒老店'},{id:203,category:'Sightseeing',name:'上野恩賜公園',hours:'14:00',mapKeyword:'Ueno Park',note:'賞櫻熱點'},{id:204,category:'Shopping',name:'阿美橫町',hours:'16:00',mapKeyword:'Ameyoko',note:'藥妝/零食採買'},{id:205,category:'Food',name:'晚餐：鳥貴族',hours:'19:00',mapKeyword:'Torikizoku Ueno',note:'平價串燒'}],
@@ -337,13 +355,14 @@ createApp({
             [{id:801,category:'Shopping',name:'最後補貨',hours:'10:00',mapKeyword:'Shinjuku',note:'唐吉訶德/藥妝'},{id:802,category:'Transport',name:'前往成田機場',hours:'13:00',mapKeyword:'Narita Express',note:'搭乘 NEX'},{id:803,category:'Flight',name:'20:40 起飛 (BR197)',hours:'20:40',mapKeyword:'Narita Airport',note:'再見東京'},{id:804,category:'Flight',name:'23:20 抵達桃園',hours:'23:20',mapKeyword:'Taoyuan Airport',note:'平安回家'}]
         ];
         
+        // 2. 自駕地圖
         const drivePlan = [
             { day: 2, stops: [{name: 'Toyota Rent a Car', note: '河口湖站前取車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''},{name: '新倉山淺間公園', note: '五重塔(上午順光)', location: 'Chureito Pagoda', parking: 'Arakurayama Sengen Park Parking'},{name: '不動茶屋 (東戀路)', note: '午餐', location: 'Houtou Fudou Higashikoiji', parking: 'Houtou Fudou Parking'},{name: '大石公園', note: '河口湖畔散步', location: 'Oishi Park', parking: 'Oishi Park Parking'}] },
             { day: 3, stops: [{name: '平野之濱', note: '車拍逆富士', location: 'Hirano no Hama', parking: 'Hirano no Hama Parking'},{name: '長池親水公園', note: '拍天鵝', location: 'Nagaike Water Park', parking: 'Nagaike Water Park Parking'},{name: '忍野八海', note: '觀光名所', location: 'Oshino Hakkai', parking: 'Oshino Hakkai Parking'},{name: 'Ogino 超市', note: '採買晚餐', location: 'Ogino Kawaguchiko', parking: 'Ogino Kawaguchiko'}] },
             { day: 4, stops: [{name: '河口湖纜車', note: '天上山公園', location: 'Mt. Fuji Panoramic Ropeway', parking: 'Ropeway Parking'},{name: '富士山吐司', note: '伴手禮', location: 'Fujisan Shokupan', parking: 'Fujisan Shokupan'},{name: 'Toyota Rent a Car', note: '河口湖站前還車', location: 'Toyota Rent a Car Kawaguchiko Station', parking: ''}] }
         ];
 
-        // --- Data & Defaults ---
+        // 3. 使用者與飯店
         const commonItems = ['護照', '日幣', 'SIM卡', '信用卡', '充電器', '常備藥', '牙刷牙膏', '轉接頭'];
         const defaultUsers = [
             {id:1,name:'吉伊',icon:'🐹',list:[...commonItems,'駕照'].map(t=>({text:t,checked:false})),flightOutCode:'TR 898',flightOutDep:'06:40',flightOutArr:'10:40',flightInCode:'BR197',flightInDep:'20:40',flightInArr:'23:20'},
@@ -356,21 +375,87 @@ createApp({
             {name:'Megu Fuji 2021',days:'Day 3-4',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Megu+Fuji+2021'},
             {name:'DOMO Hotel Shinjuku',days:'Day 5-7',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=DOMO+Hotel+Shinjuku'}
         ];
+
+        // 4. 購物清單 (嚴格檢查語法)
         const defaultShopping = {
-            wish: [{name:'Chiikawa Land',desc:'原宿/東京車站限定',link:'https://www.google.com/search?q=Kiddy+Land+Harajuku',img:'welcome.jpg'}, {name:'富士山杯',desc:'星巴克/田島硝子',link:'https://www.google.com/search?q=Starbucks+Japan+Fuji+Mug',img:'2026.tokyo.jpg'}],
-            cosme: [{name:'Tirtir 氣墊',desc:'紅盒高遮瑕',link:'https://www.google.com/search?q=Tirtir+Cushion',img:''}, {name:'Kate 怪獸唇膏',desc:'色號 03/05/103',link:'https://www.google.com/search?q=Kate+Lip+Monster',img:''}],
-            ldk: [{name:'Lululun 面膜',desc:'東京/富士山限定',link:'https://www.google.com/search?q=Lululun+Mask',img:''}],
-            souvenir: [{name:'NY Perfect Cheese',desc:'東京站必排起司脆餅',link:'https://www.google.com/search?q=New+York+Perfect+Cheese',img:''}]
+            wish: [
+                {name:'Chiikawa Land',desc:'原宿/東京車站限定',link:'https://www.google.com/search?q=Kiddy+Land+Harajuku',img:'welcome.jpg'}, 
+                {name:'富士山杯',desc:'星巴克/田島硝子',link:'https://www.google.com/search?q=Starbucks+Japan+Fuji+Mug',img:'2026.tokyo.jpg'},
+                {name:'Le Labo',desc:'東京限定 Gaiac 10',link:'https://www.google.com/search?q=Le+Labo+Tokyo',img:''},
+                {name:'Porter',desc:'吉田包 (表參道)',link:'https://www.google.com/search?q=Porter+Omotesando',img:''},
+                {name:'Human Made',desc:'藍瓶聯名周邊',link:'https://www.google.com/search?q=Human+Made+Offline+Store',img:''}
+            ],
+            cosme: [
+                {name:'Tirtir 氣墊',desc:'紅盒高遮瑕',link:'https://www.google.com/search?q=Tirtir+Cushion',img:''}, 
+                {name:'Kate 怪獸唇膏',desc:'色號 03/05/103',link:'https://www.google.com/search?q=Kate+Lip+Monster',img:''},
+                {name:'&Honey 髮油',desc:'Melty 修護系列',link:'https://www.google.com/search?q=and+honey+hair+oil',img:''},
+                {name:'Canmake',desc:'棉花糖蜜粉餅',link:'https://www.google.com/search?q=Canmake+Tokyo',img:''},
+                {name:'Takami 小藍瓶',desc:'角質代謝精華',link:'https://www.google.com/search?q=Takami+Skin+Peel',img:''}
+            ],
+            ldk: [
+                {name:'Lululun 面膜',desc:'東京/富士山限定',link:'https://www.google.com/search?q=Lululun+Mask',img:''},
+                {name:'Fino 髮膜',desc:'高 CP 值必囤',link:'https://www.google.com/search?q=Fino+Hair+Mask',img:''},
+                {name:'Excel 眉筆',desc:'PD01 / PD02',link:'https://www.google.com/search?q=Excel+Makeup',img:''},
+                {name:'Biore 防曬',desc:'水感防曬精華',link:'https://www.google.com/search?q=Biore+UV',img:''},
+                {name:'Nivea 藍罐',desc:'日版成分不同',link:'https://www.google.com/search?q=Nivea+Japan',img:''}
+            ],
+            souvenir: [
+                {name:'NY Perfect Cheese',desc:'東京站必排起司脆餅',link:'https://www.google.com/search?q=New+York+Perfect+Cheese',img:''},
+                {name:'Tokyo Banana',desc:'皮卡丘/哆啦A夢版',link:'https://www.google.com/search?q=Tokyo+Banana',img:''},
+                {name:'Press Butter Sand',desc:'焦糖奶油夾心',link:'https://www.google.com/search?q=Press+Butter+Sand',img:''},
+                {name:'Sugar Butter Tree',desc:'砂糖奶油樹',link:'https://www.google.com/search?q=Sugar+Butter+Tree',img:''},
+                {name:'Audrey',desc:'草莓花束餅乾',link:'https://www.google.com/search?q=Audrey+Tokyo',img:''}
+            ]
         };
+
+        // 5. 美食清單 (嚴格檢查語法)
         const defaultFood = {
-            Tokyo: [{name:'AFURI 拉麵',desc:'柚子鹽味 (原宿/六本木)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=AFURI+Harajuku',img:'afuri-ramen.jpg'}, {name:'HARBS',desc:'水果千層蛋糕',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=HARBS+Lumine+Est',img:'harbs-fruit-crepe.jpg'}],
-            Kamakura: [{name:'Bills',desc:'世界第一早餐 (七里濱)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Bills+Shichirigahama',img'}, {name:'吻仔魚丼',desc:'江之島名產',link:'https://www.google.com/search?q=https://www.google.com/maps/search/%3Fapi%3D1%26query%3DMoxy%2BTokyo%2BKinshicho'}],
-            Fuji: [{name:'Houtou Fudou',desc:'不動茶屋 (東戀路店)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Houtou+Fudou+Higashikoiji',img'}]
+            Tokyo: [
+                {name:'AFURI 拉麵',desc:'柚子鹽味 (原宿/六本木)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=AFURI+Harajuku',img:'afuri-ramen.jpg'}, 
+                {name:'HARBS',desc:'水果千層蛋糕',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=HARBS+Lumine+Est',img:'harbs-fruit-crepe.jpg'},
+                {name:'牛卡滋本村',desc:'炸牛排 (澀谷/新宿)',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson4'},
+                {name:'六厘舍',desc:'濃厚沾麵 (東京一番街)',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson5'},
+                {name:'Shake Shack',desc:'明治神宮外苑店 (絕美)',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson6'}
+            ],
+            Kamakura: [
+                {name:'Bills',desc:'世界第一早餐 (七里濱)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Bills+Shichirigahama',img'}, 
+                {name:'Pacific Drive-In',desc:'海景咖啡廳',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson7'},
+                {name:'Caraway',desc:'排隊咖哩名店',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson8'},
+                {name:'Yoridocoro',desc:'江之電窗景定食',link:'https://www.google.com/maps',img:'https://placehold.co/200/0000CD/FFF?text=Lawson',img:'https://placehold.co/200/0000CD/FFF?text=Lawson9'},
+                {name:'豐島屋',desc:'鴿子餅乾本店',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street0'}
+            ],
+            Fuji: [
+                {name:'Houtou Fudou',desc:'不動茶屋 (東戀路店)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Houtou+Fudou+Higashikoiji',img'},
+                {name:'Fuji Tempura Idaten',desc:'富士天婦羅',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street1'},
+                {name:'Lake Bake',desc:'湖畔麵包 (大石公園旁)',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street2'},
+                {name:'Sanrokuen',desc:'山麓園 (圍爐裏燒烤)',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street3'},
+                {name:'7-11 河口湖',desc:'便利商店景觀店',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street4'}
+            ]
         };
+
+        // 6. 打卡清單 (嚴格檢查語法)
         const defaultPhoto = {
-            Tokyo: [{name:'SHIBUYA SKY',desc:'高空展望台 (需預約)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=SHIBUYA+SKY',img'}],
-            Kamakura: [{name:'鎌倉高校前',desc:'灌籃高手平交道',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Kamakura+Kokomae',img'}],
-            Fuji: [{name:'新倉山淺間公園',desc:'五重塔 + 富士山',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Chureito+Pagoda',img'}]
+            Tokyo: [
+                {name:'SHIBUYA SKY',desc:'高空展望台 (需預約)',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=SHIBUYA+SKY',img'},
+                {name:'東京鐵塔',desc:'芝公園/地下停車場視角',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street5'},
+                {name:'豪德寺',desc:'招財貓發源地',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street6'},
+                {name:'TeamLab Planets',desc:'豐洲沉浸式藝術',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street7'},
+                {name:'淺草雷門',desc:'經典觀光地標',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street8'}
+            ],
+            Kamakura: [
+                {name:'鎌倉高校前',desc:'灌籃高手平交道',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Kamakura+Kokomae',img'},
+                {name:'長谷寺',desc:'眺望湘南海岸',link:'https://www.google.com/maps',img:'https://placehold.co/200/696969/FFF?text=Street',img:'https://placehold.co/200/696969/FFF?text=Street9'},
+                {name:'高德院',desc:'鎌倉大佛',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan0'},
+                {name:'報國寺',desc:'夢幻竹林',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan1'},
+                {name:'七里濱海岸',desc:'夕陽與江之島',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan2'}
+            ],
+            Fuji: [
+                {name:'新倉山淺間公園',desc:'五重塔 + 富士山',link:'https://maps.app.goo.gl/cyLNVJttoAM61dmFA`。?q=Chureito+Pagoda',img'},
+                {name:'羅森河口湖站前',desc:'經典便利商店景',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan3'},
+                {name:'大石公園',desc:'河口湖花海',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan4'},
+                {name:'本町商店街',desc:'昭和復古街道',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan5'},
+                {name:'山中湖平野之濱',desc:'逆富士絕景',link:'https://www.google.com/maps',img:'https://placehold.co/200/F0F8FF/000?text=Swan',img:'https://placehold.co/200/F0F8FF/000?text=Swan6'}
+            ]
         };
 
         // State
@@ -394,6 +479,7 @@ createApp({
         const apps = [{id:1,name:'行程',icon:'fa-solid fa-map-location-dot',bgClass:'bg-pink-400',view:'itinerary'},{id:2,name:'小財庫',icon:'fa-solid fa-sack-dollar',bgClass:'bg-yellow-400',view:'money'},{id:3,name:'住宿機票',icon:'fa-solid fa-plane-arrival',bgClass:'bg-indigo-400',view:'hotel'},{id:4,name:'行前準備',icon:'fa-solid fa-suitcase-rolling',bgClass:'bg-blue-400',view:'prep'},{id:5,name:'吃吃喝喝',icon:'fa-solid fa-utensils',bgClass:'bg-orange-400',view:'food'},{id:6,name:'快樂Shop',icon:'fa-solid fa-bag-shopping',bgClass:'bg-purple-400',view:'shopping'},{id:7,name:'天氣週報',icon:'fa-solid fa-cloud-sun',bgClass:'bg-sky-400',view:'weather'},{id:8,name:'網美打卡',icon:'fa-solid fa-camera',bgClass:'bg-rose-400',view:'photo'},{id:9,name:'即時救命',icon:'fa-solid fa-language',bgClass:'bg-emerald-400',view:'japanese'}];
         const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'},{week:'D8',title:'4/03'}];
         const selectedDayIndex = ref(0);
+        const japanesePhrases = ref([{jp:'すみません',tw:'不好意思'},{jp:'これをお願いします',tw:'我要這個'},{jp:'お会計お願いします',tw:'我要結帳'},{jp:'トイレはどこですか',tw:'廁所在哪裡'},{jp:'袋はいりません',tw:'不用袋子'}]);
         
         // Computed
         const getUserById = (id) => users.value.find(u=>u.id===id)||users.value[0];
@@ -454,7 +540,7 @@ createApp({
         
         const openCamera = () => { alert('📷 啟動相機 (模擬)... 請選擇照片'); document.querySelector('input[ref=commonImageInput]').click(); };
         const speak = (t) => { const u=new SpeechSynthesisUtterance(t); u.lang='ja-JP'; speechSynthesis.speak(u); };
-        const saveAsHtml = () => { const d=JSON.stringify({users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, itinerary:itineraryData.value}); const b=new Blob([document.documentElement.outerHTML.replace('//PLACEHOLDER',`const savedData=${d};`)],{type:'text/html'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Trip_V12.50.html'; a.click(); };
+        const saveAsHtml = () => { const d=JSON.stringify({users:users.value, expenses:expenses.value, shop:shoppingList.value, food:foodList.value, photo:photoSpots.value, itinerary:itineraryData.value}); const b=new Blob([document.documentElement.outerHTML.replace('//PLACEHOLDER',`const savedData=${d};`)],{type:'text/html'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Trip_V14.00.html'; a.click(); };
         const resetItinerary = () => { if(confirm('重置?')) { localStorage.removeItem(STORAGE_KEY); location.reload(); }};
         const fetchWeather = async () => { try { const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true'); const d=await r.json(); tokyoWeather.value={temp:d.current_weather.temperature, icon:'☁️'}; } catch(e){} };
 
@@ -514,7 +600,7 @@ createApp({
             openExpenseModal, addExpense, deleteExpense, openAddModal, editItem, saveItem, deleteItem,
             openAddCommonModal, editCommonItem, saveCommonItem, deleteCommonItem, processCommonImageUpload,
             addPrepItem, editFlightField, openCamera, speak, saveAsHtml, resetItinerary, startDrag,
-            tokyoWeather, kamakuraWeather, fujiWeather, itineraryMode, getDrivePlanForDay, getMapLink
+            tokyoWeather, kamakuraWeather, fujiWeather, itineraryMode, getDrivePlanForDay, getMapLink, japanesePhrases
         };
     }
 }).mount('#app');
