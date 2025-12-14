@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (Fortress V35)</title>
+<title>關東之旅 2026 (Ultimate V37)</title>
 
 <script>
     window.tailwind = {
@@ -32,7 +32,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V35.0 System Core */
+    /* V37.0 Ultimate Core - Diagnostic & Responsive Fixes */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -43,7 +43,7 @@
         overscroll-behavior: none;
     }
 
-    /* iOS Optimization */
+    /* iOS Input Fix */
     input, textarea, select { font-size: 16px !important; font-family: inherit; } 
     * { -webkit-overflow-scrolling: touch; }
 
@@ -51,7 +51,7 @@
         height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
-        padding-bottom: 140px;
+        padding-bottom: 160px; /* Increased for bottom bars */
         padding-top: env(safe-area-inset-top);
     }
 
@@ -104,7 +104,23 @@
         font-size: 24px; color: #5D4037; z-index: 90; border: 2px solid white; background: rgba(255,255,255,0.9);
         backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s;
     }
-    .fab-search:active { transform: scale(0.9); background: white; }
+    .fab-camera {
+        position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); left: 20px;
+        width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 22px; color: white; z-index: 80; border: 3px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        background: #10b981; 
+    }
+
+    /* Coupon Bar */
+    .coupon-bar {
+        position: fixed; bottom: 0; left: 0; right: 0; 
+        background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+        padding: 10px 20px; padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        border-top: 1px solid rgba(255,192,203,0.5); z-index: 100;
+        display: flex; justify-content: space-around; align-items: center;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.05); transform: translateY(0); transition: transform 0.3s;
+    }
+    .coupon-bar.hidden { transform: translateY(100%); }
 
     .welcome-screen {
         position: fixed; inset: 0; z-index: 9999; background: #FFF0F5;
@@ -158,7 +174,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">DIAMOND ELITE</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">DIAMOND V37</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -278,9 +294,9 @@
             </div>
             
             <div v-if="hotelTab==='stay'" class="space-y-6">
-                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('bnb.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">錦糸町民宿</h3></div></div><div class="p-4"><a href="https://www.google.com/maps?q=錦糸町民宿" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
-                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('megu.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">Megu Fuji</h3></div></div><div class="p-4"><a href="https://www.google.com/maps?q=Megu+Fuji" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
-                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('domo.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">DOMO 民宿</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query=DOMO+Hotel+Higashi+Shinjuku" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航 (東新宿)</a></div></div>
+                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('bnb.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">錦糸町民宿</h3></div></div><div class="p-4"><a :href="getMapLink('錦糸町 民宿')" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
+                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('megu.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">Megu Fuji</h3></div></div><div class="p-4"><a :href="getMapLink('Megu Fuji 2026')" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
+                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('domo.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">DOMO 民宿</h3></div></div><div class="p-4"><a :href="getMapLink('DOMO 民宿 東新宿')" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航 (東新宿)</a></div></div>
             </div>
 
             <div v-if="hotelTab==='ticket'" class="space-y-4 pb-20">
@@ -367,6 +383,9 @@
                 <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar"><button v-for="cat in ['cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">{{{'cosme':'藥妝清單','ldk':'LDK推薦','souvenir':'伴手禮'}[cat]}}</button></div>
                 <div class="grid grid-cols-2 gap-4 pb-20"><div v-for="(item,idx) in shopping[shopCat]" class="card !p-0 border-0 shadow-lg group relative" :key="idx"><div class="h-32 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/300x300/pink/white?text=SHOP'" class="w-full h-full object-cover" @error="handleImgError"></div><div class="p-3"><div class="font-bold text-gray-800 text-sm mb-1 truncate">{{item.name}}</div><a :href="item.link || getSearchLink(item.name)" target="_blank" class="block text-center bg-gray-50 text-gray-500 text-[10px] py-1.5 rounded font-bold hover:bg-pink-500 hover:text-white transition">前往官網 / 搜尋</a></div><div v-if="!isGuest" class="absolute top-1 right-1 flex gap-1"><button @click="openEditModal('shopping', item, idx)" class="bg-white/90 p-1.5 rounded-full text-blue-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px]"></i></button><button @click="shopping[shopCat].splice(idx,1);saveData()" class="bg-white/90 p-1.5 rounded-full text-red-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-trash text-[10px]"></i></button></div></div></div>
                 <button v-if="!isGuest" @click="openAddShopModal" class="fab-main bg-purple-400 text-white"><i class="fa-solid fa-plus"></i></button>
+                <div class="coupon-bar" :class="{'hidden': currentView !== 'shopping'}">
+                    <button @click="showCouponModal=true" class="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-black py-3 rounded-full shadow-lg flex items-center justify-center gap-2 animate-bounce"><i class="fa-solid fa-ticket"></i> 🇯🇵 激省折價券 (點我)</button>
+                </div>
              </div>
              
              <div v-if="['food','photo'].includes(currentView)">
@@ -380,30 +399,37 @@
                                 <span v-if="currentView==='food' && item.reserve" class="bg-red-500 text-white text-[10px] px-2 py-1 rounded-full font-bold shadow-sm animate-pulse-slow">需訂位</span>
                                 <span v-if="currentView==='food' && !item.reserve" class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold border border-green-200">免訂位</span>
                             </h3>
-                            <p class="text-sm text-gray-500 mb-2 font-bold">{{item.desc}}</p>
+                            <p class="text-sm text-gray-500 mb-3 font-bold">{{item.desc}}</p>
                             
                             <div v-if="currentView==='food'" class="mb-3 space-y-2">
                                 <div v-if="item.reserve" class="bg-red-50 border border-red-100 p-2 rounded-lg text-xs flex justify-between items-center">
-                                    <span class="text-red-500 font-bold"><i class="fa-solid fa-clock"></i> 建議提前預約</span>
-                                    <a v-if="item.reserveLink" :href="item.reserveLink" target="_blank" class="bg-red-500 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm hover:bg-red-600">立即訂位</a>
+                                    <span class="text-red-500 font-bold"><i class="fa-solid fa-clock"></i> 務必提前預約</span>
+                                    <a v-if="item.reserveLink" :href="item.reserveLink" target="_blank" class="bg-red-500 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm hover:bg-red-600 active:scale-95 transition">立即預訂 <i class="fa-solid fa-arrow-right"></i></a>
                                 </div>
-                                <div v-if="item.note" class="bg-yellow-50 border border-yellow-100 p-3 rounded-lg text-xs text-gray-600 leading-relaxed relative">
-                                    <i class="fa-solid fa-quote-left text-yellow-300 text-xl absolute -top-2 -left-1 opacity-50"></i>
-                                    <span class="font-black text-yellow-600 block mb-1">老饕筆記：</span>{{item.note}}
+                                <div v-if="item.note" class="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-xs text-gray-700 leading-relaxed relative mt-2 shadow-sm block">
+                                    <i class="fa-solid fa-utensils text-yellow-400 text-xl absolute -top-2 -left-1"></i>
+                                    <div class="pl-4">
+                                        <span class="font-black text-yellow-600 block mb-1">老饕筆記：</span>
+                                        {{item.note}}
+                                    </div>
                                 </div>
                             </div>
 
-                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-50 text-gray-600 font-bold py-2 rounded-lg text-sm border hover:bg-orange-400 hover:text-white transition"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-50 text-gray-600 font-bold py-3 rounded-lg text-sm border hover:bg-orange-400 hover:text-white transition"><i class="fa-solid fa-location-arrow"></i> Google Maps 導航</a>
                         </div>
                         <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2"><button @click="openEditModal(currentView==='food'?'food':'spot', item, idx)" class="w-8 h-8 bg-white rounded-full shadow text-blue-500 flex items-center justify-center"><i class="fa-solid fa-pen"></i></button><button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white rounded-full shadow text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash"></i></button></div>
                     </div>
                 </div>
                 <button v-if="!isGuest" @click="currentView==='food'?openAddFoodModal():openAddSpotModal()" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
              </div>
+
              <div v-if="currentView==='japanese'">
                 <div class="space-y-3 pb-20"><div v-for="(p,idx) in japanesePhrases" :key="idx" class="card p-5 flex justify-between items-center cursor-pointer hover:shadow-md transition border-l-4 border-emerald-400" @click="expandCard(p)"><div><div class="font-bold text-lg text-gray-800">{{p.jp}}</div><div class="text-xs text-gray-500 font-bold mt-1">{{p.zh}}</div></div><i class="fa-solid fa-expand text-gray-300"></i></div></div>
                 <button v-if="!isGuest" @click="openAddPhraseModal" class="fab-main bg-emerald-500 text-white"><i class="fa-solid fa-plus"></i></button>
+                <div class="fab-camera text-white" @click="$refs.cameraInput.click()"><i class="fa-solid fa-camera"></i></div>
+                <input type="file" ref="cameraInput" accept="image/*" capture="environment" class="hidden" @change="handleCameraTranslate">
              </div>
+
              <div v-if="currentView==='weather'">
                  <div class="bg-pink-50 p-4 rounded-2xl border border-pink-200 mb-6 shadow-sm text-center relative overflow-hidden"><i class="fa-solid fa-fan text-pink-200 text-6xl absolute -right-4 -bottom-4 animate-spin-slow"></i><h3 class="font-black text-pink-500 mb-3 text-sm">🌸 2026 權威櫻花預測</h3><div class="grid grid-cols-2 gap-3 mb-3"><a href="https://weathernews.jp/s/sakura/" target="_blank" class="bg-white text-pink-500 py-2 rounded-lg text-xs font-bold shadow-sm hover:shadow-md transition">Weathernews</a><a href="https://tenki.jp/sakura/" target="_blank" class="bg-white text-pink-500 py-2 rounded-lg text-xs font-bold shadow-sm hover:shadow-md transition">日本氣象協會</a></div><div class="grid grid-cols-3 gap-2"><div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">東京</div><div class="font-bold text-pink-600">3/22</div></div><div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">鎌倉</div><div class="font-bold text-pink-600">3/25</div></div><div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">富士山</div><div class="font-bold text-pink-600">4/10</div></div></div></div>
                  <div class="space-y-4"><div v-for="w in weatherData" class="card p-6 text-white relative" :class="w.bg"><div class="relative z-10"><div class="font-bold opacity-80 uppercase text-xs">{{w.name}}</div><div class="text-5xl font-black my-2">{{w.temp}}°C</div><div class="text-sm bg-white/20 backdrop-blur inline-block px-3 py-1 rounded-full">👕 {{getClothingAdvice(w.temp)}}</div></div></div></div>
@@ -498,13 +524,30 @@
     </div>
 
     <div v-if="showPersonaModal" class="fixed inset-0 z-[2000] bg-black/85 flex items-center justify-center p-6 backdrop-blur-lg animate-fade-in"><div class="bg-white/95 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative"><h3 class="font-black text-2xl mb-8 text-gray-700 tracking-wider">請問您是哪一位？</h3><div class="grid grid-cols-2 gap-6"><div v-for="u in users" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)"><div class="w-24 h-24 mx-auto rounded-full bg-white border-4 border-gray-100 shadow-lg flex items-center justify-center text-4xl mb-3 overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:border-pink-300 group-hover:shadow-pink-200"><img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover"><span v-else>{{u.icon}}</span></div><div class="font-black text-gray-600 text-lg group-hover:text-pink-500 transition">{{u.name}}</div><button v-if="!isGuest" @click.stop="openUserEditor(u)" class="absolute -top-1 -right-1 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition z-10"><i class="fa-solid fa-pen text-xs"></i></button></div></div></div></div>
-    
     <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span><div class="absolute inset-0 bg-black/30 flex items-center justify-center text-white text-xs font-bold opacity-0 hover:opacity-100 transition">更換</div></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border" placeholder="輸入新暱稱"><div class="flex gap-2"><button @click="showUserEditModal=false" class="flex-1 py-2 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button><button @click="saveUserChanges" class="flex-1 py-2 bg-pink-500 text-white rounded-xl font-bold shadow">儲存 (永久)</button></div></div></div>
     
+    <div v-if="showCouponModal" class="fixed inset-0 z-[3000] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl h-[80vh] flex flex-col animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-2xl text-pink-500"><i class="fa-solid fa-ticket"></i> 優惠券大全</h3>
+                <button @click="showCouponModal=false" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto space-y-4">
+                <div v-for="c in coupons" class="border border-pink-200 rounded-xl p-4 relative overflow-hidden bg-pink-50/30">
+                    <div class="absolute -right-6 -top-6 w-20 h-20 bg-pink-500 rounded-full opacity-10"></div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-black text-lg text-gray-800">{{c.name}}</h4>
+                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">{{c.discount}}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 font-bold mb-3"><i class="fa-solid fa-circle-exclamation text-pink-400"></i> {{c.note}}</p>
+                    <a :href="c.link" target="_blank" class="block w-full bg-pink-500 text-white text-center font-bold py-3 rounded-lg shadow-md active:scale-95 transition">使用優惠券 / 顯示條碼</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目 (如: 晚餐)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold">取消</button></div></div>
-    
     <div v-if="showFlightModal" class="fixed inset-0 z-[1200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">編輯機票 ({{flightMode==='out'?'去程':'回程'}})</h3><label class="text-xs font-bold text-gray-400 ml-1">航班代號</label><input v-model="tempFlightData.code" placeholder="如 TR898" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-black uppercase"><label class="text-xs font-bold text-gray-400 ml-1">座位號碼</label><input v-model="tempFlightData.seat" placeholder="如 12A" class="w-full p-3 bg-gray-50 rounded-xl mb-6 border font-black uppercase"><button @click="saveFlight" class="w-full py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg">更新機票</button></div></div>
-    
     <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
 
     <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -514,31 +557,20 @@
                 <div v-if="modalTitle==='新增交通票券'" class="mb-2">
                     <label class="text-xs font-bold text-gray-400 ml-1">快速模版 (自動帶入)</label>
                     <select v-model="modalData.type" @change="applyTicketTemplate" class="w-full p-2 bg-gray-100 rounded-xl font-bold text-sm">
-                        <option value="">自訂</option>
-                        <option value="suica">Suica 西瓜卡</option>
-                        <option value="metro">東京地鐵券</option>
-                        <option value="jrpass">JR 廣域周遊券</option>
-                        <option value="fuji">富士回遊號</option>
+                        <option value="">自訂</option><option value="suica">Suica 西瓜卡</option><option value="metro">東京地鐵券</option><option value="jrpass">JR 廣域周遊券</option><option value="fuji">富士回遊號</option>
                     </select>
                 </div>
-
                 <div v-for="f in modalFields" :key="f.key">
                     <label v-if="f.label" class="text-xs font-bold text-gray-400 ml-1 mb-1 block">{{f.label}}</label>
-                    
                     <div v-if="f.type==='checkbox'" class="flex items-center bg-gray-50 p-3 rounded-xl border">
                         <input type="checkbox" v-model="modalData[f.key]" class="w-5 h-5 accent-pink-500 mr-3">
-                        <span class="font-bold text-gray-700 text-sm">{{f.label}}</span>
+                        <span class="font-bold text-gray-700 text-sm">{{f.text||f.label}}</span>
                     </div>
-                    <div v-else-if="f.key==='note' && modalData.reserve" class="bg-red-50 p-2 rounded text-xs text-red-500 font-bold mb-2">
-                        * 提醒：請記得在下方填入預訂連結
-                    </div>
-                    
-                    <textarea v-if="f.type==='textarea'" v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
-                    
+                    <div v-else-if="f.key==='note' && modalData.reserve" class="bg-red-50 p-2 rounded text-xs text-red-500 font-bold mb-2">* 提醒：請記得在下方填入預訂連結</div>
+                    <textarea v-else-if="f.type==='textarea'" v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
                     <input v-else-if="f.onInput" v-model="modalData[f.key]" @input="f.onInput" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300">
                     <input v-else v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300">
                 </div>
-                
                 <button v-if="modalHasImg" @click="$refs.modalImgInput.click()" class="w-full py-3 bg-blue-50 text-blue-500 rounded-xl font-bold border border-blue-100">{{modalData.img?'更換圖片':'上傳圖片'}}</button>
                 <div v-if="modalTitle==='新增翻譯'" class="text-xs text-gray-400 text-center pt-2">* 填寫中文，可按下方按鈕自動翻譯</div>
                 <div v-if="modalTitle==='新增行程' && modalData.name" class="text-center">
@@ -597,7 +629,6 @@ const defaultData = {
         {company: 'Tabirai 比價網', pickup: '依照方案', url: 'https://tc.tabirai.net/car/', note: '多間租車公司比價'}
     ],
     expenses: [],
-    // V35.0 Smart Food Data with Reservation Links
     spots: {
         food: {
             Tokyo: [
@@ -660,6 +691,13 @@ createApp({
         const suggestedTickets = ref([]); 
         const transportTickets = ref(defaultData.transportTickets);
         const rentalCars = ref(defaultData.rentalCars);
+        const coupons = ref([
+            {name: '唐吉訶德 Don Quijote', discount: '10% (免稅) + 5% (折價)', link: 'https://www.djapanpass.com/coupon/0002000103', note: '未稅滿 10,000 日圓可使用'},
+            {name: 'Bic Camera', discount: '10% (免稅) + 7% (折價)', link: 'https://www.biccamera.com/bc/c/info/order/lang-select.jsp', note: '結帳時出示護照與此券'},
+            {name: '松本清', discount: '10% (免稅) + 3~7%', link: 'https://www.matsukiyo.co.jp/store/online', note: '依消費金額決定折數'},
+            {name: '三井 Outlet', discount: '優惠券 + 贈品', link: 'https://mitsui-shopping-park.com/mop/index.html', note: '至服務台出示 QR Code 換取'}
+        ]);
+        const showCouponModal = ref(false);
         
         const selectedDayIndex = ref(0);
         const itineraryMode = ref('normal');
@@ -735,11 +773,12 @@ createApp({
             return r; 
         });
 
-        // Helpers
+        // V37.0 Ultimate Universal Link (Strict App Launch)
         const getMapLink = (k,n) => {
             let q = k || n; if(!q) return '';
             if(q.startsWith('http')) return q;
-            return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+            // V37 Change: Use Standard Universal Link which works better on modern OS
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
         };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
         const getImg = (p) => p.startsWith('data:')?p:`https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/${p}`;
@@ -786,12 +825,12 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const speakJapanese = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; window.speechSynthesis.speak(u); };
         
-        // V35.0 Advanced Auto-Fill for Food
+        // V37.0 Enhanced Food Auto-Fill
         const autoFillFoodInfo = () => {
             const name = modalData.value.name;
             if(!name) return;
             const n = name.toLowerCase();
-            // Intelligent Mapping
+            // Intelligent Mapping - Strict Check
             if(n.includes('叙叙苑') || n.includes('敘敘苑')) { 
                 modalData.value.reserve=true; 
                 modalData.value.reserveLink='https://www.tablecheck.com/zh-TW/shops/jojoen-tokyoskytreetown-solamachi/reserve';
@@ -809,13 +848,17 @@ createApp({
             } else if(n.includes('炸牛排') || n.includes('本村')) { 
                 modalData.value.reserve=false; 
                 modalData.value.note='【現場排隊】只能現場排隊，翻桌率約45分鐘。'; 
+            } else if(n.includes('挽肉')) {
+                modalData.value.reserve=true;
+                modalData.value.reserveLink='https://www.tablecheck.com/zh-TW/shops/hikiniku-to-come/reserve';
+                modalData.value.note='【需訂位】極難預約，建議早上9點現場領整理券。';
             }
         };
 
         const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'商品名稱'},{key:'link',label:'官方連結 (選填)'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{shopping.value[shopCat.value].push(modalData.value); saveData();}; showModal.value=true; };
         const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
         
-        // V35.0 Food Modal Upgrade
+        // V37.0 Updated Food Modal Fields
         const openAddFoodModal = () => {
             modalTitle.value='新增美食';
             modalFields.value=[
@@ -860,7 +903,6 @@ createApp({
                 modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); };
                 modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); };
             } else if (type === 'food') {
-                // V35.0 Food Edit Fields
                 modalFields.value=[
                     {key:'name',label:'名稱',onInput:autoFillFoodInfo},
                     {key:'desc',label:'描述'},
@@ -879,20 +921,21 @@ createApp({
         const handleModalDelete = () => { if(confirm('確定刪除？') && modalDeleteCallback.value) { modalDeleteCallback.value(); showModal.value=false; } };
         const processModalImg = (e) => { const r=new FileReader(); r.onload=ev=>modalData.value.img=ev.target.result; r.readAsDataURL(e.target.files[0]); };
         const openGoogleTranslate = (text) => { window.open(`https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(text)}&op=translate`, '_blank'); };
+        const handleCameraTranslate = () => { window.open('https://translate.google.com/?sl=auto&tl=zh-TW&op=images', '_blank'); }; // Fallback to web cam
         const editFlight = (mode) => { if(isGuest.value) return; flightMode.value = mode; tempFlightData.value.code = mode==='out' ? (currentUser.value.flightOut||'') : (currentUser.value.flightIn||''); tempFlightData.value.seat = mode==='out' ? (currentUser.value.flightOutSeat||'') : (currentUser.value.flightInSeat||''); showFlightModal.value = true; };
         const saveFlight = () => { if(flightMode.value === 'out') { currentUser.value.flightOut = tempFlightData.value.code; currentUser.value.flightOutSeat = tempFlightData.value.seat; } else { currentUser.value.flightIn = tempFlightData.value.code; currentUser.value.flightInSeat = tempFlightData.value.seat; } const idx = users.value.findIndex(u=>u.id===currentUser.value.id); if(idx!==-1) users.value[idx] = currentUser.value; persistUsers(); saveData(); showFlightModal.value = false; };
 
-        // V35.0 Fortress Save Logic (Sequential + Sanitizer)
+        // V37.0 Fortress Save Logic (Sequential + Sanitizer + Optimistic Lock)
         let saveQueue = Promise.resolve();
         const isOffline = ref(!navigator.onLine);
         window.addEventListener('offline', () => { isOffline.value = true; isSaving.value = 'error'; });
         window.addEventListener('online', () => { isOffline.value = false; saveData(); });
 
-        // V35.0 Data Sanitizer (Fixes old data structure issues)
         const sanitizeData = (data) => {
             if(!data.spots.food) data.spots.food = defaultData.spots.food;
-            // Ensure all food items have new V35 fields
+            // Forcefully repair any missing fields in food data
             for (const city in data.spots.food) {
+                if(!data.spots.food[city]) data.spots.food[city] = [];
                 data.spots.food[city] = data.spots.food[city].map(item => ({
                     ...item,
                     reserve: item.reserve !== undefined ? item.reserve : false,
@@ -906,7 +949,8 @@ createApp({
         const saveData = async () => { 
             if(isGuest.value) return;
             isSaving.value = 'saving';
-            // Save Queue Pattern
+            
+            // Queue Pattern: Ensure operations are sequential
             saveQueue = saveQueue.then(async () => {
                 let data = {
                     users:users.value, itinerary:itinerary.value, expenses:expenses.value, spots:spots.value, 
@@ -917,14 +961,20 @@ createApp({
                 data = sanitizeData(data); // Apply fix
 
                 try {
+                    // Level 1: Instant Local Storage
                     localStorage.setItem('V25_DIAMOND_DATA', JSON.stringify(data));
+                    
+                    // Level 2: Firebase Cloud Sync
                     if(db && isLoggedIn.value && !isOffline.value) {
                         await setDoc(doc(db,"trips","kanto2026"), data, {merge:true}); 
                         setTimeout(() => isSaving.value = 'synced', 500);
                     } else if (isOffline.value) {
                         isSaving.value = 'error'; 
                     }
-                } catch(e) { console.error("Save Failed:", e); isSaving.value = 'error'; }
+                } catch(e) { 
+                    console.error("Save Failed:", e); 
+                    isSaving.value = 'error'; 
+                }
             });
         };
 
@@ -934,6 +984,7 @@ createApp({
         watch(showModal, (val) => { document.body.classList.toggle('modal-open', val); });
         watch(showExpenseModal, (val) => { document.body.classList.toggle('modal-open', val); });
         watch(showFlightModal, (val) => { document.body.classList.toggle('modal-open', val); });
+        watch(showCouponModal, (val) => { document.body.classList.toggle('modal-open', val); });
 
         onMounted(() => {
             initSakura(); loadUserData(); initTickets(); 
@@ -945,7 +996,29 @@ createApp({
                 if(dt.tickets) suggestedTickets.value=dt.tickets;
                 if(dt.transportTickets) transportTickets.value=dt.transportTickets;
                 if(dt.rentalCars) rentalCars.value=dt.rentalCars; 
+                
+                // V37.0 Force Retroactive Update for Food Notes
+                if(dt.spots && dt.spots.food) {
+                    const tempSpots = sanitizeData(dt).spots;
+                    const targets = {
+                        '叙叙苑': {r:true, rl:'https://www.tablecheck.com/zh-TW/shops/jojoen-tokyoskytreetown-solamachi/reserve', n:'【需訂位】午間套餐CP值最高，窗邊位置需一個月前預訂。'},
+                        'AFURI': {r:false, n:'【免訂位】建議避開用餐尖峰，柚子鹽拉麵必點。'}
+                    };
+                    for(const city in tempSpots.food) {
+                        tempSpots.food[city].forEach(item => {
+                            for(const key in targets) {
+                                if(item.name.includes(key) && !item.note) {
+                                    item.reserve = targets[key].r;
+                                    if(targets[key].rl) item.reserveLink = targets[key].rl;
+                                    item.note = targets[key].n;
+                                }
+                            }
+                        });
+                    }
+                    spots.value = tempSpots;
+                }
             }}) });
+            
             const l=localStorage.getItem('V25_DIAMOND_DATA'); 
             if(l && !isLoggedIn.value){ 
                 try { const d=JSON.parse(l); 
@@ -972,7 +1045,8 @@ createApp({
             handleAuthClick, showLoginModal, loginForm, doLogin, isLoggedIn, itineraryMode, suggestedTickets, openAddTicketModal,
             isSaving, openAddItineraryModal, openEditItineraryModal, openGoogleTranslate,
             transportTickets, openAddTransTicketModal, getAirlineInfo, flightStatusLink, getDirLink, applyTicketTemplate,
-            rentalCars, openAddCarModal, deleteCar, moveItem, openAddFoodModal, autoFillFoodInfo
+            rentalCars, openAddCarModal, deleteCar, moveItem, openAddFoodModal, autoFillFoodInfo,
+            coupons, showCouponModal, handleCameraTranslate
         };
     }
 }).mount('#app');
