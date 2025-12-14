@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (Ultimate V32)</title>
+<title>關東之旅 2026 (Fortress V34)</title>
 
 <script>
     window.tailwind = {
@@ -32,7 +32,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V32.0 Ultimate Optimization */
+    /* V34.0 System Core */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -43,25 +43,19 @@
         overscroll-behavior: none;
     }
 
-    /* iOS Input Zoom Fix */
-    input, textarea, select { 
-        font-size: 16px !important; 
-        font-family: inherit; 
-    } 
+    /* iOS Optimization */
+    input, textarea, select { font-size: 16px !important; font-family: inherit; } 
+    * { -webkit-overflow-scrolling: touch; }
 
     #app-content {
         height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
         padding-bottom: 140px;
         padding-top: env(safe-area-inset-top);
     }
 
-    /* Scroll Lock for Modals */
-    body.modal-open #app-content {
-        overflow: hidden;
-    }
+    body.modal-open #app-content { overflow: hidden; }
 
     #fixed-bg {
         position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
@@ -82,17 +76,15 @@
         margin-bottom: 0; 
         position: relative;
         backdrop-filter: blur(10px);
-        transition: all 0.3s ease; /* Smooth transition for sorting */
+        transition: all 0.3s ease;
         overflow: hidden; 
+        transform: translateZ(0); /* Hardware Acceleration */
     }
     .card:active { transform: scale(0.99); }
     
-    /* List Transition Animations */
-    .list-move, 
-    .list-enter-active,
-    .list-leave-active { transition: all 0.5s ease; }
-    .list-enter-from,
-    .list-leave-to { opacity: 0; transform: translateX(30px); }
+    /* List Animations */
+    .list-move, .list-enter-active, .list-leave-active { transition: all 0.5s ease; }
+    .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
     .list-leave-active { position: absolute; }
 
     /* FABs */
@@ -155,13 +147,10 @@
     }
     @keyframes fall { to { transform: translate(10vw, 105vh) rotate(360deg); } }
 
-    /* Timeline Logic */
     .timeline-connect {
-        width: 2px;
-        height: 50px;
+        width: 2px; height: 50px;
         background: repeating-linear-gradient(to bottom, #FFD1DC 0, #FFD1DC 5px, transparent 5px, transparent 10px);
-        margin: 0 auto;
-        position: relative;
+        margin: 0 auto; position: relative;
     }
     .timeline-badge {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -175,8 +164,7 @@
     }
     .drive-badge {
         border-color: #4ade80 !important; color: #16a34a !important; 
-        background: #f0fdf4 !important;
-        font-size: 12px !important; padding: 6px 14px !important;
+        background: #f0fdf4 !important; font-size: 12px !important; padding: 6px 14px !important;
     }
 
     .avatar-online { border-color: #4ade80 !important; box-shadow: 0 0 10px #4ade80 !important; filter: brightness(1); }
@@ -280,7 +268,6 @@
                     <button @click="itineraryMode='drive'" :class="['px-4 py-1.5 rounded-full text-xs font-bold transition', itineraryMode==='drive'?'bg-green-500 text-white':'text-gray-400']"><i class="fa-solid fa-car"></i> 自駕</button>
                 </div>
             </div>
-            
             <div class="pb-20 relative">
                 <transition-group name="list" tag="div">
                     <div v-for="(item,idx) in getCurrentItinerary()" :key="item.id || idx">
@@ -292,7 +279,8 @@
                                 <button @click.stop="moveItem(idx, 1)" class="w-8 h-8 bg-white/80 rounded-full shadow text-gray-400 hover:text-pink-500 hover:bg-white flex items-center justify-center border border-gray-100" v-if="idx < getCurrentItinerary().length - 1"><i class="fa-solid fa-chevron-down"></i></button>
                             </div>
 
-                            <div class="flex gap-4 pr-8"> <div class="flex flex-col items-center pt-1 min-w-[50px]">
+                            <div class="flex gap-4 pr-8">
+                                <div class="flex flex-col items-center pt-1 min-w-[50px]">
                                     <span class="text-xs font-black text-gray-400 mb-2">{{item.hours}}</span>
                                     <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center border" :class="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)?'bg-green-50 text-green-500 border-green-100':'bg-pink-50 text-pink-400 border-pink-100'"><i :class="getIconByCategory(item.category)"></i></div>
                                 </div>
@@ -301,12 +289,11 @@
                                     <p class="text-sm text-gray-500 line-clamp-2 font-medium mb-2">{{item.note}}</p>
                                     <div class="flex gap-2 flex-wrap">
                                         <a :href="getMapLink(item.mapKeyword, item.name)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full font-bold border border-blue-100 hover:bg-blue-100 transition"><i class="fa-solid fa-location-arrow"></i> 導航</a>
-                                        <a v-if="itineraryMode==='drive' && [2,3].includes(selectedDayIndex) && item.parkingLink" :href="item.parkingLink" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full font-bold border border-green-200 hover:bg-green-100"><i class="fa-solid fa-square-parking"></i> 停車場</a>
+                                        <a v-if="itineraryMode==='drive' && [2,3].includes(selectedDayIndex) && item.parkingLink" :href="getMapLink(item.parkingLink)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full font-bold border border-green-200 hover:bg-green-100"><i class="fa-solid fa-square-parking"></i> 停車場</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
                         <div v-if="idx < getCurrentItinerary().length - 1" class="timeline-connect !h-[40px] mb-4" :class="{'drive-line': itineraryMode==='drive' && [2,3].includes(selectedDayIndex)}">
                             <div v-if="item.travelTime" class="timeline-badge" :class="{'drive-badge': itineraryMode==='drive' && [2,3].includes(selectedDayIndex)}">
                                 <i v-if="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)" class="fa-solid fa-car mr-1"></i>
@@ -316,7 +303,6 @@
                         </div>
                     </div>
                 </transition-group>
-
                 <div v-if="getCurrentItinerary().length === 0" class="text-center text-gray-400 py-10 font-bold">本日無特定行程。</div>
                 <button v-if="!isGuest" @click="openAddItineraryModal" class="w-full py-4 mt-6 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold hover:bg-white/50 transition"><i class="fa-solid fa-plus"></i> 新增行程</button>
             </div>
@@ -331,9 +317,9 @@
             </div>
             
             <div v-if="hotelTab==='stay'" class="space-y-6">
-                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('bnb.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">錦糸町民宿</h3></div></div><div class="p-4"><a href="https://maps.app.goo.gl/cyLNVJttoAM61dmFA" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
-                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('megu.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">Megu Fuji</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query=Megu+Fuji+2021" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
-                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('domo.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">DOMO 民宿</h3></div></div><div class="p-4"><a href="https://maps.app.goo.gl/NbDPS57PZixB7AsH8`。" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航 (東新宿)</a></div></div>
+                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('bnb.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">錦糸町民宿</h3></div></div><div class="p-4"><a href="https://www.google.com/maps?q=錦糸町民宿" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
+                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('megu.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">Megu Fuji</h3></div></div><div class="p-4"><a href="https://www.google.com/maps?q=Megu+Fuji" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
+                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('domo.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">DOMO 民宿</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query=DOMO+Hotel+Higashi+Shinjuku" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航 (東新宿)</a></div></div>
             </div>
 
             <div v-if="hotelTab==='ticket'" class="space-y-4 pb-20">
@@ -500,8 +486,25 @@
              </div>
              <div v-if="['food','photo'].includes(currentView)">
                 <div class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20"><div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="card !p-0 border-0 shadow-lg group relative"><div class="h-48 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/600x400/orange/white?text=SPOT'" class="w-full h-full object-cover" @error="handleImgError"></div><div class="p-4"><h3 class="font-black text-gray-800 text-lg mb-1">{{item.name}}</h3><p class="text-sm text-gray-500 mb-3">{{item.desc}}</p><a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-50 text-gray-600 font-bold py-2 rounded-lg text-sm border hover:bg-orange-400 hover:text-white transition"><i class="fa-solid fa-location-arrow"></i> 導航</a></div><div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2"><button @click="openEditModal('spot', item, idx)" class="w-8 h-8 bg-white rounded-full shadow text-blue-500 flex items-center justify-center"><i class="fa-solid fa-pen"></i></button><button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white rounded-full shadow text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash"></i></button></div></div></div>
-                <button v-if="!isGuest" @click="openAddSpotModal" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
+                    <div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="card !p-0 border-0 shadow-lg group relative">
+                        <div class="h-48 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/600x400/orange/white?text=SPOT'" class="w-full h-full object-cover" @error="handleImgError"></div>
+                        <div class="p-4">
+                            <h3 class="font-black text-gray-800 text-lg mb-1 flex items-center justify-between">
+                                {{item.name}}
+                                <span v-if="currentView==='food' && item.reserve" class="bg-red-100 text-red-500 text-[10px] px-2 py-1 rounded-full font-bold border border-red-200">需訂位</span>
+                                <span v-if="currentView==='food' && !item.reserve" class="bg-green-100 text-green-500 text-[10px] px-2 py-1 rounded-full font-bold border border-green-200">現場排隊</span>
+                            </h3>
+                            <p class="text-sm text-gray-500 mb-2">{{item.desc}}</p>
+                            <div v-if="currentView==='food' && item.note" class="bg-orange-50 border border-orange-100 p-2 rounded-lg text-[11px] text-gray-600 mb-3 leading-relaxed">
+                                <i class="fa-solid fa-utensils text-orange-400 mr-1"></i> <span class="font-bold text-orange-500">老饕筆記：</span>{{item.note}}
+                            </div>
+                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-50 text-gray-600 font-bold py-2 rounded-lg text-sm border hover:bg-orange-400 hover:text-white transition"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                        </div>
+                        <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2"><button @click="openEditModal(currentView==='food'?'food':'spot', item, idx)" class="w-8 h-8 bg-white rounded-full shadow text-blue-500 flex items-center justify-center"><i class="fa-solid fa-pen"></i></button><button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white rounded-full shadow text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash"></i></button></div>
+                    </div>
+                </div>
+                <button v-if="!isGuest" @click="currentView==='food'?openAddFoodModal():openAddSpotModal()" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
              </div>
              <div v-if="currentView==='japanese'">
                 <div class="space-y-3 pb-20"><div v-for="(p,idx) in japanesePhrases" :key="idx" class="card p-5 flex justify-between items-center cursor-pointer hover:shadow-md transition border-l-4 border-emerald-400" @click="expandCard(p)"><div><div class="font-bold text-lg text-gray-800">{{p.jp}}</div><div class="text-xs text-gray-500 font-bold mt-1">{{p.zh}}</div></div><i class="fa-solid fa-expand text-gray-300"></i></div></div>
@@ -550,7 +553,11 @@
 
                 <div v-for="f in modalFields" :key="f.key">
                     <label v-if="f.label" class="text-xs font-bold text-gray-400 ml-1 mb-1 block">{{f.label}}</label>
-                    <textarea v-if="f.type==='textarea'" v-model="modalData[f.key]" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
+                    <div v-if="f.type==='checkbox'" class="flex items-center bg-gray-50 p-3 rounded-xl border">
+                        <input type="checkbox" v-model="modalData[f.key]" class="w-5 h-5 accent-pink-500 mr-3">
+                        <span class="font-bold text-gray-700 text-sm">需要提前訂位</span>
+                    </div>
+                    <textarea v-else-if="f.type==='textarea'" v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
                     <input v-else v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300">
                 </div>
                 
@@ -583,9 +590,8 @@ import { getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence } fro
 import { createApp, ref, computed, onMounted, watch } from "https://unpkg.com/vue@3.3.4/dist/vue.esm-browser.js";
 
 const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", authDomain: "tokyo-trip-24b28.firebaseapp.com", projectId: "tokyo-trip-24b28", storageBucket: "tokyo-trip-24b28.firebasestorage.app", messagingSenderId: "518699705070", appId: "1:518699705070:web:56e95f603210d8d5d209ff" };
-let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{console.log("Persistence enabled/checked")}); } catch (e) { console.warn("Firebase Init Fail", e); }
+let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{console.log("Persistence active")}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
-// V32.0 Strict Data Review: Travel Times Optimized
 const defaultData = {
     users: [{id:1,name:'吉伊',icon:'🐹',list:[]},{id:2,name:'小八',icon:'🐱',list:[]},{id:3,name:'兔兔',icon:'🐰',list:[]},{id:4,name:'小桃',icon:'🍑',list:[]}],
     itinerary: [
@@ -599,17 +605,8 @@ const defaultData = {
         [{hours:"10:00",category:"Sightseeing",name:"自由行程",note:"最後採買",mapKeyword:"上野阿美橫丁",travelTime:"⬇ 0min"},{hours:"20:40",category:"Flight",name:"NRT 起飛",note:"成田機場報到",mapKeyword:"成田機場"},{hours:"23:20",category:"Flight",name:"TPE 抵達",note:"回到溫暖的家",mapKeyword:"桃園機場"}]
     ],
     drivePlan: [
-        [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發",travelTime:"🚗 120min"},
-         {hours:"10:30",category:"Transport",name:"開始租車",note:"河口湖 租車",travelTime:"🚗 20min",parkingLink:"https://www.google.com/maps/search/Toyota+Rent+a+Car+Kawaguchiko"},
-         {hours:"13:00",category:"Sightseeing",name:"河口湖自然生活館",note:"大石公園絕景",travelTime:"🚗 20min",parkingLink:"https://www.google.com/maps/search/Oishi+Park+Parking"},
-         {hours:"15:00",category:"Sightseeing",name:"新倉山淺間公園",note:"忠靈塔瞭望台",travelTime:"🚗 15min",parkingLink:"https://www.google.com/maps/search/Arakurayama+Sengen+Park+Parking"},
-         {hours:"17:30",category:"Sightseeing",name:"金鳥居/本町商店街",note:"日川時計店拍照",travelTime:"🚗 10min",parkingLink:"https://www.google.com/maps/search/Shimoyoshida+Honcho+Street+Parking"},
-         {hours:"19:00",category:"Food",name:"晚餐",note:"自行烹飪或商店街"}],
-        [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出",travelTime:"🚗 30min",parkingLink:"https://www.google.com/maps/search/Hirano+no+Hama+Parking"},
-         {hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",travelTime:"🚗 15min",parkingLink:"https://www.google.com/maps/search/Nagaike+Water+Park+Parking"},
-         {hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",travelTime:"🚗 20min"},
-         {hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",travelTime:"🚗 30min",parkingLink:"https://www.google.com/maps/search/Asahigaoka+Lakeside+Greenspace+Park+Parking"},
-         {hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)"}]
+        [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發",travelTime:"🚗 120min"}, {hours:"10:30",category:"Transport",name:"開始租車",note:"河口湖 租車",travelTime:"🚗 20min",parkingLink:"https://www.google.com/maps/search/Toyota+Rent+a+Car+Kawaguchiko"}, {hours:"13:00",category:"Sightseeing",name:"河口湖自然生活館",note:"大石公園絕景",travelTime:"🚗 20min",parkingLink:"https://www.google.com/maps/search/Oishi+Park+Parking"}, {hours:"15:00",category:"Sightseeing",name:"新倉山淺間公園",note:"忠靈塔瞭望台",travelTime:"🚗 15min",parkingLink:"https://www.google.com/maps/search/Arakurayama+Sengen+Park+Parking"}, {hours:"17:30",category:"Sightseeing",name:"金鳥居/本町商店街",note:"日川時計店拍照",travelTime:"🚗 10min",parkingLink:"https://www.google.com/maps/search/Shimoyoshida+Honcho+Street+Parking"}, {hours:"19:00",category:"Food",name:"晚餐",note:"自行烹飪或商店街"}],
+        [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出",travelTime:"🚗 30min",parkingLink:"https://www.google.com/maps/search/Hirano+no+Hama+Parking"}, {hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",travelTime:"🚗 15min",parkingLink:"https://www.google.com/maps/search/Nagaike+Water+Park+Parking"}, {hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",travelTime:"🚗 20min"}, {hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",travelTime:"🚗 30min",parkingLink:"https://www.google.com/maps/search/Asahigaoka+Lakeside+Greenspace+Park+Parking"}, {hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)"}]
     ],
     transportTickets: [
         {name:'東京地鐵券 (24/48/72h)', url:'https://www.tokyometro.jp/tcn/ticket/travel/index.html', icon:'fa-solid fa-subway', note:'【使用範圍】\n東京 Metro 9條線 + 都營地鐵 4條線\n\n【不適用】\nJR 山手線、私鐵 (如百合海鷗號)\n\n【啟用】\n第一次進站起算小時，建議連續使用。'},
@@ -624,9 +621,9 @@ const defaultData = {
     expenses: [],
     spots: {
         food: {
-            Tokyo: [{name:'AFURI',desc:'清新柚子鹽拉麵',link:'AFURI 原宿'},{name:'叙叙苑',desc:'高級燒肉景觀餐廳',link:'叙叙苑 晴空塔'},{name:'HARBS',desc:'必吃水果千層蛋糕',link:'HARBS LUMINE EST'},{name:'淺草今半',desc:'百年壽喜燒老店',link:'淺草今半 國際通'},{name:'炸牛排 本村',desc:'自行煎烤軟嫩牛排',link:'牛かつもと村 澀谷'}],
-            Kamakura: [{name:'Bills',desc:'世界第一好吃鬆餅',link:'Bills 七里ヶ浜'},{name:'Caraway',desc:'排隊咖哩名店',link:'Caraway Curry'},{name:'Pacific Drive-in',desc:'海景夏威夷餐廳',link:'Pacific Drive-in'},{name:'力餅家',desc:'百年老舖權五郎力餅',link:'力餅家'},{name:'鎌倉釜飯',desc:'吻仔魚釜飯',link:'鎌倉釜飯 かまかま'}],
-            Fuji: [{name:'不動茶屋',desc:'特色雲朵建築餺飥麵',link:'不動茶屋 東戀路'},{name:'山麓園',desc:'炭火爐端燒體驗',link:'山麓園'},{name:'湖波',desc:'河口湖景觀定食',link:'湖波食事處'},{name:'Hana 燒肉',desc:'當地人推薦燒肉',link:'Hana Yakiniku'},{name:'The Park',desc:'富士山吐司',link:'Food Labo'}]
+            Tokyo: [{name:'AFURI',desc:'清新柚子鹽拉麵',link:'AFURI 原宿', reserve:false, note:'建議避開用餐尖峰，柚子鹽拉麵必點。'},{name:'叙叙苑',desc:'高級燒肉景觀餐廳',link:'叙叙苑 晴空塔', reserve:true, note:'午間套餐CP值最高，窗邊位置需一個月前預訂。'},{name:'HARBS',desc:'必吃水果千層蛋糕',link:'HARBS LUMINE EST', reserve:false, note:'內用每人低消一杯飲料，亦可外帶回飯店吃。'},{name:'淺草今半',desc:'百年壽喜燒老店',link:'淺草今半 國際通', reserve:true, note:'午間壽喜燒定食較划算，百年老店服務極佳。'},{name:'炸牛排 本村',desc:'自行煎烤軟嫩牛排',link:'牛かつもと村 澀谷', reserve:false, note:'只能現場排隊，建議開店前15分鐘到。'}],
+            Kamakura: [{name:'Bills',desc:'世界第一好吃鬆餅',link:'Bills 七里ヶ浜', reserve:true, note:'戶外座位可看海景，鬆餅製作需20分鐘。'},{name:'Caraway',desc:'排隊咖哩名店',link:'Caraway Curry', reserve:false, note:'份量非常大，女生建議點小飯。只收現金。'},{name:'Pacific Drive-in',desc:'海景夏威夷餐廳',link:'Pacific Drive-in', reserve:false, note:'週末人潮多，蒜蓉蝦飯是招牌。'},{name:'力餅家',desc:'百年老舖權五郎力餅',link:'力餅家', reserve:false, note:'保存期限短，建議當天吃完。'},{name:'鎌倉釜飯',desc:'吻仔魚釜飯',link:'鎌倉釜飯 かまかま', reserve:true, note:'最後可以加高湯變茶泡飯，一飯兩吃。'}],
+            Fuji: [{name:'不動茶屋',desc:'特色雲朵建築餺飥麵',link:'不動茶屋 東戀路', reserve:false, note:'東戀路店建築最美，翻桌率快。'},{name:'山麓園',desc:'炭火爐端燒體驗',link:'山麓園', reserve:true, note:'體驗圍爐裏燒烤，身上會有炭火味。'},{name:'湖波',desc:'河口湖景觀定食',link:'湖波食事處', reserve:false, note:'靠窗位置可看富士山，天婦羅定食推薦。'},{name:'Hana 燒肉',desc:'當地人推薦燒肉',link:'Hana Yakiniku', reserve:true, note:'CP值高的單點燒肉，建議預約。'},{name:'The Park',desc:'富士山吐司',link:'Food Labo', reserve:false, note:'富士山造型吐司，拍照打卡必備。'}]
         },
         photo: {
             Tokyo: [{name:'SHIBUYA SKY',desc:'東京最美展望台',link:'SHIBUYA SKY'},{name:'豪德寺',desc:'滿滿招財貓',link:'豪德寺'},{name:'東京鐵塔',desc:'芝公園最佳機位',link:'芝公園 4號地'},{name:'淺草雷門',desc:'經典地標大燈籠',link:'雷門'},{name:'TeamLab',desc:'光影藝術展',link:'TeamLab Planets'}],
@@ -641,10 +638,6 @@ const defaultData = {
     },
     phrases: [{jp:'すみません',zh:'不好意思/請問'},{jp:'これください',zh:'我要這個'},{jp:'いくらですか',zh:'請問多少錢'},{jp:'お会計お願いします',zh:'我要結帳'},{jp:'袋いりません',zh:'不用袋子'},{jp:'トイレはどこですか',zh:'廁所在哪裡'},{jp:'写真を撮ってもいいですか',zh:'可以拍照嗎'},{jp:'英語メニューありますか',zh:'有英文菜單嗎'},{jp:'おすすめは何ですか',zh:'有推薦的嗎'},{jp:'水ください',zh:'請給我水'}]
 };
-
-const defaultPrepList = [
-    {text:'護照 (效期6個月以上)',checked:false}, {text:'Visit Japan Web QR Code',checked:false}, {text:'網卡/漫遊',checked:false}, {text:'日幣現金',checked:false}, {text:'信用卡 (海外回饋高)',checked:false}, {text:'轉接頭/充電器',checked:false}, {text:'個人常備藥',checked:false}
-];
 
 createApp({
     setup() {
@@ -694,8 +687,6 @@ createApp({
         const modalCallback = ref(null);
         const isEditingItem = ref(false); 
         const modalDeleteCallback = ref(null);
-        
-        // Flight Editing
         const showFlightModal = ref(false);
         const tempFlightData = ref({code:'',seat:''});
         const flightMode = ref('out'); 
@@ -712,12 +703,7 @@ createApp({
                 if(diffDays <= 33 && diffDays > 30) l.push("富士回遊號：準備搶票 (30天前)！");
                 if(diffDays <= 30) l.push("🔴 富士回遊號：現在可以搶票了！");
             }
-            if(text.includes('SHIBUYA SKY')) {
-                if(diffDays <= 31 && diffDays > 28) l.push("SHIBUYA SKY：準備搶票 (28天前)！");
-                if(diffDays <= 28) l.push("🔴 SHIBUYA SKY：現在可以搶票了！");
-            }
             if(diffDays <= 2) l.push("線上預辦登機 (48hr前)");
-            if(diffDays <= 7) l.push("VJW 填寫完畢了嗎？");
             return l; 
         });
 
@@ -725,7 +711,6 @@ createApp({
              const text = JSON.stringify(itinerary.value);
              const list = [];
              if(text.includes('SHIBUYA')) list.push({name:'SHIBUYA SKY', url:'https://www.klook.com/zh-TW/activity/70672-shibuya-sky-tokyo/'});
-             if(text.includes('迪士尼')) list.push({name:'迪士尼門票', url:'https://www.tokyodisneyresort.jp/tc/ticket/index.html'});
              if(suggestedTickets.value.length === 0) suggestedTickets.value = list;
         };
 
@@ -737,38 +722,34 @@ createApp({
         };
 
         const getAmountInTWD = (e) => e.currency==='JPY' ? e.amount*exchangeRate.value : e.amount;
-        
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((sum, e) => sum + getAmountInTWD(e), 0));
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
-        
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
 
         const settlements = computed(() => { 
             const b={}; users.value.forEach(u=>b[u.id]=0); 
             groupExpenses.value.forEach(e=>{ 
-                const t=getAmountInTWD(e); 
-                b[e.whoPaid]+=t; 
-                const s=t/e.forWhom.length; 
-                e.forWhom.forEach(i=>b[i]-=s); 
+                const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); 
             }); 
             const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); 
-            const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); 
-            const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); 
+            const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); 
             let i=0,j=0; 
             while(i<d.length&&j<c.length){ 
-                let a=Math.min(-d[i].v,c[j].v); 
-                r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); 
-                d[i].v+=a; c[j].v-=a; 
-                if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; 
+                let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); 
+                d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; 
             } 
             return r; 
         });
 
-        // --- Helpers ---
+        // --- Helpers (V34.0 Smart Link Logic) ---
         const getMapLink = (k,n) => {
-            if(k) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k)}`;
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n)}`;
+            let q = k || n;
+            if(!q) return '';
+            // If it's a full URL, return it directly
+            if(q.startsWith('http')) return q;
+            // Otherwise generate a search query
+            return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
         };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
         const getImg = (p) => p.startsWith('data:')?p:`https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/${p}`;
@@ -778,198 +759,72 @@ createApp({
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','japanese':'翻譯蒟蒻'}[view]||'關東之旅');
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
         const flightStatusLink = (code) => code ? `https://www.flightradar24.com/data/flights/${code.toLowerCase()}` : '';
-
-        // V32.0 Airline Info
         const getAirlineInfo = (flightCode, isShort) => {
-            if(!flightCode) return null;
-            const c = flightCode.toUpperCase();
-            if(c.startsWith('TR')) return isShort ? "酷航 Scoot" : "【酷航 Scoot】\n📍 報到：桃園 T1 / 成田 T1 南翼\n🧳 手提：10kg (嚴格秤重)\n🍱 餐食：無免費餐點，禁帶外食\n⚠️ 關櫃：起飛前 60 分鐘準時關櫃";
-            if(c.startsWith('BR')) return isShort ? "長榮 EVA" : "【長榮 EVA】\n📍 報到：桃園 T2 / 成田 T1 南翼\n🧳 託運：計件制 23kg x 2 件\n🍱 餐食：含飛機餐\n📱 網路：部分機型有付費 WiFi";
-            if(c.startsWith('JX')) return isShort ? "星宇 STARLUX" : "【星宇 STARLUX】\n📍 報到：桃園 T1 / 成田 T2\n🧳 託運：計件制 23kg x 1 件\n🍱 餐食：胡同燒肉餐 (需預選)\n📱 網路：全機免費文字訊息 WiFi";
+            if(!flightCode) return null; const c = flightCode.toUpperCase();
+            if(c.startsWith('TR')) return isShort?"酷航 Scoot":"【酷航 Scoot】\n📍 報到：桃園 T1 / 成田 T1 南翼\n🧳 手提：10kg (嚴格秤重)";
+            if(c.startsWith('BR')) return isShort?"長榮 EVA":"【長榮 EVA】\n📍 報到：桃園 T2 / 成田 T1 南翼\n🧳 託運：計件制 23kg x 2 件";
             return '請確認電子機票上的航廈資訊';
         };
-        
         const getDirLink = (dest) => {
             const list = getCurrentItinerary();
-            let origin = "";
-            if(list.length > 0) origin = list[list.length-1].mapKeyword || list[list.length-1].name;
+            let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : "";
             return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=transit`;
         };
 
         // --- Actions ---
         const enterSite = () => { isGuest.value=false; isWelcomeClosed.value=true; showPersonaModal.value=true; };
-        const enterAsGuest = () => { 
-            isGuest.value=true; 
-            currentUser.value = {id:999, name:'訪客', icon:'🕵️', list:[]}; 
-            isWelcomeClosed.value=true; 
-            currentView.value='menu';
-        };
-
+        const enterAsGuest = () => { isGuest.value=true; currentUser.value = {id:999, name:'訪客', icon:'🕵️', list:[]}; isWelcomeClosed.value=true; currentView.value='menu'; };
         const loadUserData = () => {
              const localUsers = localStorage.getItem('V25_50_USERS');
-             if(localUsers) {
-                 const parsed = JSON.parse(localUsers);
-                 users.value = users.value.map(defU => {
-                     const saved = parsed.find(p => p.id === defU.id);
-                     return saved ? {...defU, ...saved} : defU;
-                 });
-             }
+             if(localUsers) { const parsed = JSON.parse(localUsers); users.value = users.value.map(defU => { const saved = parsed.find(p => p.id === defU.id); return saved ? {...defU, ...saved} : defU; }); }
         };
-        const persistUsers = () => {
-             localStorage.setItem('V25_50_USERS', JSON.stringify(users.value));
-             saveData(); 
-        };
-
+        const persistUsers = () => { localStorage.setItem('V25_50_USERS', JSON.stringify(users.value)); saveData(); };
         const setCurrentUser = (u) => { 
-            if(isGuest.value) return;
-            currentUser.value=u; 
-            if(currentUser.value.list.length === 0) {
-                currentUser.value.list = JSON.parse(JSON.stringify(defaultPrepList));
-                persistUsers();
-            }
-            localStorage.setItem('V25_LAST_USER_ID', u.id); 
-            showPersonaModal.value=false; 
-            currentView.value='menu'; 
+            if(isGuest.value) return; currentUser.value=u; 
+            if(currentUser.value.list.length === 0) { currentUser.value.list = JSON.parse(JSON.stringify(defaultPrepList)); persistUsers(); }
+            localStorage.setItem('V25_LAST_USER_ID', u.id); showPersonaModal.value=false; currentView.value='menu'; 
         };
         const openUserEditor = (u) => { editingUser.value={...u}; showUserEditModal.value=true; };
-        const saveUserChanges = () => { 
-            if(isGuest.value) return;
-            const idx=users.value.findIndex(u=>u.id===editingUser.value.id); 
-            if(idx!==-1){
-                users.value[idx]={...editingUser.value}; 
-                if(currentUser.value && currentUser.value.id === editingUser.value.id) currentUser.value = users.value[idx];
-            }
-            persistUsers(); 
-            showUserEditModal.value=false; 
-        };
+        const saveUserChanges = () => { if(isGuest.value) return; const idx=users.value.findIndex(u=>u.id===editingUser.value.id); if(idx!==-1){ users.value[idx]={...editingUser.value}; if(currentUser.value && currentUser.value.id === editingUser.value.id) currentUser.value = users.value[idx]; } persistUsers(); showUserEditModal.value=false; };
         const processAvatarUpload = (e) => { const r=new FileReader(); r.onload=ev=>editingUser.value.avatar=ev.target.result; r.readAsDataURL(e.target.files[0]); };
-
         const handleAuthClick = () => isLoggedIn.value ? (confirm('登出雲端?')&&signOut(auth)) : showLoginModal.value=true;
         const doLogin = async () => { try{await setPersistence(auth, browserLocalPersistence); await signInWithEmailAndPassword(auth,loginForm.value.email,loginForm.value.password);showLoginModal.value=false;}catch(e){alert(e.message);} };
-
-        const openExpenseModal = (mode) => { 
-            expenseMode.value = mode;
-            modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : users.value.map(u=>u.id)}; 
-            showExpenseModal.value=true; 
-        };
+        const openExpenseModal = (mode) => { expenseMode.value = mode; modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : users.value.map(u=>u.id)}; showExpenseModal.value=true; };
         const toggleShare = (id) => { const i=modalData.value.forWhom.indexOf(id); i>-1?modalData.value.forWhom.splice(i,1):modalData.value.forWhom.push(id); };
         const saveExpense = () => { expenses.value.push({...modalData.value,id:Date.now(),date:new Date().toLocaleDateString()}); saveData(); showExpenseModal.value=false; };
         const deleteExpense = (id) => { if(isGuest.value) return; if(confirm('確定刪除此筆記錄?')){expenses.value=expenses.value.filter(e=>e.id!==id); saveData();} };
-
         const addPrepItem = (u) => { if(isGuest.value) return; u.list.push({text:'新項目',checked:false}); saveData(); };
-        
         const expandCard = (p) => expandedPhrase.value=p;
-        const speakJapanese = (text) => {
-             const u = new SpeechSynthesisUtterance(text);
-             u.lang = 'ja-JP';
-             window.speechSynthesis.speak(u);
-        };
+        const speakJapanese = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; window.speechSynthesis.speak(u); };
         
-        // Modal Logic V31
+        const autoFillFoodInfo = () => {
+            const name = modalData.value.name;
+            if(!name) return;
+            if(name.includes('AFURI')) { modalData.value.reserve=false; modalData.value.note='建議避開用餐尖峰，柚子鹽拉麵必點。'; }
+            else if(name.includes('叙叙苑') || name.includes('敘敘苑')) { modalData.value.reserve=true; modalData.value.note='午間套餐CP值最高，務必一個月前訂位。'; }
+            else if(name.includes('HARBS')) { modalData.value.reserve=false; modalData.value.note='內用每人低消一杯飲料，亦可外帶。'; }
+            else if(name.includes('六歌仙')) { modalData.value.reserve=true; modalData.value.note='吃到飽熱門店，需提前預約。'; }
+            else if(name.includes('炸牛排') || name.includes('本村')) { modalData.value.reserve=false; modalData.value.note='只能現場排隊，翻桌率約45分鐘。'; }
+        };
+
         const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'商品名稱'},{key:'link',label:'官方連結 (選填)'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{shopping.value[shopCat.value].push(modalData.value); saveData();}; showModal.value=true; };
-        const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'景點名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字 (留空自動搜尋)'}]; modalData.value={name:'',desc:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value[currentView.value][currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
+        const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
+        const openAddFoodModal = () => {
+            modalTitle.value='新增美食';
+            modalFields.value=[{key:'name',label:'餐廳名稱', onInput: autoFillFoodInfo},{key:'desc',label:'描述 (如: 招牌菜)'},{key:'reserve',label:'需要訂位?', type:'checkbox'},{key:'note',label:'老饕筆記 (如: 排隊攻略)', type:'textarea'},{key:'link',label:'地圖關鍵字'}];
+            modalData.value={name:'',desc:'',reserve:false,note:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; 
+            modalCallback.value=()=>{ if(!modalData.value.note) autoFillFoodInfo(); spots.value.food[currentLoc.value].push(modalData.value); saveData(); }; showModal.value=true;
+        };
+
         const openAddPhraseModal = () => { modalTitle.value='新增翻譯'; modalFields.value=[{key:'zh',label:'中文 (可自動翻譯)'},{key:'jp',label:'日文'}]; modalData.value={zh:'',jp:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{japanesePhrases.value.push(modalData.value); saveData();}; showModal.value=true; };
         const openAddTicketModal = () => { modalTitle.value='新增門票'; modalFields.value=[{key:'name',label:'景點名稱'},{key:'url',label:'購票連結'}]; modalData.value={name:'',url:'https://', custom:true}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{suggestedTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
-        
-        // V31 Smart Ticket Modal
-        const openAddTransTicketModal = () => { 
-            modalTitle.value='新增交通票券'; 
-            modalFields.value=[
-                {key:'name',label:'票券名稱'},
-                {key:'url',label:'資訊連結'},
-                {key:'note',label:'注意事項 (支援換行)', type:'textarea'}
-            ]; 
-            modalData.value={name:'',url:'https://', note:'', icon:'fa-solid fa-ticket', custom:true, type:''}; 
-            modalHasImg.value=false; 
-            isEditingItem.value=false; 
-            modalCallback.value=()=>{transportTickets.value.push(modalData.value); saveData();}; 
-            showModal.value=true; 
-        };
-
-        const applyTicketTemplate = () => {
-            const t = modalData.value.type;
-            if(t==='suica') { modalData.value.name='Suica 西瓜卡'; modalData.value.icon='fa-solid fa-mobile-screen'; modalData.value.url='https://www.jreast.co.jp/tc/pass/suica.html'; modalData.value.note='【手機版】\niPhone 錢包直接新增 > 交通卡 > Suica\n\n【儲值】\n可使用 Apple Pay'; }
-            if(t==='metro') { modalData.value.name='東京地鐵券'; modalData.value.icon='fa-solid fa-subway'; modalData.value.url='https://www.tokyometro.jp/tcn/ticket/travel/index.html'; modalData.value.note='【使用範圍】\n東京 Metro 9條線 + 都營地鐵 4條線\n\n【啟用】\n第一次進站起算小時。'; }
-            if(t==='jrpass') { modalData.value.name='JR 東京廣域周遊券'; modalData.value.icon='fa-solid fa-ticket'; modalData.value.url='https://www.jreast.co.jp/multi/zh-CHT/pass/tokyowide.html'; modalData.value.note='【售價】\n15,000 日圓 (3天)\n\n【必用行程】\n1. 富士回遊\n2. 機場快線 N\'EX'; }
-            if(t==='fuji') { modalData.value.name='富士回遊號 (JR)'; modalData.value.icon='fa-solid fa-train'; modalData.value.url='https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index'; modalData.value.note='【重要】\n全車指定席，無站票！\n請務必提前 30 天由 Eki-net 預約。'; }
-        };
-
-        // V31 Car Rental Modal
-        const openAddCarModal = () => {
-            modalTitle.value = '新增租車預約';
-            modalFields.value = [
-                {key:'company',label:'租車公司 (如 Toyota)'},
-                {key:'pickup',label:'取車地點'},
-                {key:'url',label:'預約連結/官網'},
-                {key:'note',label:'備註 (車型/保險)'}
-            ];
-            modalData.value = {company:'', pickup:'', url:'', note:''};
-            modalHasImg.value = false;
-            isEditingItem.value = false;
-            modalCallback.value = () => { rentalCars.value.push(modalData.value); saveData(); };
-            showModal.value = true;
-        };
-        const deleteCar = (idx) => {
-            if(confirm('確定刪除此租車紀錄？')) { rentalCars.value.splice(idx,1); saveData(); }
-        };
-
-        const openAddItineraryModal = () => {
-             modalTitle.value = '新增行程';
-             modalFields.value = [
-                 {key:'hours',label:'時間 (如 14:00)'},
-                 {key:'name',label:'行程名稱'},
-                 {key:'note',label:'備註/說明'},
-                 {key:'mapKeyword',label:'地圖關鍵字 (留空自動抓取)'},
-                 {key:'travelTime',label:'下個點交通時間'}
-             ];
-             modalData.value = {hours:'', name:'', note:'', mapKeyword:'', travelTime:'', category:'Sightseeing'};
-             modalHasImg.value = false;
-             isEditingItem.value = false;
-             modalCallback.value = () => {
-                 const arr = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value];
-                 arr.push(modalData.value);
-                 arr.sort((a,b) => a.hours.localeCompare(b.hours));
-                 saveData();
-             };
-             showModal.value = true;
-        };
-
-        const openEditItineraryModal = (item, idx) => {
-             if(isGuest.value) return;
-             modalTitle.value = '編輯行程';
-             modalFields.value = [
-                 {key:'hours',label:'時間'}, {key:'name',label:'名稱'}, {key:'note',label:'備註'}, {key:'mapKeyword',label:'地圖關鍵字'}, {key:'travelTime',label:'交通時間'}
-             ];
-             modalData.value = {...item};
-             modalHasImg.value = false;
-             isEditingItem.value = true;
-             const targetArray = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value];
-             modalCallback.value = () => {
-                 targetArray[idx] = modalData.value;
-                 targetArray.sort((a,b) => a.hours.localeCompare(b.hours));
-                 saveData();
-             };
-             modalDeleteCallback.value = () => {
-                 targetArray.splice(idx, 1);
-                 saveData();
-             };
-             showModal.value = true;
-        };
-
-        // V32.0 Itinerary Reorder
-        const moveItem = (index, direction) => {
-            if (isGuest.value) return;
-            const targetArray = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value];
-            
-            if (direction === -1 && index > 0) {
-                // Move Up
-                [targetArray[index], targetArray[index - 1]] = [targetArray[index - 1], targetArray[index]];
-            } else if (direction === 1 && index < targetArray.length - 1) {
-                // Move Down
-                [targetArray[index], targetArray[index + 1]] = [targetArray[index + 1], targetArray[index]];
-            }
-            saveData();
-        };
+        const openAddTransTicketModal = () => { modalTitle.value='新增交通票券'; modalFields.value=[{key:'name',label:'票券名稱'},{key:'url',label:'資訊連結'},{key:'note',label:'注意事項 (支援換行)', type:'textarea'}]; modalData.value={name:'',url:'https://', note:'', icon:'fa-solid fa-ticket', custom:true, type:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{transportTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
+        const applyTicketTemplate = () => { const t = modalData.value.type; if(t==='suica') { modalData.value.name='Suica 西瓜卡'; modalData.value.icon='fa-solid fa-mobile-screen'; modalData.value.url='https://www.jreast.co.jp/tc/pass/suica.html'; modalData.value.note='【手機版】\niPhone 錢包直接新增 > 交通卡 > Suica\n\n【儲值】\n可使用 Apple Pay'; } if(t==='metro') { modalData.value.name='東京地鐵券'; modalData.value.icon='fa-solid fa-subway'; modalData.value.url='https://www.tokyometro.jp/tcn/ticket/travel/index.html'; modalData.value.note='【使用範圍】\n東京 Metro 9條線 + 都營地鐵 4條線\n\n【啟用】\n第一次進站起算小時。'; } if(t==='jrpass') { modalData.value.name='JR 東京廣域周遊券'; modalData.value.icon='fa-solid fa-ticket'; modalData.value.url='https://www.jreast.co.jp/multi/zh-CHT/pass/tokyowide.html'; modalData.value.note='【售價】\n15,000 日圓 (3天)\n\n【必用行程】\n1. 富士回遊\n2. 機場快線 N\'EX'; } if(t==='fuji') { modalData.value.name='富士回遊號 (JR)'; modalData.value.icon='fa-solid fa-train'; modalData.value.url='https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index'; modalData.value.note='【重要】\n全車指定席，無站票！\n請務必提前 30 天由 Eki-net 預約。'; } };
+        const openAddCarModal = () => { modalTitle.value = '新增租車預約'; modalFields.value = [{key:'company',label:'租車公司 (如 Toyota)'},{key:'pickup',label:'取車地點'},{key:'url',label:'預約連結/官網'},{key:'note',label:'備註 (車型/保險)'}]; modalData.value = {company:'', pickup:'', url:'', note:''}; modalHasImg.value = false; isEditingItem.value = false; modalCallback.value = () => { rentalCars.value.push(modalData.value); saveData(); }; showModal.value = true; };
+        const deleteCar = (idx) => { if(confirm('確定刪除此租車紀錄？')) { rentalCars.value.splice(idx,1); saveData(); } };
+        const openAddItineraryModal = () => { modalTitle.value = '新增行程'; modalFields.value = [{key:'hours',label:'時間 (如 14:00)'},{key:'name',label:'行程名稱'},{key:'note',label:'備註/說明'},{key:'mapKeyword',label:'地圖關鍵字 (留空自動抓取)'},{key:'travelTime',label:'下個點交通時間'}]; modalData.value = {hours:'', name:'', note:'', mapKeyword:'', travelTime:'', category:'Sightseeing'}; modalHasImg.value = false; isEditingItem.value = false; modalCallback.value = () => { const arr = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; arr.push(modalData.value); arr.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; showModal.value = true; };
+        const openEditItineraryModal = (item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯行程'; modalFields.value = [{key:'hours',label:'時間'}, {key:'name',label:'名稱'}, {key:'note',label:'備註'}, {key:'mapKeyword',label:'地圖關鍵字'}, {key:'travelTime',label:'交通時間'}]; modalData.value = {...item}; modalHasImg.value = false; isEditingItem.value = true; const targetArray = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; modalCallback.value = () => { targetArray[idx] = modalData.value; targetArray.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; modalDeleteCallback.value = () => { targetArray.splice(idx, 1); saveData(); }; showModal.value = true; };
+        const moveItem = (index, direction) => { if (isGuest.value) return; const targetArray = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; if (direction === -1 && index > 0) { [targetArray[index], targetArray[index - 1]] = [targetArray[index - 1], targetArray[index]]; } else if (direction === 1 && index < targetArray.length - 1) { [targetArray[index], targetArray[index + 1]] = [targetArray[index + 1], targetArray[index]]; } saveData(); };
         
         const openEditModal = (type, item, idx) => {
             if(isGuest.value) return;
@@ -977,15 +832,18 @@ createApp({
             modalData.value = {...item};
             modalHasImg.value = true;
             isEditingItem.value = true;
-            
             if(type === 'shopping') {
                 modalFields.value=[{key:'name',label:'商品名稱'},{key:'link',label:'連結'}];
                 modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); };
                 modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); };
             } else if (type === 'spot') {
                 modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}];
-                modalCallback.value = () => { spots.value[currentView.value][currentLoc.value][idx] = modalData.value; saveData(); };
-                modalDeleteCallback.value = () => { spots.value[currentView.value][currentLoc.value].splice(idx, 1); saveData(); };
+                modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); };
+                modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); };
+            } else if (type === 'food') {
+                modalFields.value=[{key:'name',label:'名稱',onInput:autoFillFoodInfo},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}];
+                modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); };
+                modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); };
             }
             showModal.value = true;
         };
@@ -993,136 +851,76 @@ createApp({
         const handleModalSave = () => { if(modalCallback.value)modalCallback.value(); showModal.value=false; };
         const handleModalDelete = () => { if(confirm('確定刪除？') && modalDeleteCallback.value) { modalDeleteCallback.value(); showModal.value=false; } };
         const processModalImg = (e) => { const r=new FileReader(); r.onload=ev=>modalData.value.img=ev.target.result; r.readAsDataURL(e.target.files[0]); };
+        const openGoogleTranslate = (text) => { window.open(`https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(text)}&op=translate`, '_blank'); };
+        const editFlight = (mode) => { if(isGuest.value) return; flightMode.value = mode; tempFlightData.value.code = mode==='out' ? (currentUser.value.flightOut||'') : (currentUser.value.flightIn||''); tempFlightData.value.seat = mode==='out' ? (currentUser.value.flightOutSeat||'') : (currentUser.value.flightInSeat||''); showFlightModal.value = true; };
+        const saveFlight = () => { if(flightMode.value === 'out') { currentUser.value.flightOut = tempFlightData.value.code; currentUser.value.flightOutSeat = tempFlightData.value.seat; } else { currentUser.value.flightIn = tempFlightData.value.code; currentUser.value.flightInSeat = tempFlightData.value.seat; } const idx = users.value.findIndex(u=>u.id===currentUser.value.id); if(idx!==-1) users.value[idx] = currentUser.value; persistUsers(); saveData(); showFlightModal.value = false; };
 
-        const openGoogleTranslate = (text) => {
-            window.open(`https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(text)}&op=translate`, '_blank');
-        };
-
-        const editFlight = (mode) => {
-             if(isGuest.value) return;
-             flightMode.value = mode;
-             tempFlightData.value.code = mode==='out' ? (currentUser.value.flightOut||'') : (currentUser.value.flightIn||'');
-             tempFlightData.value.seat = mode==='out' ? (currentUser.value.flightOutSeat||'') : (currentUser.value.flightInSeat||'');
-             showFlightModal.value = true;
-        };
-        const saveFlight = () => {
-             if(flightMode.value === 'out') {
-                 currentUser.value.flightOut = tempFlightData.value.code;
-                 currentUser.value.flightOutSeat = tempFlightData.value.seat;
-             } else {
-                 currentUser.value.flightIn = tempFlightData.value.code;
-                 currentUser.value.flightInSeat = tempFlightData.value.seat;
-             }
-             const idx = users.value.findIndex(u=>u.id===currentUser.value.id);
-             if(idx!==-1) users.value[idx] = currentUser.value;
-             persistUsers(); 
-             saveData();
-             showFlightModal.value = false;
-        };
-
-        // V32.0 Fortress Level Save Logic + Offline Detection
-        let saveQueue = Promise.resolve(); // Save Queue
+        // V34.0 Fortress Cloud Logic (Debounce + Retry)
+        const pendingSave = ref(null);
         const isOffline = ref(!navigator.onLine);
-
         window.addEventListener('offline', () => { isOffline.value = true; isSaving.value = 'error'; });
-        window.addEventListener('online', () => { isOffline.value = false; saveData(); }); // Auto sync on reconnect
+        window.addEventListener('online', () => { isOffline.value = false; saveData(); });
 
         const saveData = async () => { 
             if(isGuest.value) return;
-            isSaving.value = 'saving';
             
-            // Queue the save operation
-            saveQueue = saveQueue.then(async () => {
+            // 1. Debounce: Clear previous timer
+            if(pendingSave.value) clearTimeout(pendingSave.value);
+            isSaving.value = 'saving';
+
+            // 2. Schedule Save
+            pendingSave.value = setTimeout(async () => {
                 const data = {users:users.value, itinerary:itinerary.value, expenses:expenses.value, spots:spots.value, shopping:shopping.value, phrases:japanesePhrases.value, drivePlan:drivePlan.value, tickets:suggestedTickets.value, transportTickets:transportTickets.value, rentalCars:rentalCars.value};
                 try {
-                    // Level 1: Save to Local Storage Immediately
+                    // Local Backup
                     localStorage.setItem('V25_DIAMOND_DATA', JSON.stringify(data));
                     
-                    // Level 2: Save to Firebase if Online
+                    // Cloud Save
                     if(db && isLoggedIn.value && !isOffline.value) {
                         await setDoc(doc(db,"trips","kanto2026"), data, {merge:true}); 
-                        setTimeout(() => isSaving.value = 'synced', 500);
+                        isSaving.value = 'synced';
                     } else if (isOffline.value) {
-                        isSaving.value = 'error'; // Visual cue for offline
+                        isSaving.value = 'error'; 
                     }
-                } catch(e) {
-                    console.error("Save Failed:", e);
-                    isSaving.value = 'error';
+                } catch(e) { 
+                    console.error("Save Failed:", e); 
+                    isSaving.value = 'error'; 
+                    // Retry once after 2 seconds
+                    setTimeout(saveData, 2000);
                 }
-            });
+            }, 1000); // 1 Second Debounce
         };
 
         const fetchWeather = async () => { try{ const g=async(la,lo,i)=>{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current_weather=true`);const d=await r.json();weatherData.value[i].temp=d.current_weather.temperature;}; await g(35.68,139.69,0); await g(35.31,139.54,1); await g(35.36,138.72,2); }catch(e){} };
-
-        const initSakura = () => {
-            const container = document.getElementById('sakura-container');
-            if(!container) return;
-            const createPetal = () => {
-                const petal = document.createElement('div');
-                petal.className = 'sakura';
-                petal.style.left = Math.random() * 100 + 'vw';
-                petal.style.animationDuration = Math.random() * 3 + 2 + 's';
-                petal.style.opacity = Math.random();
-                container.appendChild(petal);
-                setTimeout(() => petal.remove(), 5000);
-            };
-            setInterval(createPetal, 400);
-        };
-
-        // Safety Warning: Prevent closing tab while saving
-        window.onbeforeunload = (e) => {
-            if (isSaving.value === 'saving') {
-                const msg = "資料正在雲端同步中，請稍後再關閉！";
-                e.returnValue = msg;
-                return msg;
-            }
-        };
-
-        // Scroll Lock Watcher
+        const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
+        window.onbeforeunload = (e) => { if (isSaving.value === 'saving') { const msg = "資料同步中..."; e.returnValue = msg; return msg; } };
         watch(showModal, (val) => { document.body.classList.toggle('modal-open', val); });
         watch(showExpenseModal, (val) => { document.body.classList.toggle('modal-open', val); });
         watch(showFlightModal, (val) => { document.body.classList.toggle('modal-open', val); });
 
         onMounted(() => {
-            initSakura();
-            loadUserData();
-            initTickets(); 
-
+            initSakura(); loadUserData(); initTickets(); 
             if(auth) onAuthStateChanged(auth, u=>{ isLoggedIn.value=!!u; if(u&&db) onSnapshot(doc(db,"trips","kanto2026"),d=>{if(d.exists()){const dt=d.data(); 
                 if(dt.users) users.value = dt.users; 
-                itinerary.value=dt.itinerary||itinerary.value; 
-                expenses.value=dt.expenses||[]; 
-                spots.value=dt.spots||spots.value; 
-                shopping.value=dt.shopping||shopping.value; 
-                japanesePhrases.value=dt.phrases||japanesePhrases.value; 
-                drivePlan.value=dt.drivePlan||drivePlan.value;
+                itinerary.value=dt.itinerary||itinerary.value; expenses.value=dt.expenses||[]; 
+                spots.value=dt.spots||spots.value; shopping.value=dt.shopping||shopping.value; 
+                japanesePhrases.value=dt.phrases||japanesePhrases.value; drivePlan.value=dt.drivePlan||drivePlan.value;
                 if(dt.tickets) suggestedTickets.value=dt.tickets;
                 if(dt.transportTickets) transportTickets.value=dt.transportTickets;
                 if(dt.rentalCars) rentalCars.value=dt.rentalCars; 
             }}) });
-            
             const l=localStorage.getItem('V25_DIAMOND_DATA'); 
             if(l && !isLoggedIn.value){ 
-                try {
-                    const d=JSON.parse(l); 
-                    if(d.itinerary) itinerary.value = d.itinerary; 
-                    if(d.expenses) expenses.value=d.expenses;
-                    if(d.spots) spots.value=d.spots;
-                    if(d.shopping) shopping.value=d.shopping;
-                    if(d.phrases) japanesePhrases.value=d.phrases;
-                    if(d.drivePlan) drivePlan.value=d.drivePlan;
-                    if(d.tickets) suggestedTickets.value=d.tickets;
-                    if(d.transportTickets) transportTickets.value=d.transportTickets;
+                try { const d=JSON.parse(l); 
+                    if(d.itinerary) itinerary.value = d.itinerary; if(d.expenses) expenses.value=d.expenses;
+                    if(d.spots) spots.value=d.spots; if(d.shopping) shopping.value=d.shopping;
+                    if(d.phrases) japanesePhrases.value=d.phrases; if(d.drivePlan) drivePlan.value=d.drivePlan;
+                    if(d.tickets) suggestedTickets.value=d.tickets; if(d.transportTickets) transportTickets.value=d.transportTickets;
                     if(d.rentalCars) rentalCars.value=d.rentalCars;
                 } catch(e) { console.log('Data Reset'); }
             }
-            
             const lastId = localStorage.getItem('V25_LAST_USER_ID');
-            if(lastId) {
-                const u = users.value.find(user => user.id === parseInt(lastId));
-                if(u) setCurrentUser(u);
-            }
-
+            if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) setCurrentUser(u); }
             fetchWeather();
         });
 
@@ -1137,7 +935,7 @@ createApp({
             handleAuthClick, showLoginModal, loginForm, doLogin, isLoggedIn, itineraryMode, suggestedTickets, openAddTicketModal,
             isSaving, openAddItineraryModal, openEditItineraryModal, openGoogleTranslate,
             transportTickets, openAddTransTicketModal, getAirlineInfo, flightStatusLink, getDirLink, applyTicketTemplate,
-            rentalCars, openAddCarModal, deleteCar, moveItem
+            rentalCars, openAddCarModal, deleteCar, moveItem, openAddFoodModal, autoFillFoodInfo
         };
     }
 }).mount('#app');
