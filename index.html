@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (Elite Edition)</title>
+<title>關東之旅 2026 (Guest-Lock Edition)</title>
 
 <script>
     window.tailwind = {
@@ -32,7 +32,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V25.60 Elite Optimization */
+    /* V25.70 Logic Lockdown */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -135,7 +135,6 @@
     }
     @keyframes fall { to { transform: translate(10vw, 105vh) rotate(360deg); } }
 
-    /* Timeline & Presence Styles */
     .timeline-connect {
         width: 2px;
         background: repeating-linear-gradient(to bottom, #FFD1DC 0, #FFD1DC 5px, transparent 5px, transparent 10px);
@@ -150,9 +149,9 @@
         white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 5;
     }
     
-    .avatar-offline { filter: grayscale(100%) brightness(0.6); opacity: 0.6; }
-    .avatar-online { box-shadow: 0 0 0 2px #4ADE80; opacity: 1; }
-    .online-indicator { position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; background: #4ADE80; border: 1px solid white; border-radius: 50%; }
+    .avatar-offline { filter: grayscale(100%) opacity(0.5); }
+    .avatar-online { box-shadow: 0 0 0 2px #4ADE80; opacity: 1; transform: scale(1.05); }
+    .online-indicator { position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; background: #4ADE80; border: 1px solid white; border-radius: 50%; box-shadow: 0 0 4px #4ADE80; }
     .cloud-status { width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
     .cloud-ok { background: #4ADE80; box-shadow: 0 0 5px #4ADE80; }
     .cloud-sync { background: #FACC15; animation: pulse 1s infinite; }
@@ -174,7 +173,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-40 text-center px-6" @click="enterSite">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">ELITE EDITION</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">GUEST-LOCK EDITION</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -183,7 +182,7 @@
                 <span class="animate-spin-slow">🌸</span> 成員登入
             </div>
             <button @click="enterAsGuest" class="w-full bg-gray-800/60 text-white font-bold py-3 rounded-full backdrop-blur-md text-sm border border-white/20">
-                <i class="fa-solid fa-user-secret mr-2"></i> 訪客參觀 (僅瀏覽)
+                <i class="fa-solid fa-user-secret mr-2"></i> 訪客參觀 (僅瀏覽公開資訊)
             </button>
         </div>
     </div>
@@ -196,11 +195,12 @@
         </h1>
         
         <div class="flex items-center -space-x-2">
-            <div v-for="u in users" :key="u.id" :class="['w-8 h-8 rounded-full border-2 border-white relative overflow-hidden bg-white shadow-sm transition-all', (currentUser && u.id === currentUser.id) ? 'avatar-online' : 'avatar-offline']">
+            <div v-for="u in users" :key="u.id" :class="['w-8 h-8 rounded-full border-2 border-white relative overflow-hidden bg-white shadow-sm transition-all', (!isGuest && currentUser && u.id === currentUser.id) ? 'avatar-online' : 'avatar-offline']">
                 <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
                 <span v-else class="flex items-center justify-center h-full text-sm">{{u.icon}}</span>
-                <div v-if="currentUser && u.id === currentUser.id" class="online-indicator"></div>
+                <div v-if="!isGuest && currentUser && u.id === currentUser.id" class="online-indicator"></div>
             </div>
+            <div v-if="isGuest" class="w-8 h-8 rounded-full border-2 border-white bg-gray-800 text-white flex items-center justify-center text-sm shadow-sm relative z-10">👀</div>
         </div>
     </div>
     <div v-if="currentView !== 'menu'" class="h-[60px] pt-[env(safe-area-inset-top)] box-content shrink-0"></div>
@@ -209,14 +209,15 @@
 
         <div v-if="currentView==='menu'" class="p-6 pt-12 animate-fade-in pb-32 relative">
             <div class="absolute top-6 right-6 flex items-center -space-x-2 pt-[env(safe-area-inset-top)]">
-                <div v-for="u in users" :key="u.id" :class="['w-10 h-10 rounded-full border-2 border-white relative overflow-hidden bg-white shadow-sm transition-all', (currentUser && u.id === currentUser.id) ? 'avatar-online' : 'avatar-offline']">
+                <div v-for="u in users" :key="u.id" :class="['w-10 h-10 rounded-full border-2 border-white relative overflow-hidden bg-white shadow-sm transition-all', (!isGuest && currentUser && u.id === currentUser.id) ? 'avatar-online' : 'avatar-offline']">
                     <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
                     <span v-else class="flex items-center justify-center h-full text-sm">{{u.icon}}</span>
-                    <div v-if="currentUser && u.id === currentUser.id" class="online-indicator" style="width:10px;height:10px;"></div>
+                    <div v-if="!isGuest && currentUser && u.id === currentUser.id" class="online-indicator" style="width:10px;height:10px;"></div>
                 </div>
+                <div v-if="isGuest" class="w-10 h-10 rounded-full border-2 border-white bg-gray-800 text-white flex items-center justify-center text-lg shadow-sm relative z-10">👀</div>
             </div>
 
-            <h2 class="text-3xl font-black text-gray-700 mb-8 text-center pt-[env(safe-area-inset-top)]">旅程中心 <span v-if="isGuest" class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded ml-2 align-middle">訪客</span></h2>
+            <h2 class="text-3xl font-black text-gray-700 mb-8 text-center pt-[env(safe-area-inset-top)]">旅程中心 <span v-if="isGuest" class="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded ml-2 align-middle">訪客模式</span></h2>
             <div class="mb-8 bg-white/70 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl relative overflow-hidden">
                  <div class="flex items-start gap-4 relative z-10">
                      <div class="bg-gradient-to-br from-yellow-200 to-yellow-400 w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl shrink-0 shadow-lg"><i class="fa-solid fa-bell"></i></div>
@@ -288,7 +289,12 @@
         </div>
 
         <div v-if="currentView==='money'" class="px-5 py-4 animate-fade-in">
-             <div v-if="!currentUser && !isGuest" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-lock text-4xl mb-4 text-pink-300"></i><br>請先選擇身分</div>
+             <div v-if="isGuest" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300 mt-10">
+                 <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-gray-400"><i class="fa-solid fa-user-lock"></i></div>
+                 <h3 class="text-xl font-black text-gray-600 mb-2">權限受限</h3>
+                 <p class="text-sm opacity-70">訪客模式無法存取任何帳本資料</p>
+             </div>
+             <div v-else-if="!currentUser" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-lock text-4xl mb-4 text-pink-300"></i><br>請先選擇身分</div>
              <div v-else>
                  <div class="flex gap-2 mb-4 justify-center bg-white/50 p-1 rounded-full w-max mx-auto backdrop-blur-sm shadow-sm">
                      <button @click="moneyTab='record'" :class="['px-6 py-2 rounded-full font-bold transition text-sm',moneyTab==='record'?'bg-yellow-400 text-white shadow-md':'text-gray-400']"><i class="fa-solid fa-user-lock"></i> 我的私帳</button>
@@ -300,7 +306,7 @@
                  <div v-if="moneyTab==='record'">
                      <div class="card p-6 bg-gradient-to-br from-yellow-300 to-orange-400 text-white border-none shadow-orange-200 mb-4">
                         <div class="flex justify-between items-end">
-                            <div><div class="text-xs font-bold opacity-80 mb-1">🔒 {{isGuest ? '訪客' : currentUser.name}} 的私人支出</div><div class="text-4xl font-black">TWD ${{Math.round(myPrivateTotalTWD).toLocaleString()}}</div></div>
+                            <div><div class="text-xs font-bold opacity-80 mb-1">🔒 {{currentUser.name}} 的私人支出</div><div class="text-4xl font-black">TWD ${{Math.round(myPrivateTotalTWD).toLocaleString()}}</div></div>
                         </div>
                      </div>
                      <div class="space-y-3 pb-20">
@@ -308,10 +314,10 @@
                             <div><div class="font-bold text-gray-800">{{exp.name}}</div>
                             <div class="text-[10px] text-gray-400 flex items-center gap-1">{{getPaymentIcon(exp.method)}} {{exp.date}}</div></div>
                             <div class="text-right"><span class="font-black text-gray-700 block">{{exp.currency}} {{exp.amount}}</span></div>
-                            <button v-if="!isGuest" @click="deleteExpense(exp.id)" class="ml-3 text-red-300"><i class="fa-solid fa-trash-can"></i></button>
+                            <button @click="deleteExpense(exp.id)" class="ml-3 text-red-300"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                      </div>
-                     <button v-if="!isGuest" @click="openExpenseModal('private')" class="fab-main bg-yellow-400 text-white"><i class="fa-solid fa-pen"></i></button>
+                     <button @click="openExpenseModal('private')" class="fab-main bg-yellow-400 text-white"><i class="fa-solid fa-pen"></i></button>
                  </div>
                  <div v-if="moneyTab==='split'">
                      <div class="card p-5 border-l-4 border-blue-400 bg-blue-50/50">
@@ -332,11 +338,11 @@
                              </div>
                              <div class="flex justify-between items-end">
                                  <div class="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block"><span class="text-blue-500">{{getUserName(exp.whoPaid)}}</span> 付款 <i class="fa-solid fa-caret-right text-gray-400"></i> {{exp.forWhom.length}} 人均分</div>
-                                 <button v-if="!isGuest && exp.whoPaid === currentUser.id" @click="deleteExpense(exp.id)" class="text-red-300 p-2"><i class="fa-solid fa-trash-can"></i></button>
+                                 <button v-if="exp.whoPaid === currentUser.id" @click="deleteExpense(exp.id)" class="text-red-300 p-2"><i class="fa-solid fa-trash-can"></i></button>
                              </div>
                         </div>
                      </div>
-                     <button v-if="!isGuest" @click="openExpenseModal('split')" class="fab-main bg-blue-400 text-white"><i class="fa-solid fa-plus"></i></button>
+                     <button @click="openExpenseModal('split')" class="fab-main bg-blue-400 text-white"><i class="fa-solid fa-plus"></i></button>
                  </div>
              </div>
         </div>
@@ -351,18 +357,26 @@
             <div v-if="hotelTab==='stay'" class="space-y-6">
                 <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('bnb.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">錦糸町民宿</h3></div></div><div class="p-4"><a href="https://maps.app.goo.gl/cyLNVJttoAM61dmFA" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
                 <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('megu.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">Megu Fuji</h3></div></div><div class="p-4"><a href="https://www.google.com/maps/search/?api=1&query=Megu+Fuji+2021" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a></div></div>
-                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('domo.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">DOMO 民宿</h3></div></div><div class="p-4"><a href="https://maps.app.goo.gl/NbDPS57PZixB7AsH8" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航 (東新宿)</a></div></div>
+                <div class="card !p-0 border-0 shadow-xl overflow-hidden"><div class="h-40 bg-gray-200 relative"><img :src="getImg('domo.jpg')" class="w-full h-full object-cover" @error="handleImgError"><div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">DOMO 民宿</h3></div></div><div class="p-4"><a href="https://maps.app.goo.gl/NbDPS57PZixB7AsH8`。" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航 (東新宿)</a></div></div>
             </div>
 
             <div v-if="hotelTab==='flight'" class="animate-fade-in pb-20">
-                 <div v-if="!currentUser && !isGuest" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-eye-slash text-4xl mb-4"></i><br>請先選擇身分</div>
+                 <div v-if="isGuest" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300 mt-4">
+                     <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-gray-400"><i class="fa-solid fa-ticket-simple"></i></div>
+                     <h3 class="text-xl font-black text-gray-600 mb-2">權限受限</h3>
+                     <p class="text-sm opacity-70">訪客模式無法查看個人機票</p>
+                 </div>
+                 <div v-else-if="!currentUser" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-eye-slash text-4xl mb-4"></i><br>請先選擇身分</div>
                  <div v-else class="space-y-4">
                      <div class="card !p-0 border-0 shadow-lg relative overflow-hidden group">
-                         <div class="bg-pink-500 p-3 flex justify-between items-center text-white">
-                             <span class="font-black text-sm tracking-widest">OUTBOUND</span>
-                             <button v-if="!isGuest" @click="editFlight('out')" class="text-xs bg-white/20 px-2 py-1 rounded"><i class="fa-solid fa-pen"></i></button>
-                         </div>
-                         <div class="p-5 bg-white"><div class="text-center font-black text-2xl text-gray-700">{{currentUser?.flightOut || 'TR898'}} / {{currentUser?.flightOutSeat || '--'}}</div></div>
+                         <div class="bg-pink-500 p-3 flex justify-between items-center text-white"><span class="font-black text-sm tracking-widest">OUTBOUND</span><button @click="editFlight('out')" class="text-xs bg-white/20 px-2 py-1 rounded"><i class="fa-solid fa-pen"></i></button></div>
+                         <div class="p-5 bg-white"><div class="text-center font-black text-2xl text-gray-700">{{currentUser.flightOut || 'TR898'}} / {{currentUser.flightOutSeat || '--'}}</div></div>
+                         <div v-if="getAirlineInfo(currentUser.flightOut)" class="bg-yellow-50 p-3 text-xs text-yellow-800 font-bold border-t border-yellow-100 leading-relaxed whitespace-pre-wrap"><i class="fa-solid fa-triangle-exclamation mr-1"></i> {{getAirlineInfo(currentUser.flightOut)}}</div>
+                     </div>
+                     <div class="card !p-0 border-0 shadow-lg relative overflow-hidden group">
+                         <div class="bg-indigo-500 p-3 flex justify-between items-center text-white"><span class="font-black text-sm tracking-widest">INBOUND</span><button @click="editFlight('in')" class="text-xs bg-white/20 px-2 py-1 rounded"><i class="fa-solid fa-pen"></i></button></div>
+                         <div class="p-5 bg-white"><div class="text-center font-black text-2xl text-gray-700">{{currentUser.flightIn || 'BR197'}} / {{currentUser.flightInSeat || '--'}}</div></div>
+                         <div v-if="getAirlineInfo(currentUser.flightIn)" class="bg-yellow-50 p-3 text-xs text-yellow-800 font-bold border-t border-yellow-100 leading-relaxed whitespace-pre-wrap"><i class="fa-solid fa-triangle-exclamation mr-1"></i> {{getAirlineInfo(currentUser.flightIn)}}</div>
                      </div>
                  </div>
             </div>
@@ -389,19 +403,23 @@
                 <button v-if="!isGuest" @click="openTicketModal" class="mt-3 w-full py-2 bg-white/50 text-purple-400 text-xs font-bold rounded-lg border border-purple-100">+ 新增票券</button>
             </div>
 
-            <div v-if="!currentUser && !isGuest" class="text-center text-gray-400 font-bold bg-white/50 py-10 rounded-2xl border border-dashed"><i class="fa-solid fa-suitcase text-3xl mb-2"></i><br>請登入以管理清單</div>
+            <div v-if="isGuest" class="text-center py-10 text-gray-400 font-bold bg-white/50 rounded-2xl border border-dashed border-gray-300">
+                <i class="fa-solid fa-suitcase text-3xl mb-2"></i><br>
+                訪客模式無法存取個人清單
+            </div>
+            <div v-else-if="!currentUser" class="text-center text-gray-400 font-bold bg-white/50 py-10 rounded-2xl border border-dashed"><i class="fa-solid fa-suitcase text-3xl mb-2"></i><br>請登入以管理清單</div>
             <div v-else class="card p-0">
                 <div class="bg-gray-50 p-3 border-b font-bold text-gray-700 flex justify-between items-center">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-blue-400"></i> {{(currentUser?.name || '訪客')}} 的行李</span>
-                    <div class="flex gap-2" v-if="!isGuest">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-blue-400"></i> {{currentUser.name}} 的行李</span>
+                    <div class="flex gap-2">
                         <button @click="resetList(currentUser)" class="text-[10px] bg-white border border-gray-200 text-gray-400 px-2 py-1 rounded-full">載入</button>
                         <button @click="addPrepItem(currentUser)" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-bold shadow-blue-200 shadow">+ 新增</button>
                     </div>
                 </div>
-                <div v-for="(item, idx) in (currentUser?.list || [])" :key="idx" class="flex items-center p-3 border-b border-gray-100 group">
-                    <input type="checkbox" v-model="item.checked" :disabled="isGuest" class="w-5 h-5 accent-pink-500 mr-3" @change="saveData">
-                    <input v-model="item.text" :disabled="isGuest" @change="saveData" :class="['flex-1 text-sm font-bold bg-transparent outline-none', item.checked?'text-gray-300 line-through':'text-gray-700']">
-                    <button v-if="!isGuest" @click="currentUser.list.splice(idx,1);saveData()" class="text-gray-200 hover:text-red-400 transition px-2"><i class="fa-solid fa-times"></i></button>
+                <div v-for="(item, idx) in currentUser.list" :key="idx" class="flex items-center p-3 border-b border-gray-100 group">
+                    <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-500 mr-3" @change="saveData">
+                    <input v-model="item.text" @change="saveData" :class="['flex-1 text-sm font-bold bg-transparent outline-none', item.checked?'text-gray-300 line-through':'text-gray-700']">
+                    <button @click="currentUser.list.splice(idx,1);saveData()" class="text-gray-200 hover:text-red-400 transition px-2"><i class="fa-solid fa-times"></i></button>
                 </div>
             </div>
         </div>
@@ -431,8 +449,42 @@
         
         <div v-if="['shopping','food','photo'].includes(currentView)" class="px-5 py-4 animate-fade-in">
              <div v-if="currentView!=='shopping'" class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{loc}}</button></div>
-             <div class="text-center text-gray-400 mt-10">資料載入中...</div>
-             <button v-if="!isGuest" @click="openAddSpotModal" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
+             
+             <div v-if="currentView==='shopping'">
+                 <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar"><button v-for="cat in ['cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">{{cat}}</button></div>
+                 <div class="grid grid-cols-2 gap-4 pb-20">
+                    <div v-for="(item,idx) in shopping[shopCat]" class="card !p-0 border-0 shadow-lg group relative" :key="idx">
+                        <div class="h-32 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/300x300/pink/white?text=SHOP'" class="w-full h-full object-cover" @error="handleImgError"></div>
+                        <div class="p-3">
+                            <div class="font-bold text-gray-800 text-sm mb-1 truncate">{{item.name}}</div>
+                            <a :href="item.link || getSearchLink(item.name)" target="_blank" class="block text-center bg-gray-50 text-gray-500 text-[10px] py-1.5 rounded font-bold hover:bg-pink-500 hover:text-white transition">前往官網 / 搜尋</a>
+                        </div>
+                        <div v-if="!isGuest" class="absolute top-1 right-1 flex gap-1">
+                            <button @click="openEditModal('shopping', item, idx)" class="bg-white/90 p-1.5 rounded-full text-blue-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                            <button @click="shopping[shopCat].splice(idx,1);saveData()" class="bg-white/90 p-1.5 rounded-full text-red-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                        </div>
+                    </div>
+                 </div>
+             </div>
+             
+             <div v-else>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
+                    <div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="card !p-0 border-0 shadow-lg group relative">
+                        <div class="h-48 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/600x400/orange/white?text=SPOT'" class="w-full h-full object-cover" @error="handleImgError"></div>
+                        <div class="p-4">
+                            <h3 class="font-black text-gray-800 text-lg mb-1">{{item.name}}</h3>
+                            <p class="text-sm text-gray-500 mb-3">{{item.desc}}</p>
+                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-50 text-gray-600 font-bold py-2 rounded-lg text-sm border hover:bg-orange-400 hover:text-white transition"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                        </div>
+                        <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2">
+                             <button @click="openEditModal('spot', item, idx)" class="w-8 h-8 bg-white rounded-full shadow text-blue-500 flex items-center justify-center"><i class="fa-solid fa-pen"></i></button>
+                             <button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white rounded-full shadow text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                 </div>
+             </div>
+
+             <button v-if="!isGuest" @click="currentView==='shopping'?openAddShopModal():openAddSpotModal()" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
         </div>
 
     </div>
@@ -488,6 +540,10 @@
         </div>
     </div>
 
+    <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目 (如: 晚餐)" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold">取消</button></div></div>
+    
+    <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative"><h3 class="font-bold text-lg mb-4 text-center">{{modalTitle}}</h3><div class="space-y-3"><input v-for="f in modalFields" :key="f.key" v-model="modalData[f.key]" :placeholder="f.label" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300"><button v-if="modalHasImg" @click="$refs.modalImgInput.click()" class="w-full py-3 bg-blue-50 text-blue-500 rounded-xl font-bold border border-blue-100">{{modalData.img?'更換圖片':'上傳圖片'}}</button></div><div class="flex gap-3 mt-6"><button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button><button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg">儲存</button></div></div><input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg"></div>
+
     <div v-if="expandedPhrase" class="fixed inset-0 z-[5000] bg-white flex flex-col items-center justify-center p-10 text-center">
         <div class="text-[60px] font-black mb-10 text-gray-800 break-words w-full leading-tight">{{expandedPhrase.jp}}</div>
         <div class="text-3xl font-bold text-gray-500 mb-16">{{expandedPhrase.zh}}</div>
@@ -503,7 +559,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { createApp, ref, computed, onMounted, watch } from "https://unpkg.com/vue@3.3.4/dist/vue.esm-browser.js";
+import { createApp, ref, computed, onMounted } from "https://unpkg.com/vue@3.3.4/dist/vue.esm-browser.js";
 
 const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", authDomain: "tokyo-trip-24b28.firebaseapp.com", projectId: "tokyo-trip-24b28", storageBucket: "tokyo-trip-24b28.firebasestorage.app", messagingSenderId: "518699705070", appId: "1:518699705070:web:56e95f603210d8d5d209ff" };
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); } catch (e) { console.warn("Firebase Init Fail", e); }
@@ -513,9 +569,8 @@ const defaultData = {
     itinerary: [
         [{hours:"06:40",category:"Flight",name:"TPE 起飛",note:"T1 辦理登機",mapKeyword:"桃園機場 T1"},{hours:"10:40",category:"Flight",name:"NRT 抵達",note:"領取行李/購買西瓜卡",mapKeyword:"成田機場"},{hours:"14:00",category:"Sightseeing",name:"晴空塔",note:"下午行程",mapKeyword:"東京晴空塔",travelTime:"⬇ 60min"},{hours:"18:00",category:"Food",name:"錦糸町周遭",note:"晚餐",mapKeyword:"錦糸町站 美食",travelTime:"⬇ 10min"}],
         [{hours:"09:00",category:"Sightseeing",name:"淺草寺",note:"雷門/仲見世通",mapKeyword:"淺草寺",travelTime:"⬇ 20min"},{hours:"12:00",category:"Food",name:"淺草周遭",note:"午餐",mapKeyword:"淺草站 美食",travelTime:"⬇ 5min"},{hours:"14:00",category:"Sightseeing",name:"小網神社/上野公園",note:"強運厄除/公園散步",mapKeyword:"小網神社",travelTime:"⬇ 20min"},{hours:"18:00",category:"Shopping",name:"秋葉原/東京一番街",note:"動漫或逛街",mapKeyword:"秋葉原",travelTime:"⬇ 15min"},{hours:"20:00",category:"Food",name:"晚餐",note:"依逛街行程決定",mapKeyword:"東京車站 美食"}],
-        [],[],[],[],[],[] // Filled by day index 2-7 later or default
+        [],[],[],[],[],[] 
     ],
-    // V25.60: STRICT Drive Plan with Parking Links
     drivePlan: [
         [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發",travelTime:"🚗 120min"},{hours:"10:30",category:"Transport",name:"開始租車",note:"河口湖 租車",travelTime:"🚗 20min"},
          {hours:"13:00",category:"Sightseeing",name:"河口湖自然生活館",note:"大石公園絕景",travelTime:"🚗 20min",parkingLink:"https://www.google.com/maps/search/Oishi+Park+Parking"},
@@ -534,18 +589,24 @@ const defaultData = {
     phrases: [{jp:'すみません',zh:'不好意思/請問'}]
 };
 
+const defaultPrepList = [
+    {text:'護照 (效期6個月以上)',checked:false}, {text:'Visit Japan Web QR Code',checked:false}, {text:'網卡/漫遊',checked:false}, {text:'日幣現金',checked:false}, {text:'信用卡 (海外回饋高)',checked:false}, {text:'轉接頭/充電器',checked:false}, {text:'個人常備藥',checked:false}
+];
+
 createApp({
     setup() {
         const currentView = ref('welcome');
         const currentUser = ref(null);
-        const isGuest = ref(false); // Feature 2
-        const isSaving = ref(false); // Feature 9
+        const isGuest = ref(false); // Feature 1: Guest Logic
+        const isSaving = ref(false); 
         const showPersonaModal = ref(false);
+        const showUserEditModal = ref(false);
+        const editingUser = ref({});
         const isWelcomeClosed = ref(false);
         const showLoginModal = ref(false);
+        const loginForm = ref({email:'',password:''});
         const isLoggedIn = ref(false);
         
-        // Data
         const users = ref(defaultData.users);
         const itinerary = ref(defaultData.itinerary);
         const drivePlan = ref(defaultData.drivePlan);
@@ -553,23 +614,35 @@ createApp({
         const spots = ref(defaultData.spots);
         const shopping = ref(defaultData.shopping);
         const japanesePhrases = ref(defaultData.phrases);
-        const ticketList = ref([]); // Feature 8: Editable tickets
+        const ticketList = ref([]);
         
         const selectedDayIndex = ref(0);
         const itineraryMode = ref('normal');
         const exchangeRate = ref(0.215);
         const moneyTab = ref('record');
         const hotelTab = ref('stay');
+        const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
         const weatherData = ref([{name:'Tokyo',temp:'--',bg:'bg-blue-400'},{name:'Kamakura',temp:'--',bg:'bg-indigo-400'},{name:'Fuji',temp:'--',bg:'bg-purple-400'}]);
         
+        // Modals
+        const showExpenseModal = ref(false);
+        const modalData = ref({});
+        const expenseMode = ref('private'); 
+        const expandedPhrase = ref(null);
+        const showModal = ref(false);
+        const modalTitle = ref('');
+        const modalFields = ref([]);
+        const modalHasImg = ref(false);
+        const modalCallback = ref(null);
         const showItineraryModal = ref(false);
         const editingItineraryIdx = ref(-1);
         const tempItinerary = ref({});
         const showTranslateModal = ref(false);
-        const modalData = ref({});
-        const expandedPhrase = ref(null);
-        
+        const showFlightModal = ref(false);
+        const tempFlightData = ref({});
+        const flightMode = ref('out');
+
         const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'},{week:'D8',title:'4/03'}];
         const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
 
@@ -578,21 +651,19 @@ createApp({
         // --- Core Logic ---
         
         const enterSite = () => { isWelcomeClosed.value=true; showPersonaModal.value=true; };
-        const enterAsGuest = () => { // Feature 2
+        const enterAsGuest = () => { 
             isGuest.value = true;
             currentUser.value = {id:0, name:'訪客', icon:'👀'};
             isWelcomeClosed.value = true;
             currentView.value = 'menu';
         };
 
-        // Feature 8: Initialize Ticket List (Auto + Manual)
         const initTickets = () => {
              const text = JSON.stringify(itinerary.value) + JSON.stringify(drivePlan.value);
              const list = [];
              if(text.includes('富士回遊')) list.push({name:'富士回遊號 (JR)', url:'https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index'});
              if(text.includes('SHIBUYA')) list.push({name:'SHIBUYA SKY', url:'https://www.klook.com/zh-TW/activity/70672-shibuya-sky-tokyo/'});
              if(text.includes('迪士尼')) list.push({name:'迪士尼門票', url:'https://www.tokyodisneyresort.jp/tc/ticket/index.html'});
-             // Only set if empty to avoid overwriting user edits
              if(ticketList.value.length === 0) ticketList.value = list;
         };
 
@@ -604,39 +675,61 @@ createApp({
         };
 
         const saveData = async () => { 
-            if(isGuest.value) return; // Feature 2: Lock Guest
-            isSaving.value = true; // Feature 9: Diagnostic Light
+            if(isGuest.value) return; 
+            isSaving.value = true; 
             const data = {users:users.value, itinerary:itinerary.value, drivePlan:drivePlan.value, expenses:expenses.value, spots:spots.value, shopping:shopping.value, phrases:japanesePhrases.value, ticketList:ticketList.value};
             if(db&&isLoggedIn.value) await setDoc(doc(db,"trips","kanto2026"), data, {merge:true}); 
             localStorage.setItem('V25_ELITE_DATA', JSON.stringify(data));
             setTimeout(()=>isSaving.value=false, 500);
         };
 
-        // Feature 3: Itinerary CRUD
-        const openItineraryModal = (idx) => {
-            editingItineraryIdx.value = idx;
-            if(idx === -1) tempItinerary.value = {hours:'', name:'', note:'', category:'Sightseeing', mapKeyword:''};
-            else tempItinerary.value = {...getCurrentItinerary()[idx]};
-            showItineraryModal.value = true;
+        // Actions
+        const loadUserData = () => {
+             const localUsers = localStorage.getItem('V25_50_USERS');
+             if(localUsers) {
+                 const parsed = JSON.parse(localUsers);
+                 users.value = users.value.map(defU => {
+                     const saved = parsed.find(p => p.id === defU.id);
+                     return saved ? {...defU, ...saved} : defU;
+                 });
+             }
         };
-        const saveItineraryItem = () => {
-            if(!tempItinerary.value.mapKeyword) tempItinerary.value.mapKeyword = tempItinerary.value.name; // Feature 3: Auto Map
-            const list = getCurrentItinerary();
-            if(editingItineraryIdx.value === -1) list.push(tempItinerary.value);
-            else list[editingItineraryIdx.value] = tempItinerary.value;
-            saveData();
-            showItineraryModal.value = false;
-        };
-        const deleteItineraryItem = (idx) => {
-            if(confirm('確定刪除此行程?')) { getCurrentItinerary().splice(idx,1); saveData(); }
-        };
+        const persistUsers = () => { localStorage.setItem('V25_50_USERS', JSON.stringify(users.value)); saveData(); };
+        const setCurrentUser = (u) => { currentUser.value=u; localStorage.setItem('V25_LAST_USER_ID', u.id); showPersonaModal.value=false; currentView.value='menu'; };
+        const openUserEditor = (u) => { editingUser.value={...u}; showUserEditModal.value=true; };
+        const saveUserChanges = () => { const idx=users.value.findIndex(u=>u.id===editingUser.value.id); if(idx!==-1){users.value[idx]={...editingUser.value}; if(currentUser.value && currentUser.value.id === editingUser.value.id) currentUser.value = users.value[idx];} persistUsers(); showUserEditModal.value=false; };
+        const processAvatarUpload = (e) => { const r=new FileReader(); r.onload=ev=>editingUser.value.avatar=ev.target.result; r.readAsDataURL(e.target.files[0]); };
+        const handleAuthClick = () => isLoggedIn.value ? (confirm('登出雲端?')&&signOut(auth)) : showLoginModal.value=true;
+        const doLogin = async () => { try{await setPersistence(auth, browserLocalPersistence); await signInWithEmailAndPassword(auth,loginForm.value.email,loginForm.value.password);showLoginModal.value=false;}catch(e){alert(e.message);} };
 
-        // Feature 5: Translate
+        const openItineraryModal = (idx) => { editingItineraryIdx.value = idx; if(idx === -1) tempItinerary.value = {hours:'', name:'', note:'', category:'Sightseeing', mapKeyword:''}; else tempItinerary.value = {...getCurrentItinerary()[idx]}; showItineraryModal.value = true; };
+        const saveItineraryItem = () => { if(!tempItinerary.value.mapKeyword) tempItinerary.value.mapKeyword = tempItinerary.value.name; const list = getCurrentItinerary(); if(editingItineraryIdx.value === -1) list.push(tempItinerary.value); else list[editingItineraryIdx.value] = tempItinerary.value; saveData(); showItineraryModal.value = false; };
+        const deleteItineraryItem = (idx) => { if(confirm('確定刪除此行程?')) { getCurrentItinerary().splice(idx,1); saveData(); } };
+
         const openAddPhraseModal = () => { modalData.value={zh:'',jp:''}; showTranslateModal.value=true; };
-        const handleModalSave = () => { 
-            if(showTranslateModal.value) { japanesePhrases.value.push(modalData.value); saveData(); showTranslateModal.value=false; }
-            // ... (other modals logic preserved)
-        };
+        const handleModalSave = () => { if(showTranslateModal.value) { japanesePhrases.value.push(modalData.value); saveData(); showTranslateModal.value=false; } else if(modalCallback.value) modalCallback.value(); showModal.value=false; };
+
+        const openExpenseModal = (mode) => { expenseMode.value = mode; modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : users.value.map(u=>u.id)}; showExpenseModal.value=true; };
+        const toggleShare = (id) => { const i=modalData.value.forWhom.indexOf(id); i>-1?modalData.value.forWhom.splice(i,1):modalData.value.forWhom.push(id); };
+        const saveExpense = () => { expenses.value.push({...modalData.value,id:Date.now(),date:new Date().toLocaleDateString()}); saveData(); showExpenseModal.value=false; };
+        const deleteExpense = (id) => { if(confirm('確定刪除此筆記錄?')){expenses.value=expenses.value.filter(e=>e.id!==id); saveData();} };
+        const resetList = (u) => { if(confirm('確定重置為預設懶人包清單？')){u.list = JSON.parse(JSON.stringify(defaultPrepList)); saveData();} };
+        const addPrepItem = (u) => { u.list.push({text:'新項目',checked:false}); saveData(); };
+        
+        const expandCard = (p) => expandedPhrase.value=p;
+        const speakJapanese = (t) => { const u=new SpeechSynthesisUtterance(t); u.lang='ja-JP'; window.speechSynthesis.speak(u); };
+        const handleCameraTranslate = () => alert("已擷取影像！\n請使用 Google Lens 進行掃描。");
+
+        const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'商品名稱'},{key:'link',label:'官方連結 (選填)'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; modalCallback.value=()=>{shopping.value[shopCat.value].push(modalData.value); saveData();}; showModal.value=true; };
+        const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'景點名稱'},{key:'desc',label:'描述'},{key:'link',label:'Google Map 關鍵字'}]; modalData.value={name:'',desc:'',link:'',img:''}; modalHasImg.value=true; modalCallback.value=()=>{spots.value[currentView.value][currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
+        const openEditModal = (type, item, idx) => { modalTitle.value = '編輯內容'; modalData.value = {...item}; modalHasImg.value = true; if(type === 'shopping') { modalFields.value=[{key:'name',label:'商品名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; } else if (type === 'spot') { modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value[currentView.value][currentLoc.value][idx] = modalData.value; saveData(); }; } showModal.value = true; };
+        const processModalImg = (e) => { const r=new FileReader(); r.onload=ev=>modalData.value.img=ev.target.result; r.readAsDataURL(e.target.files[0]); };
+        
+        const openTicketModal = () => { modalTitle.value='新增票券'; modalFields.value=[{key:'name',label:'票券名稱'},{key:'url',label:'購票連結'}]; modalData.value={name:'',url:''}; modalHasImg.value=false; modalCallback.value=()=>{ticketList.value.push(modalData.value); saveData();}; showModal.value=true; };
+
+        // Flight Logic
+        const editFlight = (mode) => { flightMode.value = mode; tempFlightData.value.code = mode==='out' ? (currentUser.value.flightOut||'') : (currentUser.value.flightIn||''); tempFlightData.value.seat = mode==='out' ? (currentUser.value.flightOutSeat||'') : (currentUser.value.flightInSeat||''); showFlightModal.value = true; };
+        const saveFlight = () => { if(flightMode.value === 'out') { currentUser.value.flightOut = tempFlightData.value.code; currentUser.value.flightOutSeat = tempFlightData.value.seat; } else { currentUser.value.flightIn = tempFlightData.value.code; currentUser.value.flightInSeat = tempFlightData.value.seat; } const idx = users.value.findIndex(u=>u.id===currentUser.value.id); if(idx!==-1) users.value[idx] = currentUser.value; persistUsers(); saveData(); showFlightModal.value = false; };
 
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
         const getMapLink = (k,n) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k||n)}`;
@@ -645,48 +738,51 @@ createApp({
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (v) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','japanese':'翻譯蒟蒻'}[v]||'關東之旅');
         const getIconByCategory = (c) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway'}[c]||'fa-solid fa-location-dot');
-        const speakJapanese = (t) => { const u=new SpeechSynthesisUtterance(t); u.lang='ja-JP'; window.speechSynthesis.speak(u); };
-
-        // Finance Computed
-        const myPrivateExpenses = computed(() => expenses.value.filter(e => e.whoPaid===currentUser.value?.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value?.id));
+        const getUserName = (id) => users.value.find(u=>u.id===id)?.name||'未知';
+        const getClothingAdvice = (t) => t<10?'羽絨+圍巾':t<15?'大衣+發熱衣':'洋蔥式穿搭';
+        
+        const smartReminders = computed(() => { const l=[]; if(daysUntilTrip.value<=7)l.push("VJW 填寫了嗎？"); return l; });
+        const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((s,e) => s + (e.currency==='JPY'?e.amount*exchangeRate.value:e.amount), 0));
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
-        const settlements = computed(() => { 
-            const b={}; users.value.forEach(u=>b[u.id]=0); 
-            groupExpenses.value.forEach(e=>{ const t=(e.currency==='JPY'?e.amount*exchangeRate.value:e.amount); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); 
-            const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); 
-            const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); 
-            let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } 
-            return r; 
-        });
-        const getUserName = (id) => users.value.find(u=>u.id===id)?.name||'未知';
-        const smartReminders = computed(() => { const l=[]; if(daysUntilTrip.value<=7)l.push("VJW 填寫了嗎？"); return l; }); // Simplified for brevity
+        const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=(e.currency==='JPY'?e.amount*exchangeRate.value:e.amount); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
+        const getAirlineInfo = (c) => { if(!c)return null; if(c.startsWith('TR'))return "酷航: 桃T1/成T1南。手提10kg"; if(c.startsWith('BR'))return "長榮: 桃T2/成T1南。23kgx2"; if(c.startsWith('JX'))return "星宇: 桃T1/成T2"; return null; };
 
         onMounted(() => {
+            loadUserData();
+            const initSakura = () => { const c=document.getElementById('sakura-container'); if(!c)return; setInterval(()=>{ const p=document.createElement('div'); p.className='sakura'; p.style.left=Math.random()*100+'vw'; p.style.animationDuration=Math.random()*3+2+'s'; c.appendChild(p); setTimeout(()=>p.remove(),5000); },400); };
+            initSakura();
+            
             if(auth) onAuthStateChanged(auth, u=>{ isLoggedIn.value=!!u; if(u&&db) onSnapshot(doc(db,"trips","kanto2026"),d=>{if(d.exists()){const dt=d.data(); 
+                if(dt.users) users.value=dt.users; 
                 if(dt.itinerary) itinerary.value=dt.itinerary; 
+                if(dt.expenses) expenses.value=dt.expenses;
+                if(dt.spots) spots.value=dt.spots;
+                if(dt.shopping) shopping.value=dt.shopping;
+                if(dt.phrases) japanesePhrases.value=dt.phrases;
                 if(dt.ticketList) ticketList.value=dt.ticketList;
-                // ... sync other fields
             }}) });
             
             const l=localStorage.getItem('V25_ELITE_DATA'); 
-            if(l){ const d=JSON.parse(l); if(d.itinerary) itinerary.value=d.itinerary; if(d.drivePlan) drivePlan.value=d.drivePlan; }
+            if(l && !isLoggedIn.value){ const d=JSON.parse(l); if(d.itinerary) itinerary.value=d.itinerary; if(d.drivePlan) drivePlan.value=d.drivePlan; }
             
-            initTickets(); // Feature 8
-            
-            // Auto Login
+            initTickets();
             const lastId = localStorage.getItem('V25_LAST_USER_ID');
-            if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) { currentUser.value=u; isWelcomeClosed.value=true; currentView.value='menu'; } }
+            if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) setCurrentUser(u); }
         });
 
         return {
             users, currentView, isWelcomeClosed, enterSite, enterAsGuest, isGuest, isSaving, apps, getPageTitle, isLoggedIn,
             daysUntilTrip, smartReminders, tripDays, selectedDayIndex, getCurrentItinerary, itineraryMode,
             moneyTab, exchangeRate, myPrivateExpenses, myPrivateTotalTWD, groupExpenses, settlements, getUserName, getPaymentIcon,
-            hotelTab, shopCat, shopping, currentLoc, spots, weatherData, japanesePhrases, expandCard, expandedPhrase,
-            getMapLink, getSearchLink, getImg, handleImgError, saveData, currentUser, showPersonaModal, openAddPhraseModal,
+            hotelTab, shopCat, shopping, currentLoc, spots, openAddSpotModal, weatherData, getClothingAdvice, japanesePhrases, expandCard, expandedPhrase, openAddPhraseModal,
+            getMapLink, getSearchLink, getImg, handleImgError, saveData, currentUser, showPersonaModal, setCurrentUser, openUserEditor, showUserEditModal, editingUser, saveUserChanges, processAvatarUpload, handleCameraTranslate,
+            resetList, addPrepItem, openEditModal, showFlightModal, tempFlightData, editFlight, saveFlight, flightMode, getAirlineInfo, speakJapanese, ticketList,
+            handleAuthClick, showLoginModal, loginForm, doLogin, 
             showItineraryModal, openItineraryModal, saveItineraryItem, deleteItineraryItem, tempItinerary, editingItineraryIdx,
-            showTranslateModal, modalData, handleModalSave, speakJapanese, ticketList
+            showTranslateModal, modalData, handleModalSave,
+            openExpenseModal, showExpenseModal, toggleShare, saveExpense, deleteExpense, expenseMode,
+            openAddShopModal, openTicketModal, showModal, modalTitle, modalFields, modalHasImg, processModalImg
         };
     }
 }).mount('#app');
