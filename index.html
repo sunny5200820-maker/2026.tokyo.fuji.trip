@@ -781,7 +781,7 @@ createApp({
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
-        const getMapLink = (k,n) => { let q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; };
+        const getMapLink = (k,n) => { let q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return `http://googleusercontent.com/maps.google.com/${encodeURIComponent(q)}`; };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
         const getImg = (p) => p.startsWith('data:')?p:`https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/${p}`;
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
@@ -792,7 +792,7 @@ createApp({
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
         const flightStatusLink = (code) => code ? `https://www.flightradar24.com/data/flights/${code.toLowerCase()}` : '';
         const getAirlineInfo = (flightCode, isShort) => { if(!flightCode) return null; const c = flightCode.toUpperCase(); if(c.startsWith('TR')) return isShort?"酷航 Scoot":"【酷航 Scoot】\n📍 報到：桃園 T1 / 成田 T1 南翼\n🧳 手提：10kg (嚴格秤重)"; if(c.startsWith('BR')) return isShort?"長榮 EVA":"【長榮 EVA】\n📍 報到：桃園 T2 / 成田 T1 南翼\n🧳 託運：計件制 23kg x 2 件"; return '請確認電子機票上的航廈資訊'; };
-        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=transit`; };
+        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return `http://googleusercontent.com/maps.google.com/${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=transit`; };
 
         const getAmountInTWD = (e) => e.currency==='JPY' ? e.amount*exchangeRate.value : e.amount;
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
@@ -887,105 +887,4 @@ createApp({
             } else if (type === 'spot') {
                 modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}];
                 modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); };
-                modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); };
-            } else if (type === 'food') {
-                modalFields.value=[{key:'name',label:'名稱',onInput:autoFillFoodInfo},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}];
-                modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); };
-                modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); };
-            }
-            showModal.value=true;
-        };
-        const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value = () => { shopping.value[shopCat.value].push(modalData.value); saveData(); }; showModal.value=true; };
-        const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
-        const openAddFoodModal = () => { modalTitle.value='新增美食'; modalFields.value=[{key:'name',label:'餐廳名稱', onInput: autoFillFoodInfo},{key:'desc',label:'描述'},{key:'reserve',label:'需要訂位?', type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記', type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',reserve:false,reserveLink:'',note:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{ if(!modalData.value.note) autoFillFoodInfo(); spots.value.food[currentLoc.value].push(modalData.value); saveData(); }; showModal.value=true; };
-        const openAddCouponModal = () => { modalTitle.value='新增優惠券'; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalData.value={name:'',discount:'',link:'',note:''}; modalHasImg.value=false; modalCallback.value = () => { coupons.value.push(modalData.value); saveData(); }; showModal.value=true; };
-        
-        const openEditHotelModal = (h, idx) => { if(isGuest.value) return; modalTitle.value = '編輯住宿'; modalFields.value = [{key:'name',label:'名稱'},{key:'link',label:'地圖關鍵字'}]; modalData.value = {...h}; modalHasImg.value = true; isEditingItem.value = false; modalCallback.value = () => { hotels.value[idx] = modalData.value; saveData(); }; showModal.value = true; };
-        const openAddTicketModal = () => { modalTitle.value='新增門票'; modalFields.value=[{key:'name',label:'景點名稱'},{key:'url',label:'購票連結'}]; modalData.value={name:'',url:'https://', custom:true}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{suggestedTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
-        const openAddTransTicketModal = () => { modalTitle.value='新增交通票券'; modalFields.value=[{key:'name',label:'票券名稱'},{key:'url',label:'資訊連結'},{key:'note',label:'注意事項', type:'textarea'}]; modalData.value={name:'',url:'https://', note:'', icon:'fa-solid fa-ticket', custom:true, type:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{transportTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
-        const openAddCarModal = () => { modalTitle.value = '新增租車預約'; modalFields.value = [{key:'company',label:'租車公司'},{key:'pickup',label:'取車地點'},{key:'url',label:'預約連結'},{key:'note',label:'備註'}]; modalData.value = {company:'', pickup:'', url:'', note:'', status:'todo', reservationNumber:'', insurance:''}; modalHasImg.value = false; isEditingItem.value = false; modalCallback.value = () => { rentalCars.value.push(modalData.value); saveData(); }; showModal.value = true; };
-        const openAddPhraseModal = () => { modalTitle.value='新增翻譯'; modalFields.value=[{key:'zh',label:'中文'},{key:'jp',label:'日文'}]; modalData.value={zh:'',jp:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{japanesePhrases.value.push(modalData.value); saveData();}; showModal.value=true; };
-
-        const handleModalSave = () => { if(modalCallback.value) modalCallback.value(); showModal.value=false; };
-        const handleModalDelete = () => { if(confirm('確定刪除？') && modalDeleteCallback.value) { modalDeleteCallback.value(); showModal.value=false; } };
-        const processModalImg = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); modalData.value.img = await compressImage(res); } };
-        
-        const openExpenseModal = (mode) => { expenseMode.value = mode; modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : users.value.map(u=>u.id)}; showExpenseModal.value=true; };
-        const toggleShare = (id) => { const i=modalData.value.forWhom.indexOf(id); i>-1?modalData.value.forWhom.splice(i,1):modalData.value.forWhom.push(id); };
-        const saveExpense = () => { expenses.value.push({...modalData.value,id:Date.now(),date:new Date().toLocaleDateString()}); saveData(); showExpenseModal.value=false; };
-        const deleteExpense = (id) => { if(isGuest.value) return; if(confirm('確定刪除?')){expenses.value=expenses.value.filter(e=>e.id!==id); saveData();} };
-        const deleteCar = (idx) => { if(confirm('確定刪除？')) { rentalCars.value.splice(idx,1); saveData(); } };
-        const openRentalDetail = (car, idx) => { activeRental.value = rentalCars.value[idx]; showRentalModal.value = true; };
-        const updateRentalStatus = (status) => { activeRental.value.status = status; };
-        const editFlight = (mode) => { if(isGuest.value) return; flightMode.value = mode; tempFlightData.value.code = mode==='out' ? (currentUser.value.flightOut||'') : (currentUser.value.flightIn||''); tempFlightData.value.seat = mode==='out' ? (currentUser.value.flightOutSeat||'') : (currentUser.value.flightInSeat||''); showFlightModal.value = true; };
-        const saveFlight = () => { if(flightMode.value === 'out') { currentUser.value.flightOut = tempFlightData.value.code; currentUser.value.flightOutSeat = tempFlightData.value.seat; } else { currentUser.value.flightIn = tempFlightData.value.code; currentUser.value.flightInSeat = tempFlightData.value.seat; } const idx = users.value.findIndex(u=>u.id===currentUser.value.id); if(idx!==-1) users.value[idx] = currentUser.value; saveData(); showFlightModal.value = false; };
-        
-        const autoFillFoodInfo = () => { const name = modalData.value.name; if(!name) return; const n = name.toLowerCase(); if(n.includes('叙叙苑')) { modalData.value.reserve=true; modalData.value.reserveLink='https://www.tablecheck.com/zh-TW/shops/jojoen-tokyoskytreetown-solamachi/reserve'; modalData.value.note='【需訂位】午間套餐CP值最高。'; } else if(n.includes('harbs')) { modalData.value.reserve=false; modalData.value.note='【現場排隊】水果千層必點。'; } };
-        const applyTicketTemplate = () => { const t = modalData.value.type; if(t==='suica') { modalData.value.name='Suica 西瓜卡'; modalData.value.icon='fa-solid fa-mobile-screen'; modalData.value.url='https://www.jreast.co.jp/tc/pass/suica.html'; } };
-        const speakJapanese = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; window.speechSynthesis.speak(u); };
-        const openGoogleTranslate = (text) => { window.open(`https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(text)}&op=translate`, '_blank'); };
-        const handleCameraTranslate = () => { window.open('https://translate.google.com/?sl=auto&tl=zh-TW&op=images', '_blank'); };
-        const expandCard = (p) => expandedPhrase.value=p;
-        const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
-        
-        // V41: Strict Persistence & Sync
-        onMounted(() => {
-            initSakura();
-            if(auth) onAuthStateChanged(auth, u=>{ 
-                isLoggedIn.value=!!u; 
-                if(u && db) onSnapshot(doc(db,"trips","kanto2026"), d=>{
-                    if(d.exists()){
-                        const dt = d.data();
-                        // CRITICAL FIX: Packing List Pointer Re-alignment
-                        if(dt.users) {
-                            const myId = currentUser.value?.id;
-                            users.value = dt.users;
-                            if(myId) {
-                                const freshUser = users.value.find(u => u.id === myId);
-                                if(freshUser) currentUser.value = freshUser;
-                            }
-                        }
-                        if(dt.itinerary) itinerary.value = dt.itinerary;
-                        if(dt.drivePlan) drivePlan.value = dt.drivePlan;
-                        if(dt.expenses) expenses.value = dt.expenses;
-                        if(dt.spots) spots.value = dt.spots;
-                        if(dt.shopping) shopping.value = dt.shopping;
-                        if(dt.coupons) coupons.value = dt.coupons;
-                        if(dt.phrases) japanesePhrases.value = dt.phrases;
-                        if(dt.tickets) suggestedTickets.value = dt.tickets;
-                        if(dt.transportTickets) transportTickets.value = dt.transportTickets;
-                        if(dt.rentalCars) rentalCars.value = dt.rentalCars;
-                        if(dt.hotels) hotels.value = dt.hotels;
-                    }
-                });
-            });
-            // Heartbeat for Green Dot
-            setInterval(() => { if(isLoggedIn.value && !isGuest.value) saveData(); }, 30000);
-            
-            // Load Local Backup
-            const l = localStorage.getItem('V25_DIAMOND_DATA');
-            if(l && !isLoggedIn.value) { try { const d = JSON.parse(l); Object.assign(defaultData, d); } catch(e){} }
-            const lastId = localStorage.getItem('V25_LAST_USER_ID');
-            if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) setCurrentUser(u); }
-        });
-
-        return {
-            users, currentView, isWelcomeClosed, enterSite, enterAsGuest, isGuest, apps, getPageTitle,
-            daysUntilTrip, smartReminders, tripDays, selectedDayIndex, getCurrentItinerary,
-            moneyTab, exchangeRate, myPrivateExpenses, myPrivateTotalTWD, groupExpenses, settlements, getUserName, openExpenseModal, showExpenseModal, modalData, toggleShare, saveExpense, deleteExpense, expenseMode, getPaymentIcon,
-            hotelTab, shopCat, shopping, openAddShopModal, currentLoc, spots, openAddSpotModal, weatherData, getClothingAdvice, japanesePhrases, expandCard, expandedPhrase, openAddPhraseModal,
-            showModal, modalTitle, modalFields, modalHasImg, handleModalSave, handleModalDelete, isEditingItem, processModalImg, getIconByCategory, getMapLink, getSearchLink, getImg, handleImgError, saveData,
-            currentUser, showPersonaModal, setCurrentUser, openUserEditor, showUserEditModal, editingUser, saveUserChanges, processAvatarUpload,
-            addPrepItem, openEditModal, showFlightModal, tempFlightData, editFlight, saveFlight, flightMode, speakJapanese,
-            handleAuthClick, showLoginModal, loginForm, doLogin, isLoggedIn, itineraryMode, suggestedTickets, openAddTicketModal,
-            isSaving, openAddItineraryModal, openEditItineraryModal, openGoogleTranslate,
-            transportTickets, openAddTransTicketModal, getAirlineInfo, flightStatusLink, getDirLink, applyTicketTemplate,
-            rentalCars, openAddCarModal, deleteCar, moveItem, openAddFoodModal, autoFillFoodInfo,
-            coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, 
-            toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal
-        };
-    }
-}).mount('#app');
-</script>
-</body>
-</html>
+                modalDeleteCallback.value = () => {
