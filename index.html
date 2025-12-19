@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V50.0 Diamond Plus)</title>
+<title>關東之旅 2026 (V51.0 Diamond Fix)</title>
 
 <script>
     window.tailwind = {
@@ -33,7 +33,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V50.0 Core */
+    /* V51.0 Core */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -94,18 +94,15 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid white;
         position: relative; transition: all 0.3s;
     }
-    
-    /* V50 Lightbox (Image Zoom) */
-    .lightbox-overlay {
-        position: fixed; inset: 0; z-index: 9999;
-        background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
-        display: flex; align-items: center; justify-content: center;
-        animation: fade-in 0.3s ease;
+    /* V51 Fix: Image Container */
+    .food-img-container {
+        height: 180px; width: 100%; background-color: #f3f4f6;
+        position: relative; overflow: hidden; border-radius: 24px 24px 0 0;
+        cursor: zoom-in;
     }
-    .lightbox-img {
-        max-width: 95vw; max-height: 90vh;
-        border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.2);
-        transform: scale(1); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    .food-img-container img {
+        width: 100%; height: 100%; object-fit: cover;
+        transition: transform 0.5s ease;
     }
     
     /* Raid Badges */
@@ -132,6 +129,19 @@
         z-index: 1; transition: transform 0.2s;
     }
     .waku-avatar:hover { transform: scale(1.2); z-index: 10; }
+
+    /* V51 Lightbox */
+    .lightbox-overlay {
+        position: fixed; inset: 0; z-index: 9999;
+        background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
+        display: flex; align-items: center; justify-content: center;
+        animation: fade-in 0.3s ease;
+    }
+    .lightbox-img {
+        max-width: 95vw; max-height: 90vh;
+        border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.2);
+        transform: scale(1); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
     .list-move, .list-enter-active, .list-leave-active { transition: all 0.5s ease; }
     .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
@@ -165,6 +175,7 @@
         background: #10b981; 
     }
 
+    /* Fixed Coupon FAB (Small) */
     .coupon-fab {
         position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px;
         width: 48px; height: 48px; border-radius: 50%; 
@@ -176,6 +187,7 @@
     }
     .coupon-fab:active { transform: scale(0.9); }
 
+    /* Online Status: Non-blocking */
     .online-header-bubble {
         position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 12px;
         z-index: 300; display: flex; gap: -5px; pointer-events: none;
@@ -219,7 +231,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V50.0 DIAMOND+</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V51.0 DIAMOND FIX</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -343,7 +355,7 @@
                      </div>
                  </div>
                  <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4 shadow-sm relative overflow-hidden">
-                     <h3 class="font-black text-blue-500 mb-3 text-sm">☁️ V50 即時天氣 (Open-Meteo)</h3>
+                     <h3 class="font-black text-blue-500 mb-3 text-sm">☁️ V51 即時天氣 (Open-Meteo)</h3>
                      <div v-if="weatherLoading" class="text-gray-400 text-xs py-4 font-bold animate-pulse">正在連線至日本氣象衛星...</div>
                      <div v-else class="space-y-4">
                          <div v-for="w in weatherData" :key="w.name" class="card p-6 text-white relative overflow-hidden" :class="w.bg">
@@ -367,8 +379,8 @@
                         <div v-if="currentView==='food'" class="raid-badge" :class="getRaidClass(item)">
                             <i :class="getRaidIcon(item)"></i> {{getRaidLabel(item)}}
                         </div>
-                        <div class="h-40 bg-gray-100 relative overflow-hidden rounded-t-3xl cursor-zoom-in" @click.stop="openLightbox(item.img)">
-                            <img :src="item.img || 'https://placehold.co/600x400/orange/white?text=SPOT'" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" @error="handleImgError">
+                        <div class="food-img-container" @click.stop="openLightbox(item.img)">
+                            <img :src="getImg(item.img)" class="group-hover:scale-110" @error="handleImgError">
                             <div class="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-magnifying-glass-plus text-white text-2xl drop-shadow-md"></i></div>
                         </div>
                         <div class="p-4 relative">
@@ -585,7 +597,7 @@
     </div> ```
 
 ### 第三段：JavaScript 核心邏輯 (Part 3/3)
-*(包含 GitHub 圖片映射邏輯與 Lightbox 功能)*
+*(包含關鍵的權限診斷、圖片路徑修正與同步修復)*
 
 ```html
     <div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
@@ -642,10 +654,10 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
-// V50 Strict Array: Immutable 4-User IDs.
+// V51 Strict Array: Immutable 4-User IDs.
 const defaultUsers = [{id:1,name:'吉伊',icon:'🐹',list:[...defaultPrepList]},{id:2,name:'小八',icon:'🐱',list:[...defaultPrepList]},{id:3,name:'兔兔',icon:'🐰',list:[...defaultPrepList]},{id:4,name:'小桃',icon:'🍑',list:[...defaultPrepList]}];
 
-// V50: GitHub Raw Image Mapping
+// V51: GitHub Raw Image Mapping with Exact Filenames
 const repoUrl = "https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/images/";
 const foodSpots = {
     Tokyo: [
@@ -663,11 +675,11 @@ const foodSpots = {
         {name:'力餅家', desc:'百年老舖權五郎力餅', tag:'長谷', img:'chikaramochiya.jpg', reserve:false, link:'力餅家', reserveLink:'', votes:[]}
     ],
     Fuji: [
-        // Placeholder or map cover for Fuji as specific images weren't in the list
-        {name:'不動茶屋', desc:'雲朵建築餺飥麵', tag:'河口湖', img:'fuji_map.jpg', reserve:false, link:'不動茶屋 東戀路', reserveLink:'', votes:[]}, 
-        {name:'山麓園', desc:'圍爐裏炭火燒烤', tag:'河口湖', img:'fuji_map.jpg', reserve:true, link:'山麓園', reserveLink:'https://sanrokuen.com/', votes:[]},
-        {name:'燒肉花', desc:'眺望富士山燒肉', tag:'河口湖', img:'fuji_map.jpg', reserve:true, link:'Hana Yakiniku', reserveLink:'', votes:[]},
-        {name:'The Park', desc:'富士山鬆餅與吐司', tag:'河口湖', img:'fuji_map.jpg', reserve:false, link:'The Park', reserveLink:'', votes:[]}
+        // Placeholder or map cover for Fuji
+        {name:'不動茶屋', desc:'雲朵建築餺飥麵', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:false, link:'不動茶屋 東戀路', reserveLink:'', votes:[]}, 
+        {name:'山麓園', desc:'圍爐裏炭火燒烤', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:true, link:'山麓園', reserveLink:'https://sanrokuen.com/', votes:[]},
+        {name:'燒肉花', desc:'眺望富士山燒肉', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:true, link:'Hana Yakiniku', reserveLink:'', votes:[]},
+        {name:'The Park', desc:'富士山鬆餅與吐司', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:false, link:'The Park', reserveLink:'', votes:[]}
     ]
 };
 
@@ -753,7 +765,7 @@ createApp({
         const coupons = ref(defaultData.coupons);
         const activeUsers = ref({}); 
         
-        // V50 Lightbox State
+        // V51 Lightbox State
         const previewImg = ref(null);
         const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
         const closeLightbox = () => { previewImg.value = null; };
@@ -797,10 +809,10 @@ createApp({
         const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
         const smartReminders = computed(() => { const l=[]; const diffDays = daysUntilTrip.value; const text = JSON.stringify(itinerary.value); if(text.includes('富士回遊')) { if(diffDays <= 33 && diffDays > 30) l.push("富士回遊號：準備搶票 (30天前)！"); if(diffDays <= 30) l.push("🔴 富士回遊號：現在可以搶票了！"); } if(diffDays <= 2) l.push("線上預辦登機 (48hr前)"); if(diffDays <= 0 && diffDays > -8) l.push("旅途愉快！🌸"); return l; });
 
-        const statusText = computed(() => { if (!isLoggedIn.value) return 'Offline'; if (syncStatus.value === 'syncing') return 'Syncing...'; if (syncStatus.value === 'error') return 'Error'; return 'Online'; });
+        const statusText = computed(() => { if (!isLoggedIn.value) return 'Offline'; if (syncStatus.value === 'syncing') return 'Syncing...'; if (syncStatus.value === 'error') return 'Error: 權限不足'; return 'Online'; });
         const statusColor = computed(() => { if (!isLoggedIn.value) return 'bg-gray-400'; if (syncStatus.value === 'syncing') return 'bg-yellow-400 animate-pulse'; if (syncStatus.value === 'error') return 'bg-red-500'; return 'bg-green-400'; });
 
-        // V50: Updated Image Loader with Github Raw Link
+        // V51: GitHub Raw Image Mapping - STRICT MATCH
         const getImg = (p) => {
             if (!p) return 'https://placehold.co/600x400/orange/white?text=NO+IMAGE';
             if (p.startsWith('data:') || p.startsWith('http')) return p;
@@ -830,9 +842,10 @@ createApp({
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
+        // V51 New: Use exact filenames from user's upload
         const getMapCover = (loc) => {
-            const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' };
-            return map[loc] || 'https://placehold.co/600x300/pink/white?text=MAP'; 
+            const map = { 'Tokyo': '東京美食地圖.jpg', 'Kamakura': '鎌倉美食地圖.jpg', 'Fuji': '富士山美食地圖.jpg' };
+            return getImg(map[loc]); 
         };
         const getRaidClass = (item) => {
             if(item.reserve) return 'raid-red';
@@ -858,7 +871,7 @@ createApp({
             saveData();
         };
 
-        // V50 Strict Sync
+        // V51 Strict Sync
         let saveTimeout = null;
         const saveData = async () => { 
             if(isGuest.value) return;
@@ -880,13 +893,19 @@ createApp({
                     } else {
                         syncStatus.value = 'error';
                     }
-                } catch(e) { console.error(e); syncStatus.value = 'error'; }
+                } catch(e) { 
+                    console.error("Firebase Write Error:", e);
+                    syncStatus.value = 'error'; 
+                    if(e.code === 'permission-denied') alert('【嚴重錯誤】Firebase 權限不足！\n請至 Firebase Console > Firestore Database > Rules\n將 allow read, write: if false; 改為 true');
+                }
             }, 800);
         };
         
         const forceInitCloud = async () => {
              const data = { users: defaultUsers, itinerary: defaultData.itinerary }; 
-             await setDoc(doc(db,"trips","kanto2026"), data, {merge:true});
+             try {
+                await setDoc(doc(db,"trips","kanto2026"), data, {merge:true});
+             } catch(e) { console.error("Init Failed:", e); }
         };
         
         const updateHeartbeat = async () => {
@@ -912,12 +931,12 @@ createApp({
             weatherLoading.value = false;
         };
 
-        const showDiagnostic = () => { alert(`【V50 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
+        const showDiagnostic = () => { alert(`【V51 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
 
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V50_LAST_USER_ID', u.id);
+            localStorage.setItem('V51_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -974,7 +993,7 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
         
-        // V50 Intelligent Merge
+        // V51 Intelligent Merge
         const mergeUsers = (local, remote) => {
             if(!remote || !Array.isArray(remote)) return local;
             remote.forEach(rUser => {
@@ -1034,7 +1053,7 @@ createApp({
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V50_LAST_USER_ID');
+            const lastId = localStorage.getItem('V51_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
 
@@ -1052,7 +1071,7 @@ createApp({
             rentalCars, openAddCarModal, deleteCar, openAddFoodModal, autoFillFoodInfo,
             coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal, fetchRealWeather, weatherLoading, openAddCouponModal,
             getMapCover, getRaidClass, getRaidLabel, getRaidIcon, toggleFoodVote, getUserAvatar,
-            // V50 Exports
+            // V51 Exports
             previewImg, openLightbox, closeLightbox
         };
     }
