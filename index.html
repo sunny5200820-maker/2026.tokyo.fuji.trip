@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (Ultimate V42.0 Full)</title>
+<title>關東之旅 2026 (V42.2 修復版)</title>
 
 <script>
     window.tailwind = {
@@ -32,7 +32,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V42.0 Fortress Core - Layout & Sync Engine Optimization */
+    /* V42.2 Core Styles */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -50,14 +50,11 @@
         height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
-        padding-bottom: 160px; 
+        padding-bottom: 180px; 
         padding-top: env(safe-area-inset-top);
     }
     
-    /* V42 FIX: Extreme Padding for Shopping View to prevent Coupon Bar Overlap */
-    #app-content.view-shopping {
-        padding-bottom: 300px !important; 
-    }
+    #app-content.view-shopping { padding-bottom: 350px !important; }
 
     body.modal-open #app-content { overflow: hidden; }
 
@@ -76,13 +73,10 @@
         background: rgba(255,255,255,0.92);
         border-radius: 24px;
         box-shadow: 0 8px 30px rgba(255,105,180,0.12);
-        border: 1px solid rgba(255,255,255,0.8);
-        margin-bottom: 0; 
-        position: relative;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        overflow: hidden; 
-        transform: translateZ(0); 
+        border: 2px solid rgba(255,255,255,0.8);
+        margin-bottom: 0; position: relative;
+        backdrop-filter: blur(10px); transition: all 0.3s ease;
+        overflow: hidden; transform: translateZ(0); 
     }
     .card:active { transform: scale(0.99); }
     
@@ -103,7 +97,7 @@
         font-size: 22px; color: white; z-index: 80; border: 3px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .fab-main.lifted { bottom: calc(200px + env(safe-area-inset-bottom)); } /* V42 Fix: Lift higher */
+    .fab-main.lifted { bottom: calc(220px + env(safe-area-inset-bottom)); }
 
     .fab-search {
         position: fixed; bottom: calc(30px + env(safe-area-inset-bottom)); left: 20px;
@@ -118,7 +112,6 @@
         background: #10b981; 
     }
 
-    /* V42 FIX: Coupon Bar Z-Index and Layout */
     .coupon-bar {
         position: fixed; bottom: 0; left: 0; right: 0; 
         background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
@@ -130,7 +123,6 @@
     }
     .coupon-bar.hidden { transform: translateY(150%); }
 
-    /* Rental Car Status Capsule */
     .rental-badge {
         position: absolute; top: 12px; right: 12px;
         padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 900;
@@ -165,7 +157,6 @@
     .drive-line { background: repeating-linear-gradient(to bottom, #4ade80 0, #4ade80 5px, transparent 5px, transparent 10px) !important; height: 60px !important; }
     .drive-badge { border-color: #4ade80 !important; color: #16a34a !important; background: #f0fdf4 !important; font-size: 12px !important; padding: 6px 14px !important; }
 
-    /* V42 Improved: Chiikawa Online Status Header (Non-blocking) */
     .online-header-bubble {
         position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 10px;
         z-index: 300; display: flex; gap: -5px; pointer-events: none;
@@ -184,7 +175,6 @@
     }
     .online-avatar.active .dot { background: #4ade80; }
     
-    /* V42 Diagnostic Tool Styling */
     .cloud-status {
         position: fixed; top: calc(15px + env(safe-area-inset-top)); left: 15px;
         font-size: 10px; font-weight: bold; color: #aaa;
@@ -210,7 +200,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">ULTIMATE V42</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">ULTIMATE V42.2</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -223,8 +213,7 @@
             </button>
         </div>
     </div>
-
-    <div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[60px] bg-[#FFF0F5]/90 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
+<div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[60px] bg-[#FFF0F5]/90 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
         <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-90 transition"><i class="fa-solid fa-chevron-left"></i></button>
         <h1 class="font-black text-gray-700 text-lg flex items-center gap-2 absolute left-1/2 transform -translate-x-1/2"><i class="fa-solid fa-sakura text-pink-300"></i> {{getPageTitle(currentView)}}</h1>
         <div class="w-10"></div>
@@ -309,13 +298,12 @@
                 <button v-if="!isGuest" @click="openAddItineraryModal" class="w-full py-4 mt-6 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold hover:bg-white/50 transition"><i class="fa-solid fa-plus"></i> 新增行程</button>
             </div>
         </div>
-<div v-if="['shopping','food','photo','japanese','weather'].includes(currentView)" class="px-5 py-4 animate-fade-in">
-             
+
+        <div v-if="['shopping','food','photo','japanese','weather'].includes(currentView)" class="px-5 py-4 animate-fade-in">
              <div v-if="currentView==='shopping'">
                 <div class="grid grid-cols-2 gap-3 mb-6"><a href="https://www.cosme.net/ranking/" target="_blank" class="bg-green-50 text-green-600 p-3 rounded-xl text-center font-bold text-xs border border-green-200 block">👑 COSME 大賞</a><a href="https://www.shinyusha.co.jp/media/ldk-the-beauty/" target="_blank" class="bg-pink-50 text-pink-600 p-3 rounded-xl text-center font-bold text-xs border border-pink-200 block">💄 LDK 毒舌雜誌</a></div>
                 <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar"><button v-for="cat in ['cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">{{{'cosme':'藥妝清單','ldk':'LDK推薦','souvenir':'伴手禮'}[cat]}}</button></div>
                 <div class="grid grid-cols-2 gap-4"><div v-for="(item,idx) in shopping[shopCat]" class="card !p-0 border-0 shadow-lg group relative" :key="idx"><div class="h-32 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/300x300/pink/white?text=SHOP'" class="w-full h-full object-cover" @error="handleImgError"></div><div class="p-3"><div class="font-bold text-gray-800 text-sm mb-1 truncate">{{item.name}}</div><a :href="item.link || getSearchLink(item.name)" target="_blank" class="block text-center bg-gray-50 text-gray-500 text-[10px] py-1.5 rounded font-bold hover:bg-pink-500 hover:text-white transition">前往官網 / 搜尋</a></div><div v-if="!isGuest" class="absolute top-1 right-1 flex gap-1"><button @click="openEditModal('shopping', item, idx)" class="bg-white/90 p-1.5 rounded-full text-blue-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px]"></i></button><button @click="shopping[shopCat].splice(idx,1);saveData()" class="bg-white/90 p-1.5 rounded-full text-red-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-trash text-[10px]"></i></button></div></div></div>
-                
                 <button v-if="!isGuest" @click="openAddShopModal" class="fab-main bg-purple-400 text-white" :class="{'lifted': currentView === 'shopping'}"><i class="fa-solid fa-plus"></i></button>
                 <div class="coupon-bar" :class="{'hidden': currentView !== 'shopping'}">
                     <button @click="showCouponModal=true" class="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-black py-3 rounded-full shadow-lg flex items-center justify-center gap-2 animate-bounce-slow"><i class="fa-solid fa-ticket"></i> 🇯🇵 激省折價券 (點我編輯)</button>
@@ -329,16 +317,8 @@
                      <div v-if="weatherLoading" class="text-gray-400 text-xs py-4 font-bold animate-pulse">正在連線至日本氣象衛星...</div>
                      <div v-else class="space-y-4">
                          <div v-for="w in weatherData" :key="w.name" class="card p-6 text-white relative overflow-hidden" :class="w.bg">
-                             <div class="relative z-10 flex justify-between items-center">
-                                 <div>
-                                     <div class="font-bold opacity-80 uppercase text-xs tracking-widest">{{w.displayName}}</div>
-                                     <div class="text-5xl font-black my-2">{{w.temp}}<span class="text-2xl">°C</span></div>
-                                 </div>
-                                 <div class="text-4xl opacity-90"><i :class="w.icon"></i></div>
-                             </div>
-                             <div class="relative z-10 mt-2">
-                                 <div class="text-sm bg-white/20 backdrop-blur inline-block px-3 py-1 rounded-full font-bold">👕 {{getClothingAdvice(w.temp)}}</div>
-                             </div>
+                             <div class="relative z-10 flex justify-between items-center"><div><div class="font-bold opacity-80 uppercase text-xs tracking-widest">{{w.displayName}}</div><div class="text-5xl font-black my-2">{{w.temp}}<span class="text-2xl">°C</span></div></div><div class="text-4xl opacity-90"><i :class="w.icon"></i></div></div>
+                             <div class="relative z-10 mt-2"><div class="text-sm bg-white/20 backdrop-blur inline-block px-3 py-1 rounded-full font-bold">👕 {{getClothingAdvice(w.temp)}}</div></div>
                          </div>
                      </div>
                      <button @click="fetchRealWeather" class="mt-4 text-xs bg-white text-pink-500 px-4 py-2 rounded-full font-bold shadow-sm border border-pink-100">🔄 更新天氣狀況</button>
@@ -513,7 +493,7 @@
     <div v-if="showPersonaModal" class="fixed inset-0 z-[2000] bg-black/85 flex items-center justify-center p-6 backdrop-blur-lg animate-fade-in">
         <div class="bg-white/95 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative border-[6px] border-pink-200">
             <h3 class="font-black text-2xl mb-8 text-pink-500 tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-paw"></i> 請問您是哪一位？</h3>
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-2 gap-6 mb-8 max-h-[50vh] overflow-y-auto">
                 <div v-for="u in users" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)">
                     <div class="w-24 h-24 mx-auto rounded-3xl bg-white border-4 border-gray-100 shadow-lg flex items-center justify-center text-4xl mb-3 overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:border-pink-400 group-hover:shadow-pink-300 group-hover:rotate-3">
                         <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
@@ -522,7 +502,14 @@
                     <div class="font-black text-gray-600 text-lg group-hover:text-pink-500 transition">{{u.name}}</div>
                     <button v-if="!isGuest" @click.stop="openUserEditor(u)" class="absolute -top-2 -right-2 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition z-10"><i class="fa-solid fa-pen text-xs"></i></button>
                 </div>
+                <div v-if="!isGuest" class="relative group cursor-pointer" @click="addMember">
+                    <div class="w-24 h-24 mx-auto rounded-3xl bg-gray-50 border-4 border-dashed border-gray-300 flex items-center justify-center text-4xl mb-3 text-gray-300 hover:text-pink-400 hover:border-pink-300 transition">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="font-black text-gray-400 text-sm">新增夥伴</div>
+                </div>
             </div>
+            <button v-if="!isGuest" @click="resetUsers" class="text-xs text-red-300 underline font-bold mt-2 hover:text-red-500">重置預設角色 (修復缺少角色問題)</button>
         </div>
     </div>
     
@@ -549,8 +536,7 @@
             </div>
         </div>
     </div>
-
-    <div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
+<div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
 
     <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -593,6 +579,7 @@
 
     <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
 </div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
@@ -811,8 +798,6 @@ createApp({
         const updateHeartbeat = async () => {
             if(!isLoggedIn.value || !currentUser.value || isGuest.value) return;
             try {
-                // We use a separate collection or field for heartbeats to avoid triggering large snapshots
-                // But for simplicity in this structure, we update a "heartbeats" map field
                 await updateDoc(doc(db,"trips","kanto2026"), {
                     [`heartbeats.${currentUser.value.id}`]: serverTimestamp()
                 });
@@ -899,6 +884,21 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
         
+        // V42.2 New Functions
+        const addMember = () => {
+             const newId = Date.now();
+             const newList = JSON.parse(JSON.stringify(defaultPrepList));
+             users.value.push({id: newId, name: '新夥伴', icon: '🥚', list: newList});
+             saveData();
+        };
+        const resetUsers = () => {
+            if(confirm('警告：這將會清除您目前所有的自訂角色，並還原為吉伊卡哇 4 人組。\n\n確定要執行嗎？')) {
+                users.value = JSON.parse(JSON.stringify(defaultData.users));
+                saveData();
+                alert('已還原預設角色！');
+            }
+        };
+
         onMounted(() => {
             initSakura();
             fetchRealWeather();
@@ -906,7 +906,6 @@ createApp({
             if(auth) onAuthStateChanged(auth, u=>{ 
                 isLoggedIn.value=!!u; 
                 if(u && db) {
-                    // Main Data Listener
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
@@ -922,8 +921,6 @@ createApp({
                             if(dt.transportTickets) transportTickets.value = dt.transportTickets;
                             if(dt.rentalCars) rentalCars.value = dt.rentalCars;
                             if(dt.hotels) hotels.value = dt.hotels;
-                            
-                            // Process Heartbeats
                             if(dt.heartbeats) {
                                 const now = Date.now();
                                 const map = {};
@@ -937,10 +934,8 @@ createApp({
                 }
             });
             
-            // Heartbeat loop
             setInterval(updateHeartbeat, 30000);
             
-            // Last User Auto-Select
             const lastId = localStorage.getItem('V42_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
@@ -957,7 +952,9 @@ createApp({
             syncStatus, statusText, statusColor, openAddItineraryModal, openEditItineraryModal, openGoogleTranslate,
             transportTickets, openAddTransTicketModal, getAirlineInfo, flightStatusLink, getDirLink, applyTicketTemplate,
             rentalCars, openAddCarModal, deleteCar, openAddFoodModal, autoFillFoodInfo,
-            coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal, fetchRealWeather, weatherLoading, openAddCouponModal
+            coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal, fetchRealWeather, weatherLoading, openAddCouponModal,
+            // V42.2 Exports
+            addMember, resetUsers
         };
     }
 }).mount('#app');
