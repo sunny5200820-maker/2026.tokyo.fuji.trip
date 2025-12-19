@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V47.0 Diamond)</title>
+<title>關東之旅 2026 (V48.0 Obsidian Fixed)</title>
 
 <script>
     window.tailwind = {
@@ -33,7 +33,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V47.0 Core */
+    /* V48.0 Obsidian Core */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -56,7 +56,7 @@
         transition: padding-bottom 0.3s ease;
     }
     
-    /* V47 Dynamic Padding for different views */
+    /* Dynamic Padding */
     #app-content.view-shopping { padding-bottom: 250px !important; }
 
     body.modal-open #app-content { overflow: hidden; }
@@ -83,18 +83,13 @@
     }
     .card:active { transform: scale(0.98); border-color: #FFD1DC; }
     
-    /* V47 Food Map: Adventure Cards */
-    .map-cover-container {
-        padding: 0 10px 20px 10px;
-        perspective: 1000px;
-    }
+    /* V48 Food Map Styles */
+    .map-cover-container { padding: 0 10px 20px 10px; perspective: 1000px; }
     .map-cover {
         width: 100%; height: auto; border-radius: 24px;
         border: 4px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-        animation: float 6s ease-in-out infinite;
-        transform-style: preserve-3d;
+        animation: float 6s ease-in-out infinite; transform-style: preserve-3d;
     }
-    
     .food-card {
         background: #fff; border-radius: 24px; overflow: visible; 
         box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid white;
@@ -115,7 +110,7 @@
     /* WakuWaku Avatar System */
     .waku-container {
         display: flex; flex-direction: row-reverse; justify-content: flex-end;
-        position: absolute; bottom: 16px; right: 60px; /* Left of the heart */
+        position: absolute; bottom: 16px; right: 60px;
         height: 32px; align-items: center;
     }
     .waku-avatar {
@@ -158,7 +153,7 @@
         background: #10b981; 
     }
 
-    /* V47 Fixed Coupon FAB */
+    /* Fixed Coupon FAB */
     .coupon-fab {
         position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px;
         width: 48px; height: 48px; border-radius: 50%; 
@@ -170,7 +165,7 @@
     }
     .coupon-fab:active { transform: scale(0.9); }
 
-    /* V47 Online Status: Pointer Events None to prevent blocking */
+    /* Online Status: Non-blocking */
     .online-header-bubble {
         position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 12px;
         z-index: 300; display: flex; gap: -5px; pointer-events: none;
@@ -179,7 +174,7 @@
         width: 36px; height: 36px; border-radius: 50%; border: 2px solid white;
         background: white; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         margin-left: -10px; position: relative; transition: transform 0.3s;
-        pointer-events: auto; /* Allow clicking the avatar itself */
+        pointer-events: auto;
     }
     .online-avatar.active { border-color: #4ade80; transform: translateY(2px); z-index: 10; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
     .online-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -206,7 +201,7 @@
 
 <div id="app" v-cloak class="h-full flex flex-col">
     
-    <div :class="['welcome-screen flex flex-col items-center justify-between', isWelcomeClosed ? 'hidden-screen' : '']">
+    <div v-if="!isWelcomeClosed" class="welcome-screen flex flex-col items-center justify-between">
         <div class="absolute inset-0 z-0"><img :src="getImg('welcome.jpg')" class="w-full h-full object-cover opacity-90" @error="handleImgError"></div>
         <div class="absolute top-6 right-6 z-50 pt-[env(safe-area-inset-top)]">
             <button @click.stop="handleAuthClick" :class="['flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/50 shadow-lg font-bold text-sm transition', isLoggedIn ? 'bg-green-500/80 text-white' : 'bg-white/40 text-gray-800']">
@@ -214,7 +209,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V47.0 DIAMOND</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V48.0 OBSIDIAN</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -227,103 +222,103 @@
             </button>
         </div>
     </div>
-<div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[60px] bg-[#FFF0F5]/90 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
-        <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-95 transition"><i class="fa-solid fa-chevron-left"></i></button>
-        <h1 class="font-black text-gray-700 text-lg flex items-center gap-2 absolute left-1/2 transform -translate-x-1/2"><i class="fa-solid fa-sakura text-pink-300"></i> {{getPageTitle(currentView)}}</h1>
-        <div class="w-10"></div>
-    </div>
-    <div v-if="currentView !== 'menu'" class="h-[60px] pt-[env(safe-area-inset-top)] box-content shrink-0"></div>
-
-    <div class="online-header-bubble" v-if="isWelcomeClosed">
-        <div v-for="u in usersArray" :key="u.id" :class="['online-avatar', isUserOnline(u.id) ? 'active' : '']" :title="u.name">
-            <img v-if="u.avatar" :src="u.avatar">
-            <span v-else class="flex items-center justify-center h-full w-full bg-gray-100 text-xs">{{u.icon}}</span>
-            <div class="dot"></div>
+<div v-if="isWelcomeClosed" class="h-full flex flex-col relative">
+        
+        <div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[60px] bg-[#FFF0F5]/90 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
+            <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-95 transition"><i class="fa-solid fa-chevron-left"></i></button>
+            <h1 class="font-black text-gray-700 text-lg flex items-center gap-2 absolute left-1/2 transform -translate-x-1/2"><i class="fa-solid fa-sakura text-pink-300"></i> {{getPageTitle(currentView)}}</h1>
+            <div class="w-10"></div>
         </div>
-    </div>
+        <div v-if="currentView !== 'menu'" class="h-[60px] pt-[env(safe-area-inset-top)] box-content shrink-0"></div>
 
-    <div id="app-content" class="flex-1" :class="{'view-shopping': currentView === 'shopping'}">
+        <div class="online-header-bubble">
+            <div v-for="u in usersArray" :key="u.id" :class="['online-avatar', isUserOnline(u.id) ? 'active' : '']" :title="u.name">
+                <img v-if="u.avatar" :src="u.avatar">
+                <span v-else class="flex items-center justify-center h-full w-full bg-gray-100 text-xs">{{u.icon}}</span>
+                <div class="dot"></div>
+            </div>
+        </div>
 
-        <div v-if="currentView==='menu'" class="p-6 pt-12 animate-fade-in pb-32">
-            <h2 class="text-3xl font-black text-gray-700 mb-8 text-center pt-[env(safe-area-inset-top)]">旅程中心</h2>
-            <div class="mb-8 bg-white/70 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl relative overflow-hidden">
-                 <div class="flex items-start gap-4 relative z-10">
-                     <div class="bg-gradient-to-br from-yellow-200 to-yellow-400 w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl shrink-0 shadow-lg"><i class="fa-solid fa-bell"></i></div>
-                     <div class="flex-1">
-                         <div class="font-black text-gray-800 text-lg mb-1">倒數 {{daysUntilTrip}} 天</div>
-                         <div class="text-xs text-gray-500 font-bold leading-relaxed space-y-1">
-                            <div v-for="alert in smartReminders" class="text-pink-500 flex items-start gap-1 font-black"><i class="fa-solid fa-circle-exclamation mt-0.5"></i> {{alert}}</div>
-                            <div class="text-gray-400 mt-2 pt-2 border-t border-gray-200">
-                                <div class="flex items-center gap-1"><i class="fa-solid fa-check text-green-400"></i> 護照期限檢查</div>
-                                <div class="flex items-center gap-1"><i class="fa-solid fa-check text-green-400"></i> 行動電源充電</div>
-                            </div>
+        <div id="app-content" class="flex-1" :class="{'view-shopping': currentView === 'shopping'}">
+
+            <div v-if="currentView==='menu'" class="p-6 pt-12 animate-fade-in pb-32">
+                <h2 class="text-3xl font-black text-gray-700 mb-8 text-center pt-[env(safe-area-inset-top)]">旅程中心</h2>
+                <div class="mb-8 bg-white/70 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl relative overflow-hidden">
+                     <div class="flex items-start gap-4 relative z-10">
+                         <div class="bg-gradient-to-br from-yellow-200 to-yellow-400 w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl shrink-0 shadow-lg"><i class="fa-solid fa-bell"></i></div>
+                         <div class="flex-1">
+                             <div class="font-black text-gray-800 text-lg mb-1">倒數 {{daysUntilTrip}} 天</div>
+                             <div class="text-xs text-gray-500 font-bold leading-relaxed space-y-1">
+                                <div v-for="alert in smartReminders" class="text-pink-500 flex items-start gap-1 font-black"><i class="fa-solid fa-circle-exclamation mt-0.5"></i> {{alert}}</div>
+                                <div class="text-gray-400 mt-2 pt-2 border-t border-gray-200">
+                                    <div class="flex items-center gap-1"><i class="fa-solid fa-check text-green-400"></i> 護照期限檢查</div>
+                                    <div class="flex items-center gap-1"><i class="fa-solid fa-check text-green-400"></i> 行動電源充電</div>
+                                </div>
+                             </div>
                          </div>
                      </div>
-                 </div>
-            </div>
-            <div class="grid grid-cols-3 gap-x-4 gap-y-8 px-2">
-                <div v-for="app in apps" :key="app.id" class="flex flex-col items-center cursor-pointer active:scale-95 transition duration-300 group" @click="currentView=app.view">
-                    <div class="w-[76px] h-[76px] rounded-[30px] flex items-center justify-center text-3xl text-white shadow-lg border-[4px] border-white relative overflow-hidden" :class="app.bgClass"><i :class="app.icon"></i></div>
-                    <span class="text-sm font-bold mt-3 text-gray-600 group-hover:text-pink-500 transition">{{app.name}}</span>
                 </div>
+                <div class="grid grid-cols-3 gap-x-4 gap-y-8 px-2">
+                    <div v-for="app in apps" :key="app.id" class="flex flex-col items-center cursor-pointer active:scale-95 transition duration-300 group" @click="currentView=app.view">
+                        <div class="w-[76px] h-[76px] rounded-[30px] flex items-center justify-center text-3xl text-white shadow-lg border-[4px] border-white relative overflow-hidden" :class="app.bgClass"><i :class="app.icon"></i></div>
+                        <span class="text-sm font-bold mt-3 text-gray-600 group-hover:text-pink-500 transition">{{app.name}}</span>
+                    </div>
+                </div>
+                <button @click="isWelcomeClosed=false" class="mt-12 mx-auto text-gray-400 text-sm font-bold border-b border-gray-300 pb-1 block">回到歡迎頁面</button>
+                <div v-if="isGuest" class="text-center mt-4 text-xs font-bold text-gray-400 bg-gray-200 rounded-full py-1 w-32 mx-auto">訪客模式</div>
             </div>
-            <button @click="isWelcomeClosed=false" class="mt-12 mx-auto text-gray-400 text-sm font-bold border-b border-gray-300 pb-1 block">回到歡迎頁面</button>
-            <div v-if="isGuest" class="text-center mt-4 text-xs font-bold text-gray-400 bg-gray-200 rounded-full py-1 w-32 mx-auto">訪客模式</div>
-        </div>
 
-        <div v-if="currentView==='itinerary'" class="px-5 py-4 animate-fade-in">
-            <div class="flex overflow-x-auto gap-3 mb-6 hide-scrollbar sticky top-0 bg-[#FFF0F5]/95 z-20 py-3 -mx-5 px-5 backdrop-blur-md">
-                 <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-6 py-3 rounded-2xl text-sm font-black border-2 transition shrink-0 shadow-sm flex flex-col items-center min-w-[70px]',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow-lg scale-105':'bg-white text-gray-300 border-white']"><span>{{d.week}}</span><span class="text-[10px] mt-1 opacity-80">{{d.title}}</span></button>
-            </div>
-            <div v-if="[2,3].includes(selectedDayIndex)" class="flex justify-center mb-6">
-                <div class="bg-white p-1 rounded-full border border-gray-200 shadow-sm flex">
-                    <button @click="itineraryMode='normal'" :class="['px-4 py-1.5 rounded-full text-xs font-bold transition', itineraryMode==='normal'?'bg-pink-400 text-white':'text-gray-400']">一般</button>
-                    <button @click="itineraryMode='drive'" :class="['px-4 py-1.5 rounded-full text-xs font-bold transition', itineraryMode==='drive'?'bg-green-500 text-white':'text-gray-400']"><i class="fa-solid fa-car"></i> 自駕</button>
+            <div v-if="currentView==='itinerary'" class="px-5 py-4 animate-fade-in">
+                <div class="flex overflow-x-auto gap-3 mb-6 hide-scrollbar sticky top-0 bg-[#FFF0F5]/95 z-20 py-3 -mx-5 px-5 backdrop-blur-md">
+                     <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-6 py-3 rounded-2xl text-sm font-black border-2 transition shrink-0 shadow-sm flex flex-col items-center min-w-[70px]',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow-lg scale-105':'bg-white text-gray-300 border-white']"><span>{{d.week}}</span><span class="text-[10px] mt-1 opacity-80">{{d.title}}</span></button>
                 </div>
-            </div>
-            <div class="pb-20 relative">
-                <transition-group name="list" tag="div">
-                    <div v-for="(item,idx) in getCurrentItinerary()" :key="item.id || idx">
-                        <div class="card p-5 border-0 shadow-sm relative group z-10 mb-4" @click="!isGuest && openEditItineraryModal(item, idx)">
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)?'bg-green-400':'bg-gradient-to-b from-pink-300 to-pink-100'"></div>
-                            <div class="flex gap-4 pr-8">
-                                <div class="flex flex-col items-center pt-1 min-w-[50px]">
-                                    <span class="text-xs font-black text-gray-400 mb-2">{{item.hours}}</span>
-                                    <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center border" :class="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)?'bg-green-50 text-green-500 border-green-100':'bg-pink-50 text-pink-400 border-pink-100'"><i :class="getIconByCategory(item.category)"></i></div>
-                                </div>
-                                <div class="flex-1 py-1">
-                                    <h3 class="font-black text-gray-800 text-lg mb-1">{{item.name}}</h3>
-                                    <p class="text-sm text-gray-500 line-clamp-2 font-medium mb-2">{{item.note}}</p>
-                                    <div class="flex gap-2 flex-wrap">
-                                        <a :href="getMapLink(item.mapKeyword, item.name)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full font-bold border border-blue-100 hover:bg-blue-100 transition active:scale-95"><i class="fa-solid fa-location-arrow"></i> 導航</a>
-                                        <a v-if="itineraryMode==='drive' && [2,3].includes(selectedDayIndex) && item.parkingLink" :href="getMapLink(item.parkingLink)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full font-bold border border-green-200 hover:bg-green-100 active:scale-95"><i class="fa-solid fa-square-parking"></i> 停車場</a>
+                <div v-if="[2,3].includes(selectedDayIndex)" class="flex justify-center mb-6">
+                    <div class="bg-white p-1 rounded-full border border-gray-200 shadow-sm flex">
+                        <button @click="itineraryMode='normal'" :class="['px-4 py-1.5 rounded-full text-xs font-bold transition', itineraryMode==='normal'?'bg-pink-400 text-white':'text-gray-400']">一般</button>
+                        <button @click="itineraryMode='drive'" :class="['px-4 py-1.5 rounded-full text-xs font-bold transition', itineraryMode==='drive'?'bg-green-500 text-white':'text-gray-400']"><i class="fa-solid fa-car"></i> 自駕</button>
+                    </div>
+                </div>
+                <div class="pb-20 relative">
+                    <transition-group name="list" tag="div">
+                        <div v-for="(item,idx) in getCurrentItinerary()" :key="item.id || idx">
+                            <div class="card p-5 border-0 shadow-sm relative group z-10 mb-4" @click="!isGuest && openEditItineraryModal(item, idx)">
+                                <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)?'bg-green-400':'bg-gradient-to-b from-pink-300 to-pink-100'"></div>
+                                <div class="flex gap-4 pr-8">
+                                    <div class="flex flex-col items-center pt-1 min-w-[50px]">
+                                        <span class="text-xs font-black text-gray-400 mb-2">{{item.hours}}</span>
+                                        <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center border" :class="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)?'bg-green-50 text-green-500 border-green-100':'bg-pink-50 text-pink-400 border-pink-100'"><i :class="getIconByCategory(item.category)"></i></div>
+                                    </div>
+                                    <div class="flex-1 py-1">
+                                        <h3 class="font-black text-gray-800 text-lg mb-1">{{item.name}}</h3>
+                                        <p class="text-sm text-gray-500 line-clamp-2 font-medium mb-2">{{item.note}}</p>
+                                        <div class="flex gap-2 flex-wrap">
+                                            <a :href="getMapLink(item.mapKeyword, item.name)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full font-bold border border-blue-100 hover:bg-blue-100 transition active:scale-95"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                                            <a v-if="itineraryMode==='drive' && [2,3].includes(selectedDayIndex) && item.parkingLink" :href="getMapLink(item.parkingLink)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full font-bold border border-green-200 hover:bg-green-100 active:scale-95"><i class="fa-solid fa-square-parking"></i> 停車場</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div v-if="idx < getCurrentItinerary().length - 1" class="timeline-connect !h-[40px] mb-4" :class="{'drive-line': itineraryMode==='drive' && [2,3].includes(selectedDayIndex)}">
-                            <div v-if="item.travelTime" class="timeline-badge" :class="{'drive-badge': itineraryMode==='drive' && [2,3].includes(selectedDayIndex)}">
-                                {{item.travelTime}}
+                            <div v-if="idx < getCurrentItinerary().length - 1" class="timeline-connect !h-[40px] mb-4" :class="{'drive-line': itineraryMode==='drive' && [2,3].includes(selectedDayIndex)}">
+                                <div v-if="item.travelTime" class="timeline-badge" :class="{'drive-badge': itineraryMode==='drive' && [2,3].includes(selectedDayIndex)}">
+                                    {{item.travelTime}}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </transition-group>
-                <div v-if="getCurrentItinerary().length === 0" class="text-center text-gray-400 py-10 font-bold">本日無特定行程。</div>
-                <button v-if="!isGuest" @click="openAddItineraryModal" class="w-full py-4 mt-6 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold hover:bg-white/50 transition active:scale-95"><i class="fa-solid fa-plus"></i> 新增行程</button>
+                    </transition-group>
+                    <div v-if="getCurrentItinerary().length === 0" class="text-center text-gray-400 py-10 font-bold">本日無特定行程。</div>
+                    <button v-if="!isGuest" @click="openAddItineraryModal" class="w-full py-4 mt-6 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold hover:bg-white/50 transition active:scale-95"><i class="fa-solid fa-plus"></i> 新增行程</button>
+                </div>
             </div>
-        </div>
 
-        <div v-if="['shopping','food','photo','japanese','weather'].includes(currentView)" class="px-5 py-4 animate-fade-in">
-             
-             <div v-if="currentView==='shopping'">
+            <div v-if="currentView==='shopping'" class="px-5 py-4 animate-fade-in">
                 <div class="grid grid-cols-2 gap-3 mb-6"><a href="https://www.cosme.net/ranking/" target="_blank" class="bg-green-50 text-green-600 p-3 rounded-xl text-center font-bold text-xs border border-green-200 block active:scale-95 transition">👑 COSME 大賞</a><a href="https://www.shinyusha.co.jp/media/ldk-the-beauty/" target="_blank" class="bg-pink-50 text-pink-600 p-3 rounded-xl text-center font-bold text-xs border border-pink-200 block active:scale-95 transition">💄 LDK 毒舌雜誌</a></div>
                 <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar"><button v-for="cat in ['cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition active:scale-95', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">{{{'cosme':'藥妝清單','ldk':'LDK推薦','souvenir':'伴手禮'}[cat]}}</button></div>
                 <div class="grid grid-cols-2 gap-4"><div v-for="(item,idx) in shopping[shopCat]" class="card !p-0 border-0 shadow-lg group relative" :key="idx"><div class="h-32 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/300x300/pink/white?text=SHOP'" class="w-full h-full object-cover" @error="handleImgError"></div><div class="p-3"><div class="font-bold text-gray-800 text-sm mb-1 truncate">{{item.name}}</div><a :href="item.link || getSearchLink(item.name)" target="_blank" class="block text-center bg-gray-50 text-gray-500 text-[10px] py-1.5 rounded font-bold hover:bg-pink-500 hover:text-white transition active:scale-95">前往官網 / 搜尋</a></div><div v-if="!isGuest" class="absolute top-1 right-1 flex gap-1"><button @click="openEditModal('shopping', item, idx)" class="bg-white/90 p-1.5 rounded-full text-blue-400 shadow w-7 h-7 flex items-center justify-center active:scale-90"><i class="fa-solid fa-pen text-[10px]"></i></button><button @click="shopping[shopCat].splice(idx,1);saveData()" class="bg-white/90 p-1.5 rounded-full text-red-400 shadow w-7 h-7 flex items-center justify-center active:scale-90"><i class="fa-solid fa-trash text-[10px]"></i></button></div></div></div>
                 <button v-if="!isGuest" @click="openAddShopModal" class="fab-main bg-purple-400 text-white" :class="{'lifted': currentView === 'shopping'}"><i class="fa-solid fa-plus"></i></button>
                 <button @click="showCouponModal=true" class="coupon-fab"><i class="fa-solid fa-ticket"></i></button>
-             </div>
+            </div>
              
-             <div v-if="currentView==='weather'">
+            <div v-if="currentView==='weather'" class="px-5 py-4 animate-fade-in">
                  <div class="bg-pink-50 p-4 rounded-2xl border border-pink-200 mb-6 shadow-sm text-center relative overflow-hidden">
                      <i class="fa-solid fa-fan text-pink-200 text-6xl absolute -right-4 -bottom-4 animate-spin-slow"></i>
                      <h3 class="font-black text-pink-500 mb-3 text-sm">🌸 2026 櫻花權威預測</h3>
@@ -338,7 +333,7 @@
                      </div>
                  </div>
                  <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4 shadow-sm relative overflow-hidden">
-                     <h3 class="font-black text-blue-500 mb-3 text-sm">☁️ V47 即時天氣 (Open-Meteo)</h3>
+                     <h3 class="font-black text-blue-500 mb-3 text-sm">☁️ V48 即時天氣 (Open-Meteo)</h3>
                      <div v-if="weatherLoading" class="text-gray-400 text-xs py-4 font-bold animate-pulse">正在連線至日本氣象衛星...</div>
                      <div v-else class="space-y-4">
                          <div v-for="w in weatherData" :key="w.name" class="card p-6 text-white relative overflow-hidden" :class="w.bg">
@@ -348,9 +343,9 @@
                      </div>
                      <button @click="fetchRealWeather" class="mt-4 text-xs bg-white text-blue-500 px-4 py-2 rounded-full font-bold shadow-sm border border-blue-100 active:scale-95">🔄 更新天氣狀況</button>
                  </div>
-             </div>
+            </div>
 
-            <div v-if="currentView==='food' || currentView==='photo'">
+            <div v-if="currentView==='food' || currentView==='photo'" class="px-5 py-4 animate-fade-in">
                 <div class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition active:scale-95', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
                 
                 <div v-if="currentView==='food'" class="map-cover-container">
@@ -359,7 +354,6 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20 px-2">
                     <div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="food-card relative group">
-                        
                         <div v-if="currentView==='food'" class="raid-badge" :class="getRaidClass(item)">
                             <i :class="getRaidIcon(item)"></i> {{getRaidLabel(item)}}
                         </div>
@@ -391,194 +385,194 @@
                 <button v-if="!isGuest" @click="currentView==='food'?openAddFoodModal():openAddSpotModal()" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
             </div>
              
-             <div v-if="currentView==='japanese'">
+             <div v-if="currentView==='japanese'" class="px-5 py-4 animate-fade-in">
                 <div class="space-y-3 pb-20"><div v-for="(p,idx) in japanesePhrases" :key="idx" class="card p-5 flex justify-between items-center cursor-pointer hover:shadow-md transition border-l-4 border-emerald-400" @click="expandCard(p)"><div><div class="font-bold text-lg text-gray-800">{{p.jp}}</div><div class="text-xs text-gray-500 font-bold mt-1">{{p.zh}}</div></div><i class="fa-solid fa-expand text-gray-300"></i></div></div>
                 <button v-if="!isGuest" @click="openAddPhraseModal" class="fab-main bg-emerald-500 text-white"><i class="fa-solid fa-plus"></i></button>
                 <div class="fab-camera text-white" @click="$refs.cameraInput.click()"><i class="fa-solid fa-camera"></i></div>
                 <input type="file" ref="cameraInput" accept="image/*" capture="environment" class="hidden" @change="handleCameraTranslate">
              </div>
-        </div>
         
-        <div v-if="currentView==='prep'" class="px-5 py-4 animate-fade-in">
-             <a href="https://vjw-lp.digital.go.jp/zh-hant/" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-2xl p-4 mb-6 shadow-lg flex items-center justify-between active:scale-95 transition"><div class="flex items-center gap-3"><i class="fa-solid fa-qrcode text-3xl"></i><div><div class="font-bold text-lg">Visit Japan Web</div><div class="text-xs opacity-90">入境手續/海關申報</div></div></div><i class="fa-solid fa-chevron-right"></i></a>
-             <div v-if="!currentUser || isGuest" class="text-center text-gray-400 font-bold bg-white/50 py-10 rounded-2xl border border-dashed"><i class="fa-solid fa-suitcase text-3xl mb-2"></i><br>{{isGuest?'訪客無法存取私人清單':'請登入以管理清單'}}</div>
-            <div v-else class="card p-0">
-                <div class="bg-gray-50 p-3 border-b font-bold text-gray-700 flex justify-between items-center">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-blue-400"></i> {{currentUser.name}} 的行李</span>
-                    <button @click="addPrepItem(currentUser)" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-bold shadow-blue-200 shadow active:scale-95 transition">+ 新增</button>
-                </div>
-                <div v-for="(item, idx) in currentUser.list" :key="idx" class="flex items-center p-3 border-b border-gray-100 group">
-                    <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-500 mr-3" @change="saveData">
-                    <input v-model="item.text" @change="saveData" :class="['flex-1 text-sm font-bold bg-transparent outline-none', item.checked?'text-gray-300 line-through':'text-gray-700']">
-                    <button @click="currentUser.list.splice(idx,1);saveData()" class="text-gray-200 hover:text-red-400 transition px-2"><i class="fa-solid fa-times"></i></button>
-                </div>
-            </div>
-            <div class="card p-5 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-100 mb-6 mt-6">
-                <div class="flex justify-between items-center mb-3"><h4 class="font-bold text-purple-800 text-sm flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> 景點門票精靈</h4><button v-if="!isGuest" @click="openAddTicketModal" class="text-xs bg-white text-purple-500 px-2 py-1 rounded shadow-sm font-bold border active:scale-95 transition"><i class="fa-solid fa-plus"></i></button></div>
-                <div class="space-y-2"><div v-for="(t, idx) in suggestedTickets" :key="t.name" class="bg-white p-3 rounded-xl shadow-sm border border-purple-100 flex justify-between items-center"><span class="text-sm font-bold text-gray-700">{{t.name}}</span><div class="flex gap-2"><a :href="t.url" target="_blank" class="text-xs bg-purple-500 text-white px-3 py-1.5 rounded-full font-bold active:scale-95 transition">購票</a><button v-if="!isGuest" @click="suggestedTickets.splice(idx,1);saveData()" class="text-red-300 text-xs px-1"><i class="fa-solid fa-trash"></i></button></div></div><div v-if="suggestedTickets.length===0" class="text-xs text-gray-400 text-center py-2">無特定景點門票需求。</div></div>
-            </div>
-        </div>
-        
-        <div v-if="currentView==='hotel'" class="px-5 py-4 animate-fade-in">
-             <div class="flex gap-2 mb-6 justify-center bg-white/50 p-1 rounded-full w-max mx-auto backdrop-blur-sm shadow-sm">
-                <button @click="hotelTab='stay'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='stay'?'bg-indigo-500 text-white':'text-gray-400']">住宿</button>
-                <button @click="hotelTab='ticket'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='ticket'?'bg-pink-500 text-white':'text-gray-400']">交通票券</button>
-                <button @click="hotelTab='flight'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='flight'?'bg-blue-500 text-white':'text-gray-400']">機票</button>
-                <button @click="hotelTab='car'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='car'?'bg-green-500 text-white':'text-gray-400']">租車</button>
-            </div>
-            
-            <div v-if="hotelTab==='stay'" class="space-y-6">
-                <div v-for="(h, idx) in hotels" :key="idx" class="card !p-0 border-0 shadow-xl overflow-hidden relative group">
-                    <div class="h-40 bg-gray-200 relative">
-                        <img :src="getImg(h.img)" class="w-full h-full object-cover" @error="handleImgError">
-                        <div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">{{h.name}}</h3></div>
-                        <button v-if="!isGuest" @click="openEditHotelModal(h, idx)" class="absolute top-2 right-2 bg-white/80 p-2 rounded-full text-gray-600 shadow-lg active:scale-95"><i class="fa-solid fa-pen"></i></button>
+            <div v-if="currentView==='prep'" class="px-5 py-4 animate-fade-in">
+                 <a href="https://vjw-lp.digital.go.jp/zh-hant/" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-2xl p-4 mb-6 shadow-lg flex items-center justify-between active:scale-95 transition"><div class="flex items-center gap-3"><i class="fa-solid fa-qrcode text-3xl"></i><div><div class="font-bold text-lg">Visit Japan Web</div><div class="text-xs opacity-90">入境手續/海關申報</div></div></div><i class="fa-solid fa-chevron-right"></i></a>
+                 <div v-if="!currentUser || isGuest" class="text-center text-gray-400 font-bold bg-white/50 py-10 rounded-2xl border border-dashed"><i class="fa-solid fa-suitcase text-3xl mb-2"></i><br>{{isGuest?'訪客無法存取私人清單':'請登入以管理清單'}}</div>
+                <div v-else class="card p-0">
+                    <div class="bg-gray-50 p-3 border-b font-bold text-gray-700 flex justify-between items-center">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-blue-400"></i> {{currentUser.name}} 的行李</span>
+                        <button @click="addPrepItem(currentUser)" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-bold shadow-blue-200 shadow active:scale-95 transition">+ 新增</button>
                     </div>
-                    <div class="p-4">
-                        <a :href="getMapLink(h.link)" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100 active:scale-95 transition"><i class="fa-solid fa-location-dot"></i> 導航</a>
+                    <div v-for="(item, idx) in currentUser.list" :key="idx" class="flex items-center p-3 border-b border-gray-100 group">
+                        <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-500 mr-3" @change="saveData">
+                        <input v-model="item.text" @change="saveData" :class="['flex-1 text-sm font-bold bg-transparent outline-none', item.checked?'text-gray-300 line-through':'text-gray-700']">
+                        <button @click="currentUser.list.splice(idx,1);saveData()" class="text-gray-200 hover:text-red-400 transition px-2"><i class="fa-solid fa-times"></i></button>
                     </div>
                 </div>
-            </div>
-            
-            <div v-if="hotelTab==='ticket'" class="space-y-4 pb-20">
-                <div v-for="(t, idx) in transportTickets" :key="idx" class="card overflow-hidden">
-                    <div class="p-4 flex justify-between items-center border-l-4 border-pink-400"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 text-xl"><i :class="t.icon||'fa-solid fa-ticket'"></i></div><div><div class="font-bold text-gray-800">{{t.name}}</div><div class="text-[10px] text-gray-400 font-bold mt-1">詳情與連結如下</div></div></div><div class="flex gap-2"><a :href="t.url" target="_blank" class="bg-pink-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md active:scale-95 transition">購買</a><button v-if="!isGuest && t.custom" @click="transportTickets.splice(idx,1);saveData()" class="text-red-300 px-2"><i class="fa-solid fa-trash"></i></button></div></div>
-                    <div class="bg-gray-50 p-3 text-xs text-gray-600 font-medium border-t border-gray-100 leading-relaxed whitespace-pre-wrap"><span class="font-bold text-pink-400 mb-1 block"><i class="fa-solid fa-circle-exclamation"></i> 注意事項：</span>{{t.note}}</div>
+                <div class="card p-5 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-100 mb-6 mt-6">
+                    <div class="flex justify-between items-center mb-3"><h4 class="font-bold text-purple-800 text-sm flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> 景點門票精靈</h4><button v-if="!isGuest" @click="openAddTicketModal" class="text-xs bg-white text-purple-500 px-2 py-1 rounded shadow-sm font-bold border active:scale-95 transition"><i class="fa-solid fa-plus"></i></button></div>
+                    <div class="space-y-2"><div v-for="(t, idx) in suggestedTickets" :key="t.name" class="bg-white p-3 rounded-xl shadow-sm border border-purple-100 flex justify-between items-center"><span class="text-sm font-bold text-gray-700">{{t.name}}</span><div class="flex gap-2"><a :href="t.url" target="_blank" class="text-xs bg-purple-500 text-white px-3 py-1.5 rounded-full font-bold active:scale-95 transition">購票</a><button v-if="!isGuest" @click="suggestedTickets.splice(idx,1);saveData()" class="text-red-300 text-xs px-1"><i class="fa-solid fa-trash"></i></button></div></div><div v-if="suggestedTickets.length===0" class="text-xs text-gray-400 text-center py-2">無特定景點門票需求。</div></div>
                 </div>
-                <button v-if="!isGuest" @click="openAddTransTicketModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增交通票券 (自動帶入)</button>
             </div>
             
-            <div v-if="hotelTab==='flight'" class="animate-fade-in pb-20">
-                 <div v-if="!currentUser" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-eye-slash text-4xl mb-4"></i><br>請先選擇身分</div>
-                 <div v-else class="space-y-4">
-                     <div class="card !p-0 border-0 shadow-lg relative overflow-hidden group">
-                         <div class="bg-blue-500 p-3 flex justify-between items-center text-white"><span class="font-black text-sm tracking-widest"><i class="fa-solid fa-plane-departure mr-2"></i>去程機票 (OUT)</span><button v-if="!isGuest" @click="editFlight('out')" class="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/40"><i class="fa-solid fa-pen"></i></button></div>
-                         <div class="p-5 relative bg-white"><div class="flex justify-between items-end bg-gray-50 p-3 rounded-xl mb-3"><div><div class="text-[10px] text-gray-400 font-bold">FLIGHT</div><a :href="flightStatusLink(currentUser.flightOut)" target="_blank" class="font-black text-xl text-blue-600 underline decoration-dashed underline-offset-4">{{currentUser.flightOut || 'TR898'}} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a></div><div class="text-right"><div class="text-[10px] text-gray-400 font-bold">SEAT</div><div class="font-black text-2xl text-blue-500">{{currentUser.flightOutSeat||'--'}}</div></div></div><div class="bg-yellow-50 p-3 text-xs text-yellow-800 font-bold border border-yellow-100 rounded-xl leading-relaxed whitespace-pre-wrap"><i class="fa-solid fa-circle-info mr-1"></i> {{getAirlineInfo(currentUser.flightOut, false) || '請確認航廈'}}</div></div>
+            <div v-if="currentView==='hotel'" class="px-5 py-4 animate-fade-in">
+                 <div class="flex gap-2 mb-6 justify-center bg-white/50 p-1 rounded-full w-max mx-auto backdrop-blur-sm shadow-sm">
+                    <button @click="hotelTab='stay'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='stay'?'bg-indigo-500 text-white':'text-gray-400']">住宿</button>
+                    <button @click="hotelTab='ticket'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='ticket'?'bg-pink-500 text-white':'text-gray-400']">交通票券</button>
+                    <button @click="hotelTab='flight'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='flight'?'bg-blue-500 text-white':'text-gray-400']">機票</button>
+                    <button @click="hotelTab='car'" :class="['px-4 py-2 rounded-full font-bold text-xs',hotelTab==='car'?'bg-green-500 text-white':'text-gray-400']">租車</button>
+                </div>
+                
+                <div v-if="hotelTab==='stay'" class="space-y-6">
+                    <div v-for="(h, idx) in hotels" :key="idx" class="card !p-0 border-0 shadow-xl overflow-hidden relative group">
+                        <div class="h-40 bg-gray-200 relative">
+                            <img :src="getImg(h.img)" class="w-full h-full object-cover" @error="handleImgError">
+                            <div class="absolute bottom-4 left-5 text-white shadow-black drop-shadow-md"><h3 class="font-black text-2xl">{{h.name}}</h3></div>
+                            <button v-if="!isGuest" @click="openEditHotelModal(h, idx)" class="absolute top-2 right-2 bg-white/80 p-2 rounded-full text-gray-600 shadow-lg active:scale-95"><i class="fa-solid fa-pen"></i></button>
+                        </div>
+                        <div class="p-4">
+                            <a :href="getMapLink(h.link)" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100 active:scale-95 transition"><i class="fa-solid fa-location-dot"></i> 導航</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-if="hotelTab==='ticket'" class="space-y-4 pb-20">
+                    <div v-for="(t, idx) in transportTickets" :key="idx" class="card overflow-hidden">
+                        <div class="p-4 flex justify-between items-center border-l-4 border-pink-400"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 text-xl"><i :class="t.icon||'fa-solid fa-ticket'"></i></div><div><div class="font-bold text-gray-800">{{t.name}}</div><div class="text-[10px] text-gray-400 font-bold mt-1">詳情與連結如下</div></div></div><div class="flex gap-2"><a :href="t.url" target="_blank" class="bg-pink-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md active:scale-95 transition">購買</a><button v-if="!isGuest && t.custom" @click="transportTickets.splice(idx,1);saveData()" class="text-red-300 px-2"><i class="fa-solid fa-trash"></i></button></div></div>
+                        <div class="bg-gray-50 p-3 text-xs text-gray-600 font-medium border-t border-gray-100 leading-relaxed whitespace-pre-wrap"><span class="font-bold text-pink-400 mb-1 block"><i class="fa-solid fa-circle-exclamation"></i> 注意事項：</span>{{t.note}}</div>
+                    </div>
+                    <button v-if="!isGuest" @click="openAddTransTicketModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增交通票券 (自動帶入)</button>
+                </div>
+                
+                <div v-if="hotelTab==='flight'" class="animate-fade-in pb-20">
+                     <div v-if="!currentUser" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-eye-slash text-4xl mb-4"></i><br>請先選擇身分</div>
+                     <div v-else class="space-y-4">
+                         <div class="card !p-0 border-0 shadow-lg relative overflow-hidden group">
+                             <div class="bg-blue-500 p-3 flex justify-between items-center text-white"><span class="font-black text-sm tracking-widest"><i class="fa-solid fa-plane-departure mr-2"></i>去程機票 (OUT)</span><button v-if="!isGuest" @click="editFlight('out')" class="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/40"><i class="fa-solid fa-pen"></i></button></div>
+                             <div class="p-5 relative bg-white"><div class="flex justify-between items-end bg-gray-50 p-3 rounded-xl mb-3"><div><div class="text-[10px] text-gray-400 font-bold">FLIGHT</div><a :href="flightStatusLink(currentUser.flightOut)" target="_blank" class="font-black text-xl text-blue-600 underline decoration-dashed underline-offset-4">{{currentUser.flightOut || 'TR898'}} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a></div><div class="text-right"><div class="text-[10px] text-gray-400 font-bold">SEAT</div><div class="font-black text-2xl text-blue-500">{{currentUser.flightOutSeat||'--'}}</div></div></div><div class="bg-yellow-50 p-3 text-xs text-yellow-800 font-bold border border-yellow-100 rounded-xl leading-relaxed whitespace-pre-wrap"><i class="fa-solid fa-circle-info mr-1"></i> {{getAirlineInfo(currentUser.flightOut, false) || '請確認航廈'}}</div></div>
+                         </div>
+                         <div class="card !p-0 border-0 shadow-lg relative overflow-hidden group">
+                             <div class="bg-indigo-500 p-3 flex justify-between items-center text-white"><span class="font-black text-sm tracking-widest"><i class="fa-solid fa-plane-arrival mr-2"></i>回程機票 (IN)</span><button v-if="!isGuest" @click="editFlight('in')" class="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/40"><i class="fa-solid fa-pen"></i></button></div>
+                             <div class="p-5 relative bg-white"><div class="flex justify-between items-end bg-gray-50 p-3 rounded-xl mb-3"><div><div class="text-[10px] text-gray-400 font-bold">FLIGHT</div><a :href="flightStatusLink(currentUser.flightIn)" target="_blank" class="font-black text-xl text-indigo-600 underline decoration-dashed underline-offset-4">{{currentUser.flightIn || 'BR197'}} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a></div><div class="text-right"><div class="text-[10px] text-gray-400 font-bold">SEAT</div><div class="font-black text-2xl text-indigo-500">{{currentUser.flightInSeat||'--'}}</div></div></div><div class="bg-yellow-50 p-3 text-xs text-yellow-800 font-bold border border-yellow-100 rounded-xl leading-relaxed whitespace-pre-wrap"><i class="fa-solid fa-circle-info mr-1"></i> {{getAirlineInfo(currentUser.flightIn, false) || '請確認航廈'}}</div></div>
+                         </div>
                      </div>
-                     <div class="card !p-0 border-0 shadow-lg relative overflow-hidden group">
-                         <div class="bg-indigo-500 p-3 flex justify-between items-center text-white"><span class="font-black text-sm tracking-widest"><i class="fa-solid fa-plane-arrival mr-2"></i>回程機票 (IN)</span><button v-if="!isGuest" @click="editFlight('in')" class="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/40"><i class="fa-solid fa-pen"></i></button></div>
-                         <div class="p-5 relative bg-white"><div class="flex justify-between items-end bg-gray-50 p-3 rounded-xl mb-3"><div><div class="text-[10px] text-gray-400 font-bold">FLIGHT</div><a :href="flightStatusLink(currentUser.flightIn)" target="_blank" class="font-black text-xl text-indigo-600 underline decoration-dashed underline-offset-4">{{currentUser.flightIn || 'BR197'}} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a></div><div class="text-right"><div class="text-[10px] text-gray-400 font-bold">SEAT</div><div class="font-black text-2xl text-indigo-500">{{currentUser.flightInSeat||'--'}}</div></div></div><div class="bg-yellow-50 p-3 text-xs text-yellow-800 font-bold border border-yellow-100 rounded-xl leading-relaxed whitespace-pre-wrap"><i class="fa-solid fa-circle-info mr-1"></i> {{getAirlineInfo(currentUser.flightIn, false) || '請確認航廈'}}</div></div>
-                     </div>
-                 </div>
-            </div>
+                </div>
 
-             <div v-if="hotelTab==='car'" class="animate-fade-in space-y-4 pb-20">
-                 <div v-for="(car, idx) in rentalCars" :key="idx" class="card overflow-hidden">
-                     <div class="p-5 border-l-4" :class="idx%2===0?'border-green-500':'border-blue-400'">
-                         <div class="rental-badge" :class="car.status==='done'?'done':'todo'" @click="openRentalDetail(car, idx)">
-                             <i :class="car.status==='done'?'fa-solid fa-check':'fa-solid fa-circle-exclamation'"></i>
-                             {{car.status==='done'?'已完成':'尚未預約'}}
-                         </div>
-                         <div class="flex justify-between items-start">
-                             <h3 class="font-black text-lg mb-1">{{car.company}}</h3>
-                             <button v-if="!isGuest" @click="deleteCar(idx)" class="text-red-300"><i class="fa-solid fa-trash"></i></button>
-                         </div>
-                         <p class="text-xs text-gray-500 font-bold mb-3"><i class="fa-solid fa-location-dot"></i> 取車：{{car.pickup}}</p>
-                         <a :href="car.url" target="_blank" class="block text-center text-white font-bold py-2 rounded-xl active:scale-95 transition" :class="idx%2===0?'bg-green-500':'bg-blue-400'">前往預約/查看</a>
-                     </div>
-                 </div>
-                 <button v-if="!isGuest" @click="openAddCarModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增租車預約</button>
-            </div>
-        </div>
-        
-        <div v-if="currentView==='money'" class="px-5 py-4 animate-fade-in">
-            <div v-if="isGuest" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-user-secret text-4xl mb-4 text-gray-300"></i><br>訪客模式<br>無法存取財務資訊</div>
-            <div v-else-if="!currentUser" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-lock text-4xl mb-4 text-pink-300"></i><br>請先選擇身分</div>
-            <div v-else>
-                 <div class="flex gap-2 mb-4 justify-center bg-white/50 p-1 rounded-full w-max mx-auto backdrop-blur-sm shadow-sm">
-                      <button @click="moneyTab='record'" :class="['px-6 py-2 rounded-full font-bold transition text-sm',moneyTab==='record'?'bg-yellow-400 text-white shadow-md':'text-gray-400']"><i class="fa-solid fa-user-lock"></i> 我的私帳</button>
-                      <button @click="moneyTab='split'" :class="['px-6 py-2 rounded-full font-bold transition text-sm',moneyTab==='split'?'bg-blue-400 text-white shadow-md':'text-gray-400']"><i class="fa-solid fa-users"></i> 公款分帳</button>
-                 </div>
-                 <div class="flex justify-between items-center mb-4 px-2">
-                     <div class="text-xs font-bold text-gray-500 bg-white px-3 py-1.5 rounded-full shadow-sm border border-pink-100">匯率: 1 JPY ≈ <input v-model="exchangeRate" class="w-14 text-center text-pink-500 font-black outline-none bg-transparent" type="number" step="0.001"> TWD</div>
-                 </div>
-                 <div v-if="moneyTab==='record'">
-                      <div class="card p-6 bg-gradient-to-br from-yellow-300 to-orange-400 text-white border-none shadow-orange-200 mb-4">
-                         <div class="flex justify-between items-end"><div><div class="text-xs font-bold opacity-80 mb-1">🔒 {{currentUser.name}} 的私人支出</div><div class="text-4xl font-black">TWD ${{Math.round(myPrivateTotalTWD).toLocaleString()}}</div></div></div>
-                      </div>
-                      <div class="space-y-3 pb-20">
-                         <div v-for="exp in myPrivateExpenses" :key="exp.id" class="card p-4 flex justify-between items-center !mb-0 !rounded-2xl border-l-4 border-yellow-300">
-                             <div><div class="font-bold text-gray-800">{{exp.name}}</div><div class="text-[10px] text-gray-400 flex items-center gap-1">{{getPaymentIcon(exp.method)}} {{exp.date}}</div></div>
-                             <div class="text-right"><span class="font-black text-gray-700 block">{{exp.currency}} {{exp.amount}}</span></div>
-                             <button @click="deleteExpense(exp.id)" class="ml-3 text-red-300"><i class="fa-solid fa-trash-can"></i></button>
-                         </div>
-                      </div>
-                      <button @click="openExpenseModal('private')" class="fab-main bg-yellow-400 text-white"><i class="fa-solid fa-pen"></i></button>
-                 </div>
-                 
-                 <div v-if="moneyTab==='split'">
-                      <div class="card p-5 border-l-4 border-blue-400 bg-blue-50/50">
-                          <h3 class="font-bold text-blue-500 mb-4 flex items-center gap-2"><i class="fa-solid fa-calculator"></i> 智慧結算 (TWD)</h3>
-                          <div v-for="s in settlements" class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-blue-100 mb-2"><span class="font-bold text-gray-700 text-sm">{{getUserName(s.from)}} <i class="fa-solid fa-angles-right text-blue-300 mx-1"></i> {{getUserName(s.to)}}</span><span class="font-black text-blue-600">${{s.amount.toLocaleString()}}</span></div>
-                      </div>
-                      <div class="flex items-center justify-between mt-6 mb-3 px-2">
-                          <h3 class="font-bold text-gray-600">所有人公款明細 (Live)</h3>
-                          <span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full font-bold animate-pulse-fast">即時同步中</span>
-                      </div>
-                      <div class="space-y-3 pb-20">
-                         <transition-group name="list">
-                             <div v-for="exp in groupExpenses" :key="exp.id" class="card p-4 !mb-0 !rounded-2xl border-l-4 border-blue-300 relative">
-                                 <div class="flex justify-between items-start mb-1"><div class="font-bold text-gray-800">{{exp.name}} <span class="text-[10px] text-gray-400 font-normal ml-1">{{getPaymentIcon(exp.method)}}</span></div><div class="font-black text-blue-500">{{exp.currency}} {{exp.amount}}</div></div>
-                                 <div class="flex justify-between items-end"><div class="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block"><span class="text-blue-500">{{getUserName(exp.whoPaid)}}</span> 付款 <i class="fa-solid fa-caret-right text-gray-400"></i> {{exp.forWhom.length}} 人均分</div><button v-if="exp.whoPaid === currentUser.id" @click="deleteExpense(exp.id)" class="text-red-300 p-2"><i class="fa-solid fa-trash-can"></i></button></div>
+                 <div v-if="hotelTab==='car'" class="animate-fade-in space-y-4 pb-20">
+                     <div v-for="(car, idx) in rentalCars" :key="idx" class="card overflow-hidden">
+                         <div class="p-5 border-l-4" :class="idx%2===0?'border-green-500':'border-blue-400'">
+                             <div class="rental-badge" :class="car.status==='done'?'done':'todo'" @click="openRentalDetail(car, idx)">
+                                 <i :class="car.status==='done'?'fa-solid fa-check':'fa-solid fa-circle-exclamation'"></i>
+                                 {{car.status==='done'?'已完成':'尚未預約'}}
                              </div>
-                         </transition-group>
-                      </div>
-                      <button @click="openExpenseModal('split')" class="fab-main bg-blue-400 text-white"><i class="fa-solid fa-plus"></i></button>
-                 </div>
+                             <div class="flex justify-between items-start">
+                                 <h3 class="font-black text-lg mb-1">{{car.company}}</h3>
+                                 <button v-if="!isGuest" @click="deleteCar(idx)" class="text-red-300"><i class="fa-solid fa-trash"></i></button>
+                             </div>
+                             <p class="text-xs text-gray-500 font-bold mb-3"><i class="fa-solid fa-location-dot"></i> 取車：{{car.pickup}}</p>
+                             <a :href="car.url" target="_blank" class="block text-center text-white font-bold py-2 rounded-xl active:scale-95 transition" :class="idx%2===0?'bg-green-500':'bg-blue-400'">前往預約/查看</a>
+                         </div>
+                     </div>
+                     <button v-if="!isGuest" @click="openAddCarModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增租車預約</button>
+                </div>
             </div>
+            
+            <div v-if="currentView==='money'" class="px-5 py-4 animate-fade-in">
+                <div v-if="isGuest" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-user-secret text-4xl mb-4 text-gray-300"></i><br>訪客模式<br>無法存取財務資訊</div>
+                <div v-else-if="!currentUser" class="text-center py-20 text-gray-400 font-bold bg-white/50 rounded-3xl border border-dashed border-gray-300"><i class="fa-solid fa-lock text-4xl mb-4 text-pink-300"></i><br>請先選擇身分</div>
+                <div v-else>
+                     <div class="flex gap-2 mb-4 justify-center bg-white/50 p-1 rounded-full w-max mx-auto backdrop-blur-sm shadow-sm">
+                          <button @click="moneyTab='record'" :class="['px-6 py-2 rounded-full font-bold transition text-sm',moneyTab==='record'?'bg-yellow-400 text-white shadow-md':'text-gray-400']"><i class="fa-solid fa-user-lock"></i> 我的私帳</button>
+                          <button @click="moneyTab='split'" :class="['px-6 py-2 rounded-full font-bold transition text-sm',moneyTab==='split'?'bg-blue-400 text-white shadow-md':'text-gray-400']"><i class="fa-solid fa-users"></i> 公款分帳</button>
+                     </div>
+                     <div class="flex justify-between items-center mb-4 px-2">
+                         <div class="text-xs font-bold text-gray-500 bg-white px-3 py-1.5 rounded-full shadow-sm border border-pink-100">匯率: 1 JPY ≈ <input v-model="exchangeRate" class="w-14 text-center text-pink-500 font-black outline-none bg-transparent" type="number" step="0.001"> TWD</div>
+                     </div>
+                     <div v-if="moneyTab==='record'">
+                          <div class="card p-6 bg-gradient-to-br from-yellow-300 to-orange-400 text-white border-none shadow-orange-200 mb-4">
+                             <div class="flex justify-between items-end"><div><div class="text-xs font-bold opacity-80 mb-1">🔒 {{currentUser.name}} 的私人支出</div><div class="text-4xl font-black">TWD ${{Math.round(myPrivateTotalTWD).toLocaleString()}}</div></div></div>
+                          </div>
+                          <div class="space-y-3 pb-20">
+                             <div v-for="exp in myPrivateExpenses" :key="exp.id" class="card p-4 flex justify-between items-center !mb-0 !rounded-2xl border-l-4 border-yellow-300">
+                                 <div><div class="font-bold text-gray-800">{{exp.name}}</div><div class="text-[10px] text-gray-400 flex items-center gap-1">{{getPaymentIcon(exp.method)}} {{exp.date}}</div></div>
+                                 <div class="text-right"><span class="font-black text-gray-700 block">{{exp.currency}} {{exp.amount}}</span></div>
+                                 <button @click="deleteExpense(exp.id)" class="ml-3 text-red-300"><i class="fa-solid fa-trash-can"></i></button>
+                             </div>
+                          </div>
+                          <button @click="openExpenseModal('private')" class="fab-main bg-yellow-400 text-white"><i class="fa-solid fa-pen"></i></button>
+                     </div>
+                     
+                     <div v-if="moneyTab==='split'">
+                          <div class="card p-5 border-l-4 border-blue-400 bg-blue-50/50">
+                              <h3 class="font-bold text-blue-500 mb-4 flex items-center gap-2"><i class="fa-solid fa-calculator"></i> 智慧結算 (TWD)</h3>
+                              <div v-for="s in settlements" class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-blue-100 mb-2"><span class="font-bold text-gray-700 text-sm">{{getUserName(s.from)}} <i class="fa-solid fa-angles-right text-blue-300 mx-1"></i> {{getUserName(s.to)}}</span><span class="font-black text-blue-600">${{s.amount.toLocaleString()}}</span></div>
+                          </div>
+                          <div class="flex items-center justify-between mt-6 mb-3 px-2">
+                              <h3 class="font-bold text-gray-600">所有人公款明細 (Live)</h3>
+                              <span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full font-bold animate-pulse-fast">即時同步中</span>
+                          </div>
+                          <div class="space-y-3 pb-20">
+                             <transition-group name="list">
+                                 <div v-for="exp in groupExpenses" :key="exp.id" class="card p-4 !mb-0 !rounded-2xl border-l-4 border-blue-300 relative">
+                                     <div class="flex justify-between items-start mb-1"><div class="font-bold text-gray-800">{{exp.name}} <span class="text-[10px] text-gray-400 font-normal ml-1">{{getPaymentIcon(exp.method)}}</span></div><div class="font-black text-blue-500">{{exp.currency}} {{exp.amount}}</div></div>
+                                     <div class="flex justify-between items-end"><div class="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block"><span class="text-blue-500">{{getUserName(exp.whoPaid)}}</span> 付款 <i class="fa-solid fa-caret-right text-gray-400"></i> {{exp.forWhom.length}} 人均分</div><button v-if="exp.whoPaid === currentUser.id" @click="deleteExpense(exp.id)" class="text-red-300 p-2"><i class="fa-solid fa-trash-can"></i></button></div>
+                                 </div>
+                             </transition-group>
+                          </div>
+                          <button @click="openExpenseModal('split')" class="fab-main bg-blue-400 text-white"><i class="fa-solid fa-plus"></i></button>
+                     </div>
+                </div>
+            </div>
+
+        </div> <div v-if="currentView!=='menu'" class="fab-home" @click="currentView='menu'"><i class="fa-solid fa-house"></i></div>
+        <a v-if="currentView!=='welcome'" :href="getSearchLink('')" target="_blank" class="fab-search"><i class="fa-brands fa-google"></i></a>
+
+        <div class="cloud-status" @click="showDiagnostic">
+            <div class="status-dot" :class="statusColor"></div>
+            <span class="ml-1">{{ statusText }}</span>
         </div>
 
-    </div>
-
-    <div v-if="currentView!=='menu'" class="fab-home" @click="currentView='menu'"><i class="fa-solid fa-house"></i></div>
-    <a v-if="currentView!=='welcome'" :href="getSearchLink('')" target="_blank" class="fab-search"><i class="fa-brands fa-google"></i></a>
-
-    <div class="cloud-status" @click="showDiagnostic">
-        <div class="status-dot" :class="statusColor"></div>
-        <span class="ml-1">{{ statusText }}</span>
-    </div>
-
-    <div v-if="showPersonaModal" class="fixed inset-0 z-[2000] bg-black/85 flex items-center justify-center p-6 backdrop-blur-lg animate-fade-in">
-        <div class="bg-white/95 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative border-[6px] border-pink-200">
-            <h3 class="font-black text-2xl mb-8 text-pink-500 tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-paw"></i> 請問您是哪一位？</h3>
-            <div class="grid grid-cols-2 gap-6 mb-2">
-                <div v-for="u in usersArray" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)">
-                    <div class="w-24 h-24 mx-auto rounded-3xl bg-white border-4 border-gray-100 shadow-lg flex items-center justify-center text-4xl mb-3 overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:border-pink-400 group-hover:shadow-pink-300 group-hover:rotate-3">
-                        <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
-                        <span v-else>{{u.icon}}</span>
+        <div v-if="showPersonaModal" class="fixed inset-0 z-[2000] bg-black/85 flex items-center justify-center p-6 backdrop-blur-lg animate-fade-in">
+            <div class="bg-white/95 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative border-[6px] border-pink-200">
+                <h3 class="font-black text-2xl mb-8 text-pink-500 tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-paw"></i> 請問您是哪一位？</h3>
+                <div class="grid grid-cols-2 gap-6 mb-2">
+                    <div v-for="u in usersArray" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)">
+                        <div class="w-24 h-24 mx-auto rounded-3xl bg-white border-4 border-gray-100 shadow-lg flex items-center justify-center text-4xl mb-3 overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:border-pink-400 group-hover:shadow-pink-300 group-hover:rotate-3">
+                            <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
+                            <span v-else>{{u.icon}}</span>
+                        </div>
+                        <div class="font-black text-gray-600 text-lg group-hover:text-pink-500 transition">{{u.name}}</div>
+                        <button v-if="!isGuest" @click.stop="openUserEditor(u)" class="absolute -top-2 -right-2 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition z-10"><i class="fa-solid fa-pen text-xs"></i></button>
                     </div>
-                    <div class="font-black text-gray-600 text-lg group-hover:text-pink-500 transition">{{u.name}}</div>
-                    <button v-if="!isGuest" @click.stop="openUserEditor(u)" class="absolute -top-2 -right-2 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition z-10"><i class="fa-solid fa-pen text-xs"></i></button>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div v-if="showCouponModal" class="fixed inset-0 z-[3000] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl h-[80vh] flex flex-col animate-fade-in">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-black text-2xl text-pink-500"><i class="fa-solid fa-ticket"></i> 優惠券</h3>
-                <div class="flex gap-2">
-                    <button v-if="!isGuest" @click="openAddCouponModal" class="bg-gray-100 text-gray-600 w-8 h-8 rounded-full active:scale-95"><i class="fa-solid fa-plus"></i></button>
-                    <button @click="showCouponModal=false" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 active:scale-95"><i class="fa-solid fa-times"></i></button>
-                </div>
-            </div>
-            <div class="flex-1 overflow-y-auto space-y-4 pb-10">
-                <div v-for="(c, idx) in coupons" class="border border-pink-200 rounded-xl p-4 relative overflow-hidden bg-pink-50/30 group">
-                    <div class="absolute -right-6 -top-6 w-20 h-20 bg-pink-500 rounded-full opacity-10"></div>
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="font-black text-lg text-gray-800">{{c.name}}</h4>
-                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">{{c.discount}}</span>
+        
+        <div v-if="showCouponModal" class="fixed inset-0 z-[3000] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl h-[80vh] flex flex-col animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-black text-2xl text-pink-500"><i class="fa-solid fa-ticket"></i> 優惠券</h3>
+                    <div class="flex gap-2">
+                        <button v-if="!isGuest" @click="openAddCouponModal" class="bg-gray-100 text-gray-600 w-8 h-8 rounded-full active:scale-95"><i class="fa-solid fa-plus"></i></button>
+                        <button @click="showCouponModal=false" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 active:scale-95"><i class="fa-solid fa-times"></i></button>
                     </div>
-                    <p class="text-xs text-gray-500 font-bold mb-3"><i class="fa-solid fa-circle-exclamation text-pink-400"></i> {{c.note}}</p>
-                    <a :href="c.link" target="_blank" class="block w-full bg-pink-500 text-white text-center font-bold py-3 rounded-lg shadow-md active:scale-95 transition">使用 / 條碼</a>
-                    <button v-if="!isGuest" @click="openEditModal('coupon', c, idx)" class="absolute top-2 right-2 bg-white/80 p-2 rounded-full text-blue-400 shadow active:scale-90"><i class="fa-solid fa-pen"></i></button>
-                    <button v-if="!isGuest" @click="coupons.splice(idx,1);saveData()" class="absolute bottom-2 right-2 text-red-300 opacity-50 hover:opacity-100 active:scale-90"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="flex-1 overflow-y-auto space-y-4 pb-10">
+                    <div v-for="(c, idx) in coupons" class="border border-pink-200 rounded-xl p-4 relative overflow-hidden bg-pink-50/30 group">
+                        <div class="absolute -right-6 -top-6 w-20 h-20 bg-pink-500 rounded-full opacity-10"></div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-black text-lg text-gray-800">{{c.name}}</h4>
+                            <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">{{c.discount}}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 font-bold mb-3"><i class="fa-solid fa-circle-exclamation text-pink-400"></i> {{c.note}}</p>
+                        <a :href="c.link" target="_blank" class="block w-full bg-pink-500 text-white text-center font-bold py-3 rounded-lg shadow-md active:scale-95 transition">使用 / 條碼</a>
+                        <button v-if="!isGuest" @click="openEditModal('coupon', c, idx)" class="absolute top-2 right-2 bg-white/80 p-2 rounded-full text-blue-400 shadow active:scale-90"><i class="fa-solid fa-pen"></i></button>
+                        <button v-if="!isGuest" @click="coupons.splice(idx,1);saveData()" class="absolute bottom-2 right-2 text-red-300 opacity-50 hover:opacity-100 active:scale-90"><i class="fa-solid fa-trash"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-<div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
+
+    </div> ```
+```html
+    <div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
 
     <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -632,7 +626,7 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
-// V47 Strict Object Schema for Users (Prevents Array Overwrite)
+// V48 Strict Object Schema for Users (Prevents Array Overwrite)
 const defaultUsersObj = {
     "1": {id:1, name:'吉伊', icon:'🐹', list:[...defaultPrepList]},
     "2": {id:2, name:'小八', icon:'🐱', list:[...defaultPrepList]},
@@ -717,12 +711,12 @@ const defaultData = {
 createApp({
     setup() {
         const currentView = ref('welcome');
+        const isWelcomeClosed = ref(false); // Default to false (Show Welcome Screen)
         const currentUser = ref(null);
         const isGuest = ref(false); 
         const showPersonaModal = ref(false);
         const showUserEditModal = ref(false);
         const editingUser = ref({});
-        const isWelcomeClosed = ref(false);
         const showLoginModal = ref(false);
         const loginForm = ref({email:'',password:''});
         const isLoggedIn = ref(false);
@@ -754,7 +748,7 @@ createApp({
         const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
         
-        // V47 Real Weather Data
+        // V48 Real Weather Data
         const weatherLoading = ref(false);
         const weatherData = ref([
             {name:'Tokyo', displayName:'東京', temp:'--', bg:'bg-blue-400', icon:'fa-solid fa-cloud-sun'},
@@ -798,7 +792,7 @@ createApp({
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','japanese':'翻譯蒟蒻'}[view]||'關東之旅');
         
-        // V47 Online Status Logic
+        // V48 Online Status Logic
         const isUserOnline = (id) => { const last = activeUsers.value[id]; return last && (Date.now() - last) < 65000; };
         const getUserName = (id) => users.value[id]?.name||'未知';
         const getUserAvatar = (id) => users.value[id]?.avatar || 'https://placehold.co/100x100/pink/white?text=' + getUserName(id).charAt(0);
@@ -814,11 +808,10 @@ createApp({
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         const settlements = computed(() => { const b={}; usersArray.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=usersArray.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
-        // V47 New: Dynamic Map Cover
+        // V48 Dynamic Map Cover
         const getMapCover = (loc) => {
             const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' };
-            // Fallback to placeholder if not found, but trying to load local file
-            return map[loc]; 
+            return map[loc] || 'https://placehold.co/600x300/pink/white?text=MAP'; 
         };
         const getRaidClass = (item) => {
             if(item.reserve) return 'raid-red';
@@ -844,7 +837,7 @@ createApp({
             saveData();
         };
 
-        // V47 Strict Sync: Object-based Update
+        // V48 Strict Sync: Object-based Update
         let saveTimeout = null;
         const saveData = async () => { 
             if(isGuest.value) return;
@@ -871,7 +864,7 @@ createApp({
             }, 800);
         };
         
-        // V47 Heartbeat
+        // V48 Heartbeat
         const updateHeartbeat = async () => {
             if(!isLoggedIn.value || !currentUser.value || isGuest.value) return;
             try {
@@ -896,13 +889,13 @@ createApp({
             weatherLoading.value = false;
         };
 
-        const showDiagnostic = () => { alert(`【V47 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
+        const showDiagnostic = () => { alert(`【V48 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
 
         // Logic
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V47_LAST_USER_ID', u.id);
+            localStorage.setItem('V48_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -1003,7 +996,7 @@ createApp({
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V47_LAST_USER_ID');
+            const lastId = localStorage.getItem('V48_LAST_USER_ID');
             if(lastId) { const u = users.value[lastId]; if(u) currentUser.value = u; }
         });
 
