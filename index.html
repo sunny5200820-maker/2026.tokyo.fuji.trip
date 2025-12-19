@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V42.2 修復版)</title>
+<title>關東之旅 2026 (V46.0 Emerald Adventure)</title>
 
 <script>
     window.tailwind = {
@@ -15,11 +15,12 @@
                 extend: {
                     colors: {'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},
                     fontFamily: {sans:['Zen Maru Gothic','sans-serif']},
-                    animation: {'wiggle':'wiggle 3s ease-in-out infinite','float':'float 3s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards','spin-slow':'spin 8s linear infinite','pulse-fast':'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite', 'bounce-slow': 'bounce 2s infinite'},
+                    animation: {'wiggle':'wiggle 3s ease-in-out infinite','float':'float 4s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards','spin-slow':'spin 8s linear infinite','pulse-fast':'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite', 'bounce-slow': 'bounce 2s infinite', 'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'},
                     keyframes: {
                         wiggle: {'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},
-                        float: {'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-5px)'}},
-                        fadeIn: {from:{opacity:0,transform:'translateY(10px)'},to:{opacity:1,transform:'translateY(0)'}}
+                        float: {'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-8px)'}},
+                        fadeIn: {from:{opacity:0,transform:'translateY(10px)'},to:{opacity:1,transform:'translateY(0)'}},
+                        pop: {'0%':{transform:'scale(0)'},'100%':{transform:'scale(1)'}}
                     }
                 }
             }
@@ -32,7 +33,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V42.2 Core Styles */
+    /* V46.0 Emerald Core */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -52,9 +53,10 @@
         overflow-x: hidden;
         padding-bottom: 180px; 
         padding-top: env(safe-area-inset-top);
+        transition: padding-bottom 0.3s ease;
     }
     
-    #app-content.view-shopping { padding-bottom: 350px !important; }
+    #app-content.view-shopping { padding-bottom: 250px !important; }
 
     body.modal-open #app-content { overflow: hidden; }
 
@@ -70,16 +72,48 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     
     .card {
-        background: rgba(255,255,255,0.92);
+        background: rgba(255,255,255,0.95);
         border-radius: 24px;
         box-shadow: 0 8px 30px rgba(255,105,180,0.12);
         border: 2px solid rgba(255,255,255,0.8);
         margin-bottom: 0; position: relative;
-        backdrop-filter: blur(10px); transition: all 0.3s ease;
+        backdrop-filter: blur(10px); transition: all 0.2s ease;
         overflow: hidden; transform: translateZ(0); 
     }
-    .card:active { transform: scale(0.99); }
+    .card:active { transform: scale(0.98); border-color: #FFD1DC; }
     
+    /* V46 Food Map: Adventure Cards */
+    .map-cover {
+        width: 100%; height: auto; border-radius: 20px;
+        border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        margin-bottom: 20px; animation: float 6s ease-in-out infinite;
+    }
+    .food-card {
+        background: #fff; border-radius: 24px; overflow: visible; /* Allow avatars to pop out */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 16px; border: 1px solid #fff;
+        position: relative;
+    }
+    .raid-badge {
+        position: absolute; top: 10px; left: 10px; z-index: 10;
+        padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 900;
+        color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: flex; items-center; gap: 4px;
+    }
+    .raid-green { background: #10b981; border: 2px solid #a7f3d0; } /* Weed */
+    .raid-yellow { background: #f59e0b; border: 2px solid #fde68a; } /* Party */
+    .raid-red { background: #ef4444; border: 2px solid #fecaca; animation: pulse-fast; } /* Special Grade */
+
+    /* V46 WakuWaku Avatar System */
+    .waku-container {
+        display: flex; flex-direction: row-reverse; justify-content: flex-end;
+        position: absolute; bottom: 12px; right: 50px; /* Left of the heart */
+    }
+    .waku-avatar {
+        width: 28px; height: 28px; border-radius: 50%; border: 2px solid white;
+        margin-right: -8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
     .list-move, .list-enter-active, .list-leave-active { transition: all 0.5s ease; }
     .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
     .list-leave-active { position: absolute; }
@@ -97,7 +131,7 @@
         font-size: 22px; color: white; z-index: 80; border: 3px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .fab-main.lifted { bottom: calc(220px + env(safe-area-inset-bottom)); }
+    .fab-main.lifted { bottom: calc(180px + env(safe-area-inset-bottom)); }
 
     .fab-search {
         position: fixed; bottom: calc(30px + env(safe-area-inset-bottom)); left: 20px;
@@ -112,16 +146,17 @@
         background: #10b981; 
     }
 
-    .coupon-bar {
-        position: fixed; bottom: 0; left: 0; right: 0; 
-        background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-        padding: 12px 20px; padding-bottom: calc(25px + env(safe-area-inset-bottom));
-        border-top: 1px solid rgba(255,192,203,0.5); z-index: 200;
-        display: flex; justify-content: center; align-items: center;
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.1); 
-        transform: translateY(0); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* V46 Fixed Coupon FAB: Small, Right-Aligned, Non-Blocking */
+    .coupon-fab {
+        position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px;
+        width: 48px; height: 48px; border-radius: 50%; 
+        background: linear-gradient(135deg, #f43f5e, #fb7185);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 18px; border: 2px solid white;
+        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+        z-index: 200; transition: transform 0.2s;
     }
-    .coupon-bar.hidden { transform: translateY(150%); }
+    .coupon-fab:active { transform: scale(0.9); }
 
     .rental-badge {
         position: absolute; top: 12px; right: 12px;
@@ -157,15 +192,16 @@
     .drive-line { background: repeating-linear-gradient(to bottom, #4ade80 0, #4ade80 5px, transparent 5px, transparent 10px) !important; height: 60px !important; }
     .drive-badge { border-color: #4ade80 !important; color: #16a34a !important; background: #f0fdf4 !important; font-size: 12px !important; padding: 6px 14px !important; }
 
+    /* V46 Online Status: Pointer Events None to prevent blocking */
     .online-header-bubble {
-        position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 10px;
+        position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 12px;
         z-index: 300; display: flex; gap: -5px; pointer-events: none;
     }
     .online-avatar {
         width: 36px; height: 36px; border-radius: 50%; border: 2px solid white;
         background: white; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         margin-left: -10px; position: relative; transition: transform 0.3s;
-        pointer-events: auto;
+        pointer-events: auto; /* Allow clicking the avatar itself */
     }
     .online-avatar.active { border-color: #4ade80; transform: translateY(2px); z-index: 10; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
     .online-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -200,7 +236,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">ULTIMATE V42.2</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V46.0 EMERALD</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -214,7 +250,7 @@
         </div>
     </div>
 <div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[60px] bg-[#FFF0F5]/90 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
-        <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-90 transition"><i class="fa-solid fa-chevron-left"></i></button>
+        <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-95 transition"><i class="fa-solid fa-chevron-left"></i></button>
         <h1 class="font-black text-gray-700 text-lg flex items-center gap-2 absolute left-1/2 transform -translate-x-1/2"><i class="fa-solid fa-sakura text-pink-300"></i> {{getPageTitle(currentView)}}</h1>
         <div class="w-10"></div>
     </div>
@@ -281,8 +317,8 @@
                                     <h3 class="font-black text-gray-800 text-lg mb-1">{{item.name}}</h3>
                                     <p class="text-sm text-gray-500 line-clamp-2 font-medium mb-2">{{item.note}}</p>
                                     <div class="flex gap-2 flex-wrap">
-                                        <a :href="getMapLink(item.mapKeyword, item.name)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full font-bold border border-blue-100 hover:bg-blue-100 transition"><i class="fa-solid fa-location-arrow"></i> 導航</a>
-                                        <a v-if="itineraryMode==='drive' && [2,3].includes(selectedDayIndex) && item.parkingLink" :href="getMapLink(item.parkingLink)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full font-bold border border-green-200 hover:bg-green-100"><i class="fa-solid fa-square-parking"></i> 停車場</a>
+                                        <a :href="getMapLink(item.mapKeyword, item.name)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full font-bold border border-blue-100 hover:bg-blue-100 transition active:scale-95"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                                        <a v-if="itineraryMode==='drive' && [2,3].includes(selectedDayIndex) && item.parkingLink" :href="getMapLink(item.parkingLink)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full font-bold border border-green-200 hover:bg-green-100 active:scale-95"><i class="fa-solid fa-square-parking"></i> 停車場</a>
                                     </div>
                                 </div>
                             </div>
@@ -295,25 +331,36 @@
                     </div>
                 </transition-group>
                 <div v-if="getCurrentItinerary().length === 0" class="text-center text-gray-400 py-10 font-bold">本日無特定行程。</div>
-                <button v-if="!isGuest" @click="openAddItineraryModal" class="w-full py-4 mt-6 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold hover:bg-white/50 transition"><i class="fa-solid fa-plus"></i> 新增行程</button>
+                <button v-if="!isGuest" @click="openAddItineraryModal" class="w-full py-4 mt-6 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold hover:bg-white/50 transition active:scale-95"><i class="fa-solid fa-plus"></i> 新增行程</button>
             </div>
         </div>
 
         <div v-if="['shopping','food','photo','japanese','weather'].includes(currentView)" class="px-5 py-4 animate-fade-in">
+             
              <div v-if="currentView==='shopping'">
-                <div class="grid grid-cols-2 gap-3 mb-6"><a href="https://www.cosme.net/ranking/" target="_blank" class="bg-green-50 text-green-600 p-3 rounded-xl text-center font-bold text-xs border border-green-200 block">👑 COSME 大賞</a><a href="https://www.shinyusha.co.jp/media/ldk-the-beauty/" target="_blank" class="bg-pink-50 text-pink-600 p-3 rounded-xl text-center font-bold text-xs border border-pink-200 block">💄 LDK 毒舌雜誌</a></div>
-                <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar"><button v-for="cat in ['cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">{{{'cosme':'藥妝清單','ldk':'LDK推薦','souvenir':'伴手禮'}[cat]}}</button></div>
-                <div class="grid grid-cols-2 gap-4"><div v-for="(item,idx) in shopping[shopCat]" class="card !p-0 border-0 shadow-lg group relative" :key="idx"><div class="h-32 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/300x300/pink/white?text=SHOP'" class="w-full h-full object-cover" @error="handleImgError"></div><div class="p-3"><div class="font-bold text-gray-800 text-sm mb-1 truncate">{{item.name}}</div><a :href="item.link || getSearchLink(item.name)" target="_blank" class="block text-center bg-gray-50 text-gray-500 text-[10px] py-1.5 rounded font-bold hover:bg-pink-500 hover:text-white transition">前往官網 / 搜尋</a></div><div v-if="!isGuest" class="absolute top-1 right-1 flex gap-1"><button @click="openEditModal('shopping', item, idx)" class="bg-white/90 p-1.5 rounded-full text-blue-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px]"></i></button><button @click="shopping[shopCat].splice(idx,1);saveData()" class="bg-white/90 p-1.5 rounded-full text-red-400 shadow w-7 h-7 flex items-center justify-center"><i class="fa-solid fa-trash text-[10px]"></i></button></div></div></div>
+                <div class="grid grid-cols-2 gap-3 mb-6"><a href="https://www.cosme.net/ranking/" target="_blank" class="bg-green-50 text-green-600 p-3 rounded-xl text-center font-bold text-xs border border-green-200 block active:scale-95 transition">👑 COSME 大賞</a><a href="https://www.shinyusha.co.jp/media/ldk-the-beauty/" target="_blank" class="bg-pink-50 text-pink-600 p-3 rounded-xl text-center font-bold text-xs border border-pink-200 block active:scale-95 transition">💄 LDK 毒舌雜誌</a></div>
+                <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar"><button v-for="cat in ['cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition active:scale-95', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">{{{'cosme':'藥妝清單','ldk':'LDK推薦','souvenir':'伴手禮'}[cat]}}</button></div>
+                <div class="grid grid-cols-2 gap-4"><div v-for="(item,idx) in shopping[shopCat]" class="card !p-0 border-0 shadow-lg group relative" :key="idx"><div class="h-32 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/300x300/pink/white?text=SHOP'" class="w-full h-full object-cover" @error="handleImgError"></div><div class="p-3"><div class="font-bold text-gray-800 text-sm mb-1 truncate">{{item.name}}</div><a :href="item.link || getSearchLink(item.name)" target="_blank" class="block text-center bg-gray-50 text-gray-500 text-[10px] py-1.5 rounded font-bold hover:bg-pink-500 hover:text-white transition active:scale-95">前往官網 / 搜尋</a></div><div v-if="!isGuest" class="absolute top-1 right-1 flex gap-1"><button @click="openEditModal('shopping', item, idx)" class="bg-white/90 p-1.5 rounded-full text-blue-400 shadow w-7 h-7 flex items-center justify-center active:scale-90"><i class="fa-solid fa-pen text-[10px]"></i></button><button @click="shopping[shopCat].splice(idx,1);saveData()" class="bg-white/90 p-1.5 rounded-full text-red-400 shadow w-7 h-7 flex items-center justify-center active:scale-90"><i class="fa-solid fa-trash text-[10px]"></i></button></div></div></div>
                 <button v-if="!isGuest" @click="openAddShopModal" class="fab-main bg-purple-400 text-white" :class="{'lifted': currentView === 'shopping'}"><i class="fa-solid fa-plus"></i></button>
-                <div class="coupon-bar" :class="{'hidden': currentView !== 'shopping'}">
-                    <button @click="showCouponModal=true" class="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white font-black py-3 rounded-full shadow-lg flex items-center justify-center gap-2 animate-bounce-slow"><i class="fa-solid fa-ticket"></i> 🇯🇵 激省折價券 (點我編輯)</button>
-                </div>
+                <button @click="showCouponModal=true" class="coupon-fab"><i class="fa-solid fa-ticket"></i></button>
              </div>
              
              <div v-if="currentView==='weather'">
                  <div class="bg-pink-50 p-4 rounded-2xl border border-pink-200 mb-6 shadow-sm text-center relative overflow-hidden">
                      <i class="fa-solid fa-fan text-pink-200 text-6xl absolute -right-4 -bottom-4 animate-spin-slow"></i>
-                     <h3 class="font-black text-pink-500 mb-3 text-sm">🌸 V42 即時天氣 (Open-Meteo)</h3>
+                     <h3 class="font-black text-pink-500 mb-3 text-sm">🌸 2026 櫻花權威預測</h3>
+                     <div class="grid grid-cols-2 gap-3 mb-3">
+                         <a href="https://weathernews.jp/s/sakura/" target="_blank" class="bg-white text-pink-500 py-2 rounded-lg text-xs font-bold shadow-sm hover:shadow-md transition">Weathernews</a>
+                         <a href="https://tenki.jp/sakura/" target="_blank" class="bg-white text-pink-500 py-2 rounded-lg text-xs font-bold shadow-sm hover:shadow-md transition">日本氣象協會</a>
+                     </div>
+                     <div class="grid grid-cols-3 gap-2">
+                         <div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">東京</div><div class="font-bold text-pink-600">3/22</div></div>
+                         <div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">鎌倉</div><div class="font-bold text-pink-600">3/25</div></div>
+                         <div class="bg-white rounded-lg p-2"><div class="text-[10px] text-gray-400">富士山</div><div class="font-bold text-pink-600">4/10</div></div>
+                     </div>
+                 </div>
+                 <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4 shadow-sm relative overflow-hidden">
+                     <h3 class="font-black text-blue-500 mb-3 text-sm">☁️ V46 即時天氣 (Open-Meteo)</h3>
                      <div v-if="weatherLoading" class="text-gray-400 text-xs py-4 font-bold animate-pulse">正在連線至日本氣象衛星...</div>
                      <div v-else class="space-y-4">
                          <div v-for="w in weatherData" :key="w.name" class="card p-6 text-white relative overflow-hidden" :class="w.bg">
@@ -321,29 +368,46 @@
                              <div class="relative z-10 mt-2"><div class="text-sm bg-white/20 backdrop-blur inline-block px-3 py-1 rounded-full font-bold">👕 {{getClothingAdvice(w.temp)}}</div></div>
                          </div>
                      </div>
-                     <button @click="fetchRealWeather" class="mt-4 text-xs bg-white text-pink-500 px-4 py-2 rounded-full font-bold shadow-sm border border-pink-100">🔄 更新天氣狀況</button>
+                     <button @click="fetchRealWeather" class="mt-4 text-xs bg-white text-blue-500 px-4 py-2 rounded-full font-bold shadow-sm border border-blue-100 active:scale-95">🔄 更新天氣狀況</button>
                  </div>
              </div>
 
             <div v-if="currentView==='food' || currentView==='photo'">
-                <div class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
+                <div class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition active:scale-95', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
+                
+                <div v-if="currentView==='food'" class="px-2">
+                    <img :src="getMapCover(currentLoc)" class="map-cover" @error="handleImgError">
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
-                    <div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="card !p-0 border-0 shadow-lg group relative">
-                        <div class="h-48 bg-gray-100 relative overflow-hidden"><img :src="item.img || 'https://placehold.co/600x400/orange/white?text=SPOT'" class="w-full h-full object-cover" @error="handleImgError"></div>
-                        <div class="p-4">
-                            <h3 class="font-black text-gray-800 text-lg mb-1 flex items-center justify-between">
-                                {{item.name}}
-                                <span v-if="currentView==='food' && item.reserve" class="bg-red-500 text-white text-[10px] px-2 py-1 rounded-full font-bold shadow-sm animate-pulse-fast">需訂位</span>
-                                <span v-if="currentView==='food' && !item.reserve" class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold border border-green-200">免訂位</span>
-                            </h3>
-                            <p class="text-sm text-gray-500 mb-3 font-bold">{{item.desc}}</p>
-                            <div v-if="currentView==='food'" class="mb-3 space-y-2">
-                                <div v-if="item.reserve" class="bg-red-50 border border-red-100 p-2 rounded-lg text-xs flex justify-between items-center"><span class="text-red-500 font-bold"><i class="fa-solid fa-clock"></i> 務必提前預約</span><a v-if="item.reserveLink" :href="item.reserveLink" target="_blank" class="bg-red-500 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm hover:bg-red-600 active:scale-95 transition">立即預訂 <i class="fa-solid fa-arrow-right"></i></a></div>
-                                <div v-if="item.note" class="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-xs text-gray-700 leading-relaxed relative mt-2 shadow-sm block"><i class="fa-solid fa-utensils text-yellow-400 text-xl absolute -top-2 -left-1"></i><div class="pl-4"><span class="font-black text-yellow-600 block mb-1">老饕筆記：</span>{{item.note}}</div></div>
-                            </div>
-                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-50 text-gray-600 font-bold py-3 rounded-lg text-sm border hover:bg-orange-400 hover:text-white transition"><i class="fa-solid fa-location-arrow"></i> Google Maps 導航</a>
+                    <div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="food-card relative group">
+                        
+                        <div v-if="currentView==='food'" class="raid-badge" :class="getRaidClass(item)">
+                            <i :class="getRaidIcon(item)"></i> {{getRaidLabel(item)}}
                         </div>
-                        <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2"><button @click="openEditModal(currentView==='food'?'food':'spot', item, idx)" class="w-8 h-8 bg-white rounded-full shadow text-blue-500 flex items-center justify-center"><i class="fa-solid fa-pen"></i></button><button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white rounded-full shadow text-red-500 flex items-center justify-center"><i class="fa-solid fa-trash"></i></button></div>
+
+                        <div class="h-40 bg-gray-100 relative overflow-hidden rounded-t-3xl"><img :src="item.img || 'https://placehold.co/600x400/orange/white?text=SPOT'" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" @error="handleImgError"></div>
+                        <div class="p-4 relative">
+                            <h3 class="font-black text-gray-800 text-lg mb-1 flex justify-between items-center">{{item.name}}</h3>
+                            <p class="text-sm text-gray-500 mb-3 font-bold">{{item.desc}}</p>
+                            
+                            <div v-if="currentView==='food'" class="mb-3 space-y-2">
+                                <div v-if="item.reserveLink" class="text-center"><a :href="item.reserveLink" target="_blank" class="inline-block bg-red-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-sm active:scale-95">立即預約</a></div>
+                            </div>
+                            
+                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-100 text-gray-500 font-bold py-2 rounded-lg text-xs hover:bg-orange-400 hover:text-white transition active:scale-95"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+
+                            <div v-if="currentView==='food'" class="absolute bottom-4 right-4 flex items-center gap-2">
+                                <div class="waku-container">
+                                    <div v-for="uid in (item.votes || [])" :key="uid" class="waku-avatar">
+                                        <img :src="getUserAvatar(uid)" class="w-full h-full rounded-full object-cover">
+                                    </div>
+                                </div>
+                                <button @click="toggleFoodVote(item)" class="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-md transition active:scale-75" :class="(item.votes||[]).includes(currentUser?.id) ? 'bg-pink-500 text-white' : 'bg-white text-gray-300'"><i class="fa-solid fa-heart"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2 z-20"><button @click="openEditModal(currentView==='food'?'food':'spot', item, idx)" class="w-8 h-8 bg-white/90 rounded-full shadow text-blue-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-pen"></i></button><button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white/90 rounded-full shadow text-red-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-trash"></i></button></div>
                     </div>
                 </div>
                 <button v-if="!isGuest" @click="currentView==='food'?openAddFoodModal():openAddSpotModal()" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
@@ -358,11 +422,12 @@
         </div>
         
         <div v-if="currentView==='prep'" class="px-5 py-4 animate-fade-in">
+             <a href="https://vjw-lp.digital.go.jp/zh-hant/" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-2xl p-4 mb-6 shadow-lg flex items-center justify-between active:scale-95 transition"><div class="flex items-center gap-3"><i class="fa-solid fa-qrcode text-3xl"></i><div><div class="font-bold text-lg">Visit Japan Web</div><div class="text-xs opacity-90">入境手續/海關申報</div></div></div><i class="fa-solid fa-chevron-right"></i></a>
              <div v-if="!currentUser || isGuest" class="text-center text-gray-400 font-bold bg-white/50 py-10 rounded-2xl border border-dashed"><i class="fa-solid fa-suitcase text-3xl mb-2"></i><br>{{isGuest?'訪客無法存取私人清單':'請登入以管理清單'}}</div>
             <div v-else class="card p-0">
                 <div class="bg-gray-50 p-3 border-b font-bold text-gray-700 flex justify-between items-center">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-blue-400"></i> {{currentUser.name}} 的行李</span>
-                    <button @click="addPrepItem(currentUser)" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-bold shadow-blue-200 shadow">+ 新增</button>
+                    <button @click="addPrepItem(currentUser)" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-bold shadow-blue-200 shadow active:scale-95 transition">+ 新增</button>
                 </div>
                 <div v-for="(item, idx) in currentUser.list" :key="idx" class="flex items-center p-3 border-b border-gray-100 group">
                     <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-500 mr-3" @change="saveData">
@@ -371,8 +436,8 @@
                 </div>
             </div>
             <div class="card p-5 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-100 mb-6 mt-6">
-                <div class="flex justify-between items-center mb-3"><h4 class="font-bold text-purple-800 text-sm flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> 景點門票精靈</h4><button v-if="!isGuest" @click="openAddTicketModal" class="text-xs bg-white text-purple-500 px-2 py-1 rounded shadow-sm font-bold border"><i class="fa-solid fa-plus"></i></button></div>
-                <div class="space-y-2"><div v-for="(t, idx) in suggestedTickets" :key="t.name" class="bg-white p-3 rounded-xl shadow-sm border border-purple-100 flex justify-between items-center"><span class="text-sm font-bold text-gray-700">{{t.name}}</span><div class="flex gap-2"><a :href="t.url" target="_blank" class="text-xs bg-purple-500 text-white px-3 py-1.5 rounded-full font-bold">購票</a><button v-if="!isGuest" @click="suggestedTickets.splice(idx,1);saveData()" class="text-red-300 text-xs px-1"><i class="fa-solid fa-trash"></i></button></div></div><div v-if="suggestedTickets.length===0" class="text-xs text-gray-400 text-center py-2">無特定景點門票需求。</div></div>
+                <div class="flex justify-between items-center mb-3"><h4 class="font-bold text-purple-800 text-sm flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> 景點門票精靈</h4><button v-if="!isGuest" @click="openAddTicketModal" class="text-xs bg-white text-purple-500 px-2 py-1 rounded shadow-sm font-bold border active:scale-95 transition"><i class="fa-solid fa-plus"></i></button></div>
+                <div class="space-y-2"><div v-for="(t, idx) in suggestedTickets" :key="t.name" class="bg-white p-3 rounded-xl shadow-sm border border-purple-100 flex justify-between items-center"><span class="text-sm font-bold text-gray-700">{{t.name}}</span><div class="flex gap-2"><a :href="t.url" target="_blank" class="text-xs bg-purple-500 text-white px-3 py-1.5 rounded-full font-bold active:scale-95 transition">購票</a><button v-if="!isGuest" @click="suggestedTickets.splice(idx,1);saveData()" class="text-red-300 text-xs px-1"><i class="fa-solid fa-trash"></i></button></div></div><div v-if="suggestedTickets.length===0" class="text-xs text-gray-400 text-center py-2">無特定景點門票需求。</div></div>
             </div>
         </div>
         
@@ -392,17 +457,17 @@
                         <button v-if="!isGuest" @click="openEditHotelModal(h, idx)" class="absolute top-2 right-2 bg-white/80 p-2 rounded-full text-gray-600 shadow-lg active:scale-95"><i class="fa-solid fa-pen"></i></button>
                     </div>
                     <div class="p-4">
-                        <a :href="getMapLink(h.link)" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100"><i class="fa-solid fa-location-dot"></i> 導航</a>
+                        <a :href="getMapLink(h.link)" target="_blank" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl border border-indigo-100 active:scale-95 transition"><i class="fa-solid fa-location-dot"></i> 導航</a>
                     </div>
                 </div>
             </div>
             
             <div v-if="hotelTab==='ticket'" class="space-y-4 pb-20">
                 <div v-for="(t, idx) in transportTickets" :key="idx" class="card overflow-hidden">
-                    <div class="p-4 flex justify-between items-center border-l-4 border-pink-400"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 text-xl"><i :class="t.icon||'fa-solid fa-ticket'"></i></div><div><div class="font-bold text-gray-800">{{t.name}}</div><div class="text-[10px] text-gray-400 font-bold mt-1">詳情與連結如下</div></div></div><div class="flex gap-2"><a :href="t.url" target="_blank" class="bg-pink-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md">購買</a><button v-if="!isGuest && t.custom" @click="transportTickets.splice(idx,1);saveData()" class="text-red-300 px-2"><i class="fa-solid fa-trash"></i></button></div></div>
+                    <div class="p-4 flex justify-between items-center border-l-4 border-pink-400"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-500 text-xl"><i :class="t.icon||'fa-solid fa-ticket'"></i></div><div><div class="font-bold text-gray-800">{{t.name}}</div><div class="text-[10px] text-gray-400 font-bold mt-1">詳情與連結如下</div></div></div><div class="flex gap-2"><a :href="t.url" target="_blank" class="bg-pink-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md active:scale-95 transition">購買</a><button v-if="!isGuest && t.custom" @click="transportTickets.splice(idx,1);saveData()" class="text-red-300 px-2"><i class="fa-solid fa-trash"></i></button></div></div>
                     <div class="bg-gray-50 p-3 text-xs text-gray-600 font-medium border-t border-gray-100 leading-relaxed whitespace-pre-wrap"><span class="font-bold text-pink-400 mb-1 block"><i class="fa-solid fa-circle-exclamation"></i> 注意事項：</span>{{t.note}}</div>
                 </div>
-                <button v-if="!isGuest" @click="openAddTransTicketModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold"><i class="fa-solid fa-plus"></i> 新增交通票券 (自動帶入)</button>
+                <button v-if="!isGuest" @click="openAddTransTicketModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增交通票券 (自動帶入)</button>
             </div>
             
             <div v-if="hotelTab==='flight'" class="animate-fade-in pb-20">
@@ -431,10 +496,10 @@
                              <button v-if="!isGuest" @click="deleteCar(idx)" class="text-red-300"><i class="fa-solid fa-trash"></i></button>
                          </div>
                          <p class="text-xs text-gray-500 font-bold mb-3"><i class="fa-solid fa-location-dot"></i> 取車：{{car.pickup}}</p>
-                         <a :href="car.url" target="_blank" class="block text-center text-white font-bold py-2 rounded-xl" :class="idx%2===0?'bg-green-500':'bg-blue-400'">前往預約/查看</a>
+                         <a :href="car.url" target="_blank" class="block text-center text-white font-bold py-2 rounded-xl active:scale-95 transition" :class="idx%2===0?'bg-green-500':'bg-blue-400'">前往預約/查看</a>
                      </div>
                  </div>
-                 <button v-if="!isGuest" @click="openAddCarModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold"><i class="fa-solid fa-plus"></i> 新增租車預約</button>
+                 <button v-if="!isGuest" @click="openAddCarModal" class="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-bold active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增租車預約</button>
             </div>
         </div>
         
@@ -468,12 +533,17 @@
                           <h3 class="font-bold text-blue-500 mb-4 flex items-center gap-2"><i class="fa-solid fa-calculator"></i> 智慧結算 (TWD)</h3>
                           <div v-for="s in settlements" class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-blue-100 mb-2"><span class="font-bold text-gray-700 text-sm">{{getUserName(s.from)}} <i class="fa-solid fa-angles-right text-blue-300 mx-1"></i> {{getUserName(s.to)}}</span><span class="font-black text-blue-600">${{s.amount.toLocaleString()}}</span></div>
                       </div>
-                      <h3 class="font-bold text-gray-600 mt-6 mb-3 px-2">所有人公款明細</h3>
+                      <div class="flex items-center justify-between mt-6 mb-3 px-2">
+                          <h3 class="font-bold text-gray-600">所有人公款明細 (Live)</h3>
+                          <span class="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full font-bold animate-pulse-fast">即時同步中</span>
+                      </div>
                       <div class="space-y-3 pb-20">
-                         <div v-for="exp in groupExpenses" :key="exp.id" class="card p-4 !mb-0 !rounded-2xl border-l-4 border-blue-300 relative">
-                             <div class="flex justify-between items-start mb-1"><div class="font-bold text-gray-800">{{exp.name}} <span class="text-[10px] text-gray-400 font-normal ml-1">{{getPaymentIcon(exp.method)}}</span></div><div class="font-black text-blue-500">{{exp.currency}} {{exp.amount}}</div></div>
-                             <div class="flex justify-between items-end"><div class="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block"><span class="text-blue-500">{{getUserName(exp.whoPaid)}}</span> 付款 <i class="fa-solid fa-caret-right text-gray-400"></i> {{exp.forWhom.length}} 人均分</div><button v-if="exp.whoPaid === currentUser.id" @click="deleteExpense(exp.id)" class="text-red-300 p-2"><i class="fa-solid fa-trash-can"></i></button></div>
-                         </div>
+                         <transition-group name="list">
+                             <div v-for="exp in groupExpenses" :key="exp.id" class="card p-4 !mb-0 !rounded-2xl border-l-4 border-blue-300 relative">
+                                 <div class="flex justify-between items-start mb-1"><div class="font-bold text-gray-800">{{exp.name}} <span class="text-[10px] text-gray-400 font-normal ml-1">{{getPaymentIcon(exp.method)}}</span></div><div class="font-black text-blue-500">{{exp.currency}} {{exp.amount}}</div></div>
+                                 <div class="flex justify-between items-end"><div class="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded inline-block"><span class="text-blue-500">{{getUserName(exp.whoPaid)}}</span> 付款 <i class="fa-solid fa-caret-right text-gray-400"></i> {{exp.forWhom.length}} 人均分</div><button v-if="exp.whoPaid === currentUser.id" @click="deleteExpense(exp.id)" class="text-red-300 p-2"><i class="fa-solid fa-trash-can"></i></button></div>
+                             </div>
+                         </transition-group>
                       </div>
                       <button @click="openExpenseModal('split')" class="fab-main bg-blue-400 text-white"><i class="fa-solid fa-plus"></i></button>
                  </div>
@@ -493,7 +563,7 @@
     <div v-if="showPersonaModal" class="fixed inset-0 z-[2000] bg-black/85 flex items-center justify-center p-6 backdrop-blur-lg animate-fade-in">
         <div class="bg-white/95 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative border-[6px] border-pink-200">
             <h3 class="font-black text-2xl mb-8 text-pink-500 tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-paw"></i> 請問您是哪一位？</h3>
-            <div class="grid grid-cols-2 gap-6 mb-8 max-h-[50vh] overflow-y-auto">
+            <div class="grid grid-cols-2 gap-6 mb-2">
                 <div v-for="u in users" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)">
                     <div class="w-24 h-24 mx-auto rounded-3xl bg-white border-4 border-gray-100 shadow-lg flex items-center justify-center text-4xl mb-3 overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:border-pink-400 group-hover:shadow-pink-300 group-hover:rotate-3">
                         <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
@@ -502,14 +572,7 @@
                     <div class="font-black text-gray-600 text-lg group-hover:text-pink-500 transition">{{u.name}}</div>
                     <button v-if="!isGuest" @click.stop="openUserEditor(u)" class="absolute -top-2 -right-2 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition z-10"><i class="fa-solid fa-pen text-xs"></i></button>
                 </div>
-                <div v-if="!isGuest" class="relative group cursor-pointer" @click="addMember">
-                    <div class="w-24 h-24 mx-auto rounded-3xl bg-gray-50 border-4 border-dashed border-gray-300 flex items-center justify-center text-4xl mb-3 text-gray-300 hover:text-pink-400 hover:border-pink-300 transition">
-                        <i class="fa-solid fa-plus"></i>
-                    </div>
-                    <div class="font-black text-gray-400 text-sm">新增夥伴</div>
-                </div>
             </div>
-            <button v-if="!isGuest" @click="resetUsers" class="text-xs text-red-300 underline font-bold mt-2 hover:text-red-500">重置預設角色 (修復缺少角色問題)</button>
         </div>
     </div>
     
@@ -518,8 +581,8 @@
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-black text-2xl text-pink-500"><i class="fa-solid fa-ticket"></i> 優惠券</h3>
                 <div class="flex gap-2">
-                    <button v-if="!isGuest" @click="openAddCouponModal" class="bg-gray-100 text-gray-600 w-8 h-8 rounded-full"><i class="fa-solid fa-plus"></i></button>
-                    <button @click="showCouponModal=false" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500"><i class="fa-solid fa-times"></i></button>
+                    <button v-if="!isGuest" @click="openAddCouponModal" class="bg-gray-100 text-gray-600 w-8 h-8 rounded-full active:scale-95"><i class="fa-solid fa-plus"></i></button>
+                    <button @click="showCouponModal=false" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 active:scale-95"><i class="fa-solid fa-times"></i></button>
                 </div>
             </div>
             <div class="flex-1 overflow-y-auto space-y-4 pb-10">
@@ -531,7 +594,8 @@
                     </div>
                     <p class="text-xs text-gray-500 font-bold mb-3"><i class="fa-solid fa-circle-exclamation text-pink-400"></i> {{c.note}}</p>
                     <a :href="c.link" target="_blank" class="block w-full bg-pink-500 text-white text-center font-bold py-3 rounded-lg shadow-md active:scale-95 transition">使用 / 條碼</a>
-                    <button v-if="!isGuest" @click="coupons.splice(idx,1);saveData()" class="absolute bottom-2 right-2 text-red-300 opacity-50 hover:opacity-100"><i class="fa-solid fa-trash"></i></button>
+                    <button v-if="!isGuest" @click="openEditModal('coupon', c, idx)" class="absolute top-2 right-2 bg-white/80 p-2 rounded-full text-blue-400 shadow active:scale-90"><i class="fa-solid fa-pen"></i></button>
+                    <button v-if="!isGuest" @click="coupons.splice(idx,1);saveData()" class="absolute bottom-2 right-2 text-red-300 opacity-50 hover:opacity-100 active:scale-90"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
         </div>
@@ -558,22 +622,22 @@
                 <div v-if="modalTitle==='新增行程' && modalData.name" class="text-center"><a :href="getDirLink(modalData.name)" target="_blank" class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-bold border border-gray-300 shadow-sm"><i class="fa-solid fa-route"></i> 🔍 估算時間</a></div>
             </div>
             <div class="flex gap-3 mt-6">
-                <button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button>
-                <button v-if="modalTitle==='新增翻譯'" @click="openGoogleTranslate(modalData.zh)" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg">G 翻譯</button>
-                <button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg">儲存</button>
+                <button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500 active:scale-95">取消</button>
+                <button v-if="modalTitle==='新增翻譯'" @click="openGoogleTranslate(modalData.zh)" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg active:scale-95">G 翻譯</button>
+                <button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button>
             </div>
-            <button v-if="isEditingItem" @click="handleModalDelete" class="w-full mt-2 text-red-300 py-2 font-bold text-xs"><i class="fa-solid fa-trash"></i> 刪除此項目</button>
+            <button v-if="isEditingItem" @click="handleModalDelete" class="w-full mt-2 text-red-300 py-2 font-bold text-xs active:scale-95"><i class="fa-solid fa-trash"></i> 刪除此項目</button>
         </div>
         <input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg">
     </div>
 
-    <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
+    <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl active:scale-95 transition">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
     
-    <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold">取消</button></div></div>
+    <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
     
-    <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border"><button @click="saveUserChanges" class="w-full py-2 bg-pink-500 text-white rounded-xl font-bold shadow">儲存</button></div></div>
+    <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border"><button @click="saveUserChanges" class="w-full py-2 bg-pink-500 text-white rounded-xl font-bold shadow active:scale-95">儲存</button></div></div>
     
-    <div v-if="showFlightModal" class="fixed inset-0 z-[1200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">編輯機票</h3><label class="text-xs font-bold text-gray-400 ml-1">航班代號</label><input v-model="tempFlightData.code" placeholder="如 TR898" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-black uppercase"><label class="text-xs font-bold text-gray-400 ml-1">座位號碼</label><input v-model="tempFlightData.seat" placeholder="如 12A" class="w-full p-3 bg-gray-50 rounded-xl mb-6 border font-black uppercase"><button @click="saveFlight" class="w-full py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg">更新機票</button></div></div>
+    <div v-if="showFlightModal" class="fixed inset-0 z-[1200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">編輯機票</h3><label class="text-xs font-bold text-gray-400 ml-1">航班代號</label><input v-model="tempFlightData.code" placeholder="如 TR898" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-black uppercase"><label class="text-xs font-bold text-gray-400 ml-1">座位號碼</label><input v-model="tempFlightData.seat" placeholder="如 12A" class="w-full p-3 bg-gray-50 rounded-xl mb-6 border font-black uppercase"><button @click="saveFlight" class="w-full py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">更新機票</button></div></div>
     
     <div v-if="expandedPhrase" class="fixed inset-0 z-[5000] bg-white flex flex-col items-center justify-center p-10 text-center"><div class="flex-1 flex flex-col items-center justify-center w-full"><div class="text-[80px] leading-tight font-black mb-10 text-gray-800 break-words w-full">{{expandedPhrase.jp}}</div><div class="text-3xl font-bold text-gray-500 mb-16">{{expandedPhrase.zh}}</div><button @click.stop="speakJapanese(expandedPhrase.jp)" class="w-24 h-24 rounded-full bg-emerald-500 text-white text-4xl shadow-xl flex items-center justify-center active:scale-90 transition animate-pulse-fast"><i class="fa-solid fa-volume-high"></i></button><div class="mt-4 text-emerald-600 font-bold">點擊播放發音</div></div><button class="mb-10 w-16 h-16 rounded-full bg-gray-100 text-gray-400 text-2xl flex items-center justify-center shadow-md active:scale-90" @click="expandedPhrase=null"><i class="fa-solid fa-times"></i></button></div>
 
@@ -590,8 +654,32 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
+// V46 Strict Schema: Immutable 4-User IDs.
+const defaultUsers = [{id:1,name:'吉伊',icon:'🐹',list:[...defaultPrepList]},{id:2,name:'小八',icon:'🐱',list:[...defaultPrepList]},{id:3,name:'兔兔',icon:'🐰',list:[...defaultPrepList]},{id:4,name:'小桃',icon:'🍑',list:[...defaultPrepList]}];
+
+const foodSpots = {
+    Tokyo: [
+        {name:'牛かつもと村', desc:'自行煎烤軟嫩炸牛排', tag:'新宿/澀谷', img:'', reserve:false, link:'牛かつもと村', reserveLink:'', votes:[]},
+        {name:'HARBS', desc:'必吃水果千層蛋糕', tag:'六本木/新宿', img:'', reserve:false, link:'HARBS', reserveLink:'', votes:[]},
+        {name:'今半', desc:'百年老店壽喜燒', tag:'人形町', img:'', reserve:true, link:'人形町今半', reserveLink:'https://www.asakusaimahan.co.jp/english/guide', votes:[]},
+        {name:'AFURI', desc:'清爽柚子鹽拉麵', tag:'原宿', img:'', reserve:false, link:'AFURI 原宿', reserveLink:'', votes:[]}
+    ],
+    Kamakura: [
+        {name:'Bills', desc:'世界第一早餐鬆餅', tag:'七里濱', img:'', reserve:true, link:'Bills 七里ヶ浜', reserveLink:'https://billsjapan.com/en/shichirigahama', votes:[]},
+        {name:'Pacific Drive-in',desc:'海景咖啡與蒜蓉蝦', tag:'七里濱', img:'', reserve:false, link:'Pacific Drive-in', reserveLink:'', votes:[]},
+        {name:'吻仔魚釜飯', desc:'江之電必吃美食', tag:'鎌倉', img:'', reserve:false, link:'鎌倉 釜飯', reserveLink:'', votes:[]},
+        {name:'力餅家', desc:'百年老舖權五郎力餅', tag:'長谷', img:'', reserve:false, link:'力餅家', reserveLink:'', votes:[]}
+    ],
+    Fuji: [
+        {name:'不動茶屋', desc:'雲朵建築餺飥麵', tag:'河口湖', img:'', reserve:false, link:'不動茶屋 東戀路', reserveLink:'', votes:[]},
+        {name:'山麓園', desc:'圍爐裏炭火燒烤', tag:'河口湖', img:'', reserve:true, link:'山麓園', reserveLink:'https://sanrokuen.com/', votes:[]},
+        {name:'燒肉花', desc:'眺望富士山燒肉', tag:'河口湖', img:'', reserve:true, link:'Hana Yakiniku', reserveLink:'', votes:[]},
+        {name:'The Park', desc:'富士山鬆餅與吐司', tag:'河口湖', img:'', reserve:false, link:'The Park', reserveLink:'', votes:[]}
+    ]
+};
+
 const defaultData = {
-    users: [{id:1,name:'吉伊',icon:'🐹',list:[...defaultPrepList]},{id:2,name:'小八',icon:'🐱',list:[...defaultPrepList]},{id:3,name:'兔兔',icon:'🐰',list:[...defaultPrepList]},{id:4,name:'小桃',icon:'🍑',list:[...defaultPrepList]}],
+    users: JSON.parse(JSON.stringify(defaultUsers)),
     itinerary: [
         [{hours:"06:40",category:"Flight",name:"TPE 起飛",note:"T1 辦理登機",mapKeyword:"桃園機場 T1"},{hours:"10:40",category:"Flight",name:"NRT 抵達",note:"領取行李/購買西瓜卡",mapKeyword:"成田機場"},{hours:"14:00",category:"Sightseeing",name:"晴空塔",note:"下午行程",mapKeyword:"東京晴空塔",travelTime:"⬇ 60-90min (電車/巴士)"},{hours:"18:00",category:"Food",name:"錦糸町周遭",note:"晚餐",mapKeyword:"錦糸町站 美食",travelTime:"⬇ 15min (步行)"}],
         [{hours:"09:00",category:"Sightseeing",name:"淺草寺",note:"雷門/仲見世通",mapKeyword:"淺草寺",travelTime:"⬇ 20min (電車)"},{hours:"12:00",category:"Food",name:"淺草周遭",note:"午餐",mapKeyword:"淺草站 美食",travelTime:"⬇ 5min (步行)"},{hours:"14:00",category:"Sightseeing",name:"小網神社/上野公園",note:"強運厄除/公園散步",mapKeyword:"小網神社",travelTime:"⬇ 25min (電車)"},{hours:"18:00",category:"Shopping",name:"秋葉原/東京一番街",note:"動漫或逛街",mapKeyword:"秋葉原",travelTime:"⬇ 15min (電車)"},{hours:"20:00",category:"Food",name:"晚餐",note:"依逛街行程決定",mapKeyword:"東京車站 美食"}],
@@ -619,11 +707,7 @@ const defaultData = {
     ],
     phrases: [{jp:'すみません',zh:'不好意思/請問'},{jp:'これください',zh:'我要這個'},{jp:'いくらですか',zh:'請問多少錢'},{jp:'お会計お願いします',zh:'我要結帳'},{jp:'袋いりません',zh:'不用袋子'},{jp:'トイレはどこですか',zh:'廁所在哪裡'},{jp:'写真を撮ってもいいですか',zh:'可以拍照嗎'},{jp:'英語メニューありますか',zh:'有英文菜單嗎'},{jp:'おすすめは何ですか',zh:'有推薦的嗎'},{jp:'水ください',zh:'請給我水'}], 
     spots: { 
-        food: {
-            Tokyo: [{name:'AFURI',desc:'清新柚子鹽拉麵',link:'AFURI 原宿', reserve:false, note:'【免訂位】建議避開用餐尖峰，柚子鹽拉麵必點。'},{name:'叙叙苑',desc:'高級燒肉景觀餐廳',link:'叙叙苑 晴空塔', reserve:true, reserveLink:'https://www.tablecheck.com/zh-TW/shops/jojoen-tokyoskytreetown-solamachi/reserve', note:'【需訂位】午間套餐CP值最高，窗邊位置需一個月前預訂。'},{name:'HARBS',desc:'必吃水果千層蛋糕',link:'HARBS LUMINE EST', reserve:false, note:'【免訂位】內用每人低消一杯飲料，亦可外帶回飯店吃。'},{name:'淺草今半',desc:'百年壽喜燒老店',link:'淺草今半 國際通', reserve:true, reserveLink:'https://www.asakusaimahan.co.jp/english/guide', note:'【需訂位】午間壽喜燒定食較划算，百年老店服務極佳。'},{name:'炸牛排 本村',desc:'自行煎烤軟嫩牛排',link:'牛かつもと村 澀谷', reserve:false, note:'【現場排隊】只能現場排隊，建議開店前15分鐘到。'}], 
-            Kamakura: [{name:'Bills',desc:'世界第一好吃鬆餅',link:'Bills 七里ヶ浜', reserve:true, reserveLink:'https://billsjapan.com/en/shichirigahama', note:'【需訂位】戶外座位可看海景，鬆餅製作需20分鐘。'},{name:'Caraway',desc:'排隊咖哩名店',link:'Caraway Curry', reserve:false, note:'【現場排隊】份量非常大，女生建議點小飯。只收現金。'},{name:'Pacific Drive-in',desc:'海景夏威夷餐廳',link:'Pacific Drive-in', reserve:false, note:'【現場排隊】週末人潮多，蒜蓉蝦飯是招牌。'},{name:'力餅家',desc:'百年老舖權五郎力餅',link:'力餅家', reserve:false, note:'保存期限短，建議當天吃完。'},{name:'鎌倉釜飯',desc:'吻仔魚釜飯',link:'鎌倉釜飯 かまかま', reserve:true, reserveLink:'https://www.kamakama.jp/', note:'【建議訂位】最後可以加高湯變茶泡飯，一飯兩吃。'}], 
-            Fuji: [{name:'不動茶屋',desc:'特色雲朵建築餺飥麵',link:'不動茶屋 東戀路', reserve:false, note:'【現場排隊】東戀路店建築最美，翻桌率快。'},{name:'山麓園',desc:'炭火爐端燒體驗',link:'山麓園', reserve:true, reserveLink:'https://sanrokuen.com/', note:'【建議訂位】體驗圍爐裏燒烤，身上會有炭火味。'},{name:'湖波',desc:'河口湖景觀定食',link:'湖波食事處', reserve:false, note:'【現場排隊】靠窗位置可看富士山，天婦羅定食推薦。'},{name:'Hana 燒肉',desc:'當地人推薦燒肉',link:'Hana Yakiniku', reserve:true, reserveLink:'https://www.hotpepper.jp/strJ000354673/yoyaku/', note:'【需訂位】CP值高的單點燒肉，建議預約。'},{name:'The Park',desc:'富士山吐司',link:'Food Labo', reserve:false, note:'富士山造型吐司，拍照打卡必備。'}]
-        }, 
+        food: foodSpots, 
         photo: {
             Tokyo: [{name:'SHIBUYA SKY',desc:'東京最美展望台',link:'SHIBUYA SKY'},{name:'豪德寺',desc:'滿滿招財貓',link:'豪德寺'},{name:'東京鐵塔',desc:'芝公園最佳機位',link:'芝公園 4號地'},{name:'淺草雷門',desc:'經典地標大燈籠',link:'雷門'},{name:'TeamLab',desc:'光影藝術展',link:'TeamLab Planets'}], 
             Kamakura: [{name:'鎌倉高校前',desc:'灌籃高手平交道',link:'鎌倉高校前駅'},{name:'長谷寺',desc:'眺望湘南海岸',link:'長谷寺'},{name:'報國寺',desc:'絕美竹林',link:'報國寺'},{name:'江島神社',desc:'海上鳥居',link:'江島神社'},{name:'七里濱',desc:'最美海岸線',link:'七里ヶ浜 海岸'}], 
@@ -661,8 +745,9 @@ createApp({
         const isLoggedIn = ref(false);
         const syncStatus = ref('idle'); 
         
-        // Data Refs
-        const users = ref(JSON.parse(JSON.stringify(defaultData.users)));
+        // Data Refs (Persistent 4-Person Structure)
+        const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
+        
         const itinerary = ref(defaultData.itinerary);
         const drivePlan = ref(defaultData.drivePlan);
         const expenses = ref([]);
@@ -685,7 +770,7 @@ createApp({
         const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
         
-        // V42 Real Weather Data
+        // V46 Real Weather Data
         const weatherLoading = ref(false);
         const weatherData = ref([
             {name:'Tokyo', displayName:'東京', temp:'--', bg:'bg-blue-400', icon:'fa-solid fa-cloud-sun'},
@@ -716,32 +801,10 @@ createApp({
         const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
         const smartReminders = computed(() => { const l=[]; const diffDays = daysUntilTrip.value; const text = JSON.stringify(itinerary.value); if(text.includes('富士回遊')) { if(diffDays <= 33 && diffDays > 30) l.push("富士回遊號：準備搶票 (30天前)！"); if(diffDays <= 30) l.push("🔴 富士回遊號：現在可以搶票了！"); } if(diffDays <= 2) l.push("線上預辦登機 (48hr前)"); if(diffDays <= 0 && diffDays > -8) l.push("旅途愉快！🌸"); return l; });
 
-        // V42 Fortress: Status Text
-        const statusText = computed(() => {
-            if (!isLoggedIn.value) return 'Offline';
-            if (syncStatus.value === 'syncing') return 'Syncing...';
-            if (syncStatus.value === 'error') return 'Error';
-            return 'Online';
-        });
-        const statusColor = computed(() => {
-            if (!isLoggedIn.value) return 'bg-gray-400';
-            if (syncStatus.value === 'syncing') return 'bg-yellow-400 animate-pulse';
-            if (syncStatus.value === 'error') return 'bg-red-500';
-            return 'bg-green-400';
-        });
+        const statusText = computed(() => { if (!isLoggedIn.value) return 'Offline'; if (syncStatus.value === 'syncing') return 'Syncing...'; if (syncStatus.value === 'error') return 'Error'; return 'Online'; });
+        const statusColor = computed(() => { if (!isLoggedIn.value) return 'bg-gray-400'; if (syncStatus.value === 'syncing') return 'bg-yellow-400 animate-pulse'; if (syncStatus.value === 'error') return 'bg-red-500'; return 'bg-green-400'; });
 
-        const compressImage = (base64) => {
-            return new Promise((resolve) => {
-                const img = new Image(); img.src = base64;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let w = img.width, h = img.height; const MAX = 600;
-                    if(w>MAX){ h*=MAX/w; w=MAX; } canvas.width=w; canvas.height=h;
-                    const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
-                    resolve(canvas.toDataURL('image/jpeg', 0.6));
-                };
-            });
-        };
+        const compressImage = (base64) => { return new Promise((resolve) => { const img = new Image(); img.src = base64; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const MAX = 600; if(w>MAX){ h*=MAX/w; w=MAX; } canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; }); };
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
@@ -751,12 +814,10 @@ createApp({
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','japanese':'翻譯蒟蒻'}[view]||'關東之旅');
         
-        // V42 Online Status Logic
-        const isUserOnline = (id) => {
-            const last = activeUsers.value[id];
-            return last && (Date.now() - last) < 60000; // 1 min timeout
-        };
+        // V46 Online Status Logic (Improved)
+        const isUserOnline = (id) => { const last = activeUsers.value[id]; return last && (Date.now() - last) < 65000; };
         const getUserName = (id) => users.value.find(u=>u.id===id)?.name||'未知';
+        const getUserAvatar = (id) => users.value.find(u=>u.id===id)?.avatar || 'https://placehold.co/100x100/pink/white?text=' + getUserName(id).charAt(0);
         const getClothingAdvice = (t) => t==='--'?'--': t<10?'羽絨+圍巾':t<15?'大衣+發熱衣':'洋蔥式穿搭';
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
         const flightStatusLink = (code) => code ? `https://www.flightradar24.com/data/flights/${code.toLowerCase()}` : '';
@@ -766,16 +827,47 @@ createApp({
         const getAmountInTWD = (e) => e.currency==='JPY' ? e.amount*exchangeRate.value : e.amount;
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((sum, e) => sum + getAmountInTWD(e), 0));
+        // V46 Fix: Ensure Group Expenses are derived from the synced 'expenses' array
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
-        // V42 Atomic Sync Logic (Debounced + Heartbeat Separation)
+        // V46 New Features: Map Covers & Raid Badges
+        const getMapCover = (loc) => {
+            const map = { 'Tokyo': '東京美食地圖.jpg', 'Kamakura': '鎌倉美食地圖.jpg', 'Fuji': '富士山美食地圖.jpg' };
+            return getImg(map[loc]);
+        };
+        const getRaidClass = (item) => {
+            if(item.reserve) return 'raid-red';
+            if(item.desc.includes('排隊')) return 'raid-yellow';
+            return 'raid-green';
+        };
+        const getRaidLabel = (item) => {
+            if(item.reserve) return '特級咒物 (需預約)';
+            if(item.desc.includes('排隊')) return '討伐隊級 (排隊)';
+            return '雜草級 (輕鬆吃)';
+        };
+        const getRaidIcon = (item) => {
+            if(item.reserve) return 'fa-solid fa-dragon';
+            if(item.desc.includes('排隊')) return 'fa-solid fa-people-group';
+            return 'fa-solid fa-seedling';
+        };
+        const toggleFoodVote = (item) => {
+            if(!currentUser.value) return;
+            if(!item.votes) item.votes = [];
+            const idx = item.votes.indexOf(currentUser.value.id);
+            if(idx > -1) item.votes.splice(idx, 1);
+            else item.votes.push(currentUser.value.id);
+            saveData();
+        };
+
+        // V46 Strict Sync: Debounce & Optimistic UI
         let saveTimeout = null;
         const saveData = async () => { 
             if(isGuest.value) return;
             syncStatus.value = 'syncing';
             clearTimeout(saveTimeout);
             
+            // Optimistic Local Save first
             saveTimeout = setTimeout(async () => {
                 const data = { 
                     users:users.value, itinerary:itinerary.value, expenses:expenses.value, spots:spots.value, 
@@ -791,10 +883,10 @@ createApp({
                         syncStatus.value = 'error';
                     }
                 } catch(e) { console.error(e); syncStatus.value = 'error'; }
-            }, 500);
+            }, 800);
         };
         
-        // V42 Independent Heartbeat
+        // V46 Independent Heartbeat Logic
         const updateHeartbeat = async () => {
             if(!isLoggedIn.value || !currentUser.value || isGuest.value) return;
             try {
@@ -804,38 +896,28 @@ createApp({
             } catch(e) { console.log("Heartbeat skip"); }
         };
 
-        // V42 Real Weather Fetcher
+        // Real Weather
         const fetchRealWeather = async () => {
             weatherLoading.value = true;
             try {
-                // Tokyo, Kamakura, Fujikawaguchiko coordinates
-                const locs = [
-                    {lat: 35.6895, lon: 139.6917, key:'Tokyo'},
-                    {lat: 35.3192, lon: 139.5467, key:'Kamakura'},
-                    {lat: 35.4988, lon: 138.7616, key:'Fuji'}
-                ];
-                
+                const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ];
                 for(let l of locs) {
                     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`);
                     const d = await res.json();
                     const target = weatherData.value.find(w => w.name === l.key);
-                    if(target && d.current_weather) {
-                        target.temp = Math.round(d.current_weather.temperature);
-                    }
+                    if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); }
                 }
             } catch(e) { console.error("Weather Error", e); }
             weatherLoading.value = false;
         };
 
-        const showDiagnostic = () => {
-             alert(`【V42 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`);
-        };
+        const showDiagnostic = () => { alert(`【V46 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
 
         // Logic
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V42_LAST_USER_ID', u.id);
+            localStorage.setItem('V46_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -851,11 +933,19 @@ createApp({
         const openEditItineraryModal = (item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {...item}; modalHasImg.value=false; isEditingItem.value = true; const targetArray = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; modalCallback.value = () => { targetArray[idx] = modalData.value; targetArray.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; modalDeleteCallback.value = () => { targetArray.splice(idx, 1); saveData(); }; showModal.value = true; };
         const openAddItineraryModal = () => { modalTitle.value = '新增行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {hours:'',name:'',note:'',category:'Sightseeing'}; modalHasImg.value=false; isEditingItem.value = false; modalCallback.value = () => { const arr = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; arr.push(modalData.value); arr.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; showModal.value = true; };
         
-        const openEditModal = (type, item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯'; modalData.value = {...item}; modalHasImg.value=true; isEditingItem.value = true; if(type === 'shopping') { modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); }; } else if (type === 'spot') { modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); }; } else if (type === 'food') { modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); }; } showModal.value=true; };
+        const openEditModal = (type, item, idx) => { 
+            if(isGuest.value) return; 
+            modalTitle.value = '編輯'; modalData.value = {...item}; modalHasImg.value=true; isEditingItem.value = true; 
+            if(type === 'shopping') { modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); }; } 
+            else if (type === 'spot') { modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); }; } 
+            else if (type === 'food') { modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); }; } 
+            else if (type === 'coupon') { modalTitle.value = '編輯優惠券'; modalHasImg.value=false; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalCallback.value = () => { coupons.value[idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { coupons.value.splice(idx, 1); saveData(); }; }
+            showModal.value=true; 
+        };
         const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value = () => { shopping.value[shopCat.value].push(modalData.value); saveData(); }; showModal.value=true; };
         const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
         const openAddFoodModal = () => { modalTitle.value='新增美食'; modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需要訂位?', type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記', type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',reserve:false,reserveLink:'',note:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{ if(!modalData.value.note) autoFillFoodInfo(); spots.value.food[currentLoc.value].push(modalData.value); saveData(); }; showModal.value=true; };
-        const openAddCouponModal = () => { modalTitle.value='新增優惠券'; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalData.value={name:'',discount:'',link:'',note:''}; modalHasImg.value=false; modalCallback.value = () => { coupons.value.push(modalData.value); saveData(); }; showModal.value=true; };
+        const openAddCouponModal = () => { modalTitle.value='新增優惠券'; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalData.value={name:'',discount:'',link:'',note:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value = () => { coupons.value.push(modalData.value); saveData(); }; showModal.value=true; };
         const openEditHotelModal = (h, idx) => { if(isGuest.value) return; modalTitle.value = '編輯住宿'; modalFields.value = [{key:'name',label:'名稱'},{key:'link',label:'地圖關鍵字'}]; modalData.value = {...h}; modalHasImg.value = true; isEditingItem.value = false; modalCallback.value = () => { hotels.value[idx] = modalData.value; saveData(); }; showModal.value = true; };
         const openAddTicketModal = () => { modalTitle.value='新增門票'; modalFields.value=[{key:'name',label:'景點名稱'},{key:'url',label:'購票連結'}]; modalData.value={name:'',url:'https://', custom:true}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{suggestedTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
         const openAddTransTicketModal = () => { modalTitle.value='新增交通票券'; modalFields.value=[{key:'name',label:'票券名稱'},{key:'url',label:'資訊連結'},{key:'note',label:'注意事項', type:'textarea'}]; modalData.value={name:'',url:'https://', note:'', icon:'fa-solid fa-ticket', custom:true, type:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{transportTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
@@ -884,19 +974,24 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
         
-        // V42.2 New Functions
-        const addMember = () => {
-             const newId = Date.now();
-             const newList = JSON.parse(JSON.stringify(defaultPrepList));
-             users.value.push({id: newId, name: '新夥伴', icon: '🥚', list: newList});
-             saveData();
-        };
-        const resetUsers = () => {
-            if(confirm('警告：這將會清除您目前所有的自訂角色，並還原為吉伊卡哇 4 人組。\n\n確定要執行嗎？')) {
-                users.value = JSON.parse(JSON.stringify(defaultData.users));
-                saveData();
-                alert('已還原預設角色！');
-            }
+        // V46: Strict 4-Slot Fixed Merge
+        const mergeFixedUsers = (cloudUsers) => {
+            if(!Array.isArray(cloudUsers)) return defaultUsers;
+            const final = JSON.parse(JSON.stringify(defaultUsers));
+            // Only update properties of ID 1,2,3,4. Ignore any extra IDs.
+            cloudUsers.forEach(cu => {
+                const target = final.find(u => u.id === cu.id);
+                if(target) { 
+                    target.name = cu.name || target.name; 
+                    target.avatar = cu.avatar || target.avatar; 
+                    target.list = cu.list || target.list;
+                    target.flightOut = cu.flightOut;
+                    target.flightOutSeat = cu.flightOutSeat;
+                    target.flightIn = cu.flightIn;
+                    target.flightInSeat = cu.flightInSeat;
+                }
+            });
+            return final;
         };
 
         onMounted(() => {
@@ -909,7 +1004,7 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
-                            if(dt.users) users.value = dt.users;
+                            if(dt.users) users.value = mergeFixedUsers(dt.users); // USE FIXED MERGE
                             if(dt.itinerary) itinerary.value = dt.itinerary;
                             if(dt.drivePlan) drivePlan.value = dt.drivePlan;
                             if(dt.expenses) expenses.value = dt.expenses;
@@ -921,6 +1016,7 @@ createApp({
                             if(dt.transportTickets) transportTickets.value = dt.transportTickets;
                             if(dt.rentalCars) rentalCars.value = dt.rentalCars;
                             if(dt.hotels) hotels.value = dt.hotels;
+                            
                             if(dt.heartbeats) {
                                 const now = Date.now();
                                 const map = {};
@@ -936,7 +1032,7 @@ createApp({
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V42_LAST_USER_ID');
+            const lastId = localStorage.getItem('V46_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
 
@@ -953,8 +1049,8 @@ createApp({
             transportTickets, openAddTransTicketModal, getAirlineInfo, flightStatusLink, getDirLink, applyTicketTemplate,
             rentalCars, openAddCarModal, deleteCar, openAddFoodModal, autoFillFoodInfo,
             coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal, fetchRealWeather, weatherLoading, openAddCouponModal,
-            // V42.2 Exports
-            addMember, resetUsers
+            // V46 New Exports
+            getMapCover, getRaidClass, getRaidLabel, getRaidIcon, toggleFoodVote, getUserAvatar
         };
     }
 }).mount('#app');
