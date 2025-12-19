@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V46.0 Emerald Adventure)</title>
+<title>關東之旅 2026 (V47.0 Diamond)</title>
 
 <script>
     window.tailwind = {
@@ -15,10 +15,10 @@
                 extend: {
                     colors: {'chii-pink':'#FFD1DC','chii-deep-pink':'#FF9EAC','chii-blue':'#A2D2FF','chii-yellow':'#FFF5BA','chii-text':'#5D4037'},
                     fontFamily: {sans:['Zen Maru Gothic','sans-serif']},
-                    animation: {'wiggle':'wiggle 3s ease-in-out infinite','float':'float 4s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards','spin-slow':'spin 8s linear infinite','pulse-fast':'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite', 'bounce-slow': 'bounce 2s infinite', 'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'},
+                    animation: {'wiggle':'wiggle 3s ease-in-out infinite','float':'float 6s ease-in-out infinite','fade-in':'fadeIn 0.5s ease-out forwards','spin-slow':'spin 8s linear infinite','pulse-fast':'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite', 'pop': 'pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'},
                     keyframes: {
                         wiggle: {'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},
-                        float: {'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-8px)'}},
+                        float: {'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-10px)'}},
                         fadeIn: {from:{opacity:0,transform:'translateY(10px)'},to:{opacity:1,transform:'translateY(0)'}},
                         pop: {'0%':{transform:'scale(0)'},'100%':{transform:'scale(1)'}}
                     }
@@ -33,7 +33,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V46.0 Emerald Core */
+    /* V47.0 Core */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -56,6 +56,7 @@
         transition: padding-bottom 0.3s ease;
     }
     
+    /* V47 Dynamic Padding for different views */
     #app-content.view-shopping { padding-bottom: 250px !important; }
 
     body.modal-open #app-content { overflow: hidden; }
@@ -82,37 +83,48 @@
     }
     .card:active { transform: scale(0.98); border-color: #FFD1DC; }
     
-    /* V46 Food Map: Adventure Cards */
+    /* V47 Food Map: Adventure Cards */
+    .map-cover-container {
+        padding: 0 10px 20px 10px;
+        perspective: 1000px;
+    }
     .map-cover {
-        width: 100%; height: auto; border-radius: 20px;
-        border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        margin-bottom: 20px; animation: float 6s ease-in-out infinite;
+        width: 100%; height: auto; border-radius: 24px;
+        border: 4px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        animation: float 6s ease-in-out infinite;
+        transform-style: preserve-3d;
     }
+    
     .food-card {
-        background: #fff; border-radius: 24px; overflow: visible; /* Allow avatars to pop out */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 16px; border: 1px solid #fff;
-        position: relative;
+        background: #fff; border-radius: 24px; overflow: visible; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid white;
+        position: relative; transition: all 0.3s;
     }
+    
+    /* Raid Badges */
     .raid-badge {
-        position: absolute; top: 10px; left: 10px; z-index: 10;
-        padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 900;
-        color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        display: flex; items-center; gap: 4px;
+        position: absolute; top: -8px; left: -8px; z-index: 20;
+        padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 900;
+        color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        display: flex; items-center; gap: 4px; animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .raid-green { background: #10b981; border: 2px solid #a7f3d0; } /* Weed */
-    .raid-yellow { background: #f59e0b; border: 2px solid #fde68a; } /* Party */
-    .raid-red { background: #ef4444; border: 2px solid #fecaca; animation: pulse-fast; } /* Special Grade */
+    .raid-green { background: linear-gradient(135deg, #10b981, #34d399); border: 2px solid #ecfdf5; }
+    .raid-yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); border: 2px solid #fffbeb; }
+    .raid-red { background: linear-gradient(135deg, #ef4444, #f87171); border: 2px solid #fef2f2; animation: pulse-fast; }
 
-    /* V46 WakuWaku Avatar System */
+    /* WakuWaku Avatar System */
     .waku-container {
         display: flex; flex-direction: row-reverse; justify-content: flex-end;
-        position: absolute; bottom: 12px; right: 50px; /* Left of the heart */
+        position: absolute; bottom: 16px; right: 60px; /* Left of the heart */
+        height: 32px; align-items: center;
     }
     .waku-avatar {
-        width: 28px; height: 28px; border-radius: 50%; border: 2px solid white;
-        margin-right: -8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 32px; height: 32px; border-radius: 50%; border: 2px solid white;
+        margin-right: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 1; transition: transform 0.2s;
     }
+    .waku-avatar:hover { transform: scale(1.2); z-index: 10; }
 
     .list-move, .list-enter-active, .list-leave-active { transition: all 0.5s ease; }
     .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
@@ -146,7 +158,7 @@
         background: #10b981; 
     }
 
-    /* V46 Fixed Coupon FAB: Small, Right-Aligned, Non-Blocking */
+    /* V47 Fixed Coupon FAB */
     .coupon-fab {
         position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px;
         width: 48px; height: 48px; border-radius: 50%; 
@@ -158,41 +170,7 @@
     }
     .coupon-fab:active { transform: scale(0.9); }
 
-    .rental-badge {
-        position: absolute; top: 12px; right: 12px;
-        padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 900;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 20; cursor: pointer;
-        display: flex; align-items: center; gap: 6px; transition: all 0.2s;
-    }
-    .rental-badge.done { background: #dcfce7; color: #166534; border: 2px solid #86efac; }
-    .rental-badge.todo { background: #fee2e2; color: #991b1b; border: 2px solid #fca5a5; animation: pulse-fast; }
-    .rental-badge:active { transform: scale(0.95); }
-
-    .welcome-screen {
-        position: fixed; inset: 0; z-index: 9999; background: #FFF0F5;
-        transition: transform 0.8s cubic-bezier(0.7,0,0.3,1); cursor: pointer; height: 100%;
-    }
-    .welcome-screen.hidden-screen { transform: translateY(-100%); pointer-events: none; }
-    
-    .sakura {
-        position: fixed; top: -20px; background: #FFB7B2; border-radius: 100% 0 100% 0; opacity: 0.6;
-        animation: fall linear infinite; z-index: 0; pointer-events: none; width: 14px; height: 14px;
-    }
-    @keyframes fall { to { transform: translate(10vw, 105vh) rotate(360deg); } }
-
-    .timeline-connect {
-        width: 2px; height: 50px; background: repeating-linear-gradient(to bottom, #FFD1DC 0, #FFD1DC 5px, transparent 5px, transparent 10px);
-        margin: 0 auto; position: relative;
-    }
-    .timeline-badge {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        background: white; border: 1px solid #FFD1DC; border-radius: 12px; padding: 4px 10px; font-size: 11px; color: #FF9EAC; font-weight: bold;
-        white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 5;
-    }
-    .drive-line { background: repeating-linear-gradient(to bottom, #4ade80 0, #4ade80 5px, transparent 5px, transparent 10px) !important; height: 60px !important; }
-    .drive-badge { border-color: #4ade80 !important; color: #16a34a !important; background: #f0fdf4 !important; font-size: 12px !important; padding: 6px 14px !important; }
-
-    /* V46 Online Status: Pointer Events None to prevent blocking */
+    /* V47 Online Status: Pointer Events None to prevent blocking */
     .online-header-bubble {
         position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 12px;
         z-index: 300; display: flex; gap: -5px; pointer-events: none;
@@ -236,7 +214,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V46.0 EMERALD</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V47.0 DIAMOND</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -257,7 +235,7 @@
     <div v-if="currentView !== 'menu'" class="h-[60px] pt-[env(safe-area-inset-top)] box-content shrink-0"></div>
 
     <div class="online-header-bubble" v-if="isWelcomeClosed">
-        <div v-for="u in users" :key="u.id" :class="['online-avatar', isUserOnline(u.id) ? 'active' : '']" :title="u.name">
+        <div v-for="u in usersArray" :key="u.id" :class="['online-avatar', isUserOnline(u.id) ? 'active' : '']" :title="u.name">
             <img v-if="u.avatar" :src="u.avatar">
             <span v-else class="flex items-center justify-center h-full w-full bg-gray-100 text-xs">{{u.icon}}</span>
             <div class="dot"></div>
@@ -360,7 +338,7 @@
                      </div>
                  </div>
                  <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4 shadow-sm relative overflow-hidden">
-                     <h3 class="font-black text-blue-500 mb-3 text-sm">☁️ V46 即時天氣 (Open-Meteo)</h3>
+                     <h3 class="font-black text-blue-500 mb-3 text-sm">☁️ V47 即時天氣 (Open-Meteo)</h3>
                      <div v-if="weatherLoading" class="text-gray-400 text-xs py-4 font-bold animate-pulse">正在連線至日本氣象衛星...</div>
                      <div v-else class="space-y-4">
                          <div v-for="w in weatherData" :key="w.name" class="card p-6 text-white relative overflow-hidden" :class="w.bg">
@@ -375,11 +353,11 @@
             <div v-if="currentView==='food' || currentView==='photo'">
                 <div class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition active:scale-95', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
                 
-                <div v-if="currentView==='food'" class="px-2">
+                <div v-if="currentView==='food'" class="map-cover-container">
                     <img :src="getMapCover(currentLoc)" class="map-cover" @error="handleImgError">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20 px-2">
                     <div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="food-card relative group">
                         
                         <div v-if="currentView==='food'" class="raid-badge" :class="getRaidClass(item)">
@@ -403,11 +381,11 @@
                                         <img :src="getUserAvatar(uid)" class="w-full h-full rounded-full object-cover">
                                     </div>
                                 </div>
-                                <button @click="toggleFoodVote(item)" class="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-md transition active:scale-75" :class="(item.votes||[]).includes(currentUser?.id) ? 'bg-pink-500 text-white' : 'bg-white text-gray-300'"><i class="fa-solid fa-heart"></i></button>
+                                <button @click="toggleFoodVote(item)" class="w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-md transition active:scale-75 z-20" :class="(item.votes||[]).includes(currentUser?.id) ? 'bg-pink-500 text-white' : 'bg-white text-gray-300'"><i class="fa-solid fa-heart"></i></button>
                             </div>
                         </div>
                         
-                        <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2 z-20"><button @click="openEditModal(currentView==='food'?'food':'spot', item, idx)" class="w-8 h-8 bg-white/90 rounded-full shadow text-blue-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-pen"></i></button><button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white/90 rounded-full shadow text-red-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-trash"></i></button></div>
+                        <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2 z-20"><button @click="openEditModal(currentView==='food'?'food':'spot', item, idx)" class="w-8 h-8 bg-white/90 rounded-full shadow text-blue-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-pen text-[10px]"></i></button><button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white/90 rounded-full shadow text-red-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-trash text-[10px]"></i></button></div>
                     </div>
                 </div>
                 <button v-if="!isGuest" @click="currentView==='food'?openAddFoodModal():openAddSpotModal()" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
@@ -564,7 +542,7 @@
         <div class="bg-white/95 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative border-[6px] border-pink-200">
             <h3 class="font-black text-2xl mb-8 text-pink-500 tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-paw"></i> 請問您是哪一位？</h3>
             <div class="grid grid-cols-2 gap-6 mb-2">
-                <div v-for="u in users" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)">
+                <div v-for="u in usersArray" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)">
                     <div class="w-24 h-24 mx-auto rounded-3xl bg-white border-4 border-gray-100 shadow-lg flex items-center justify-center text-4xl mb-3 overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:border-pink-400 group-hover:shadow-pink-300 group-hover:rotate-3">
                         <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
                         <span v-else>{{u.icon}}</span>
@@ -633,7 +611,7 @@
 
     <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl active:scale-95 transition">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
     
-    <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
+    <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in usersArray" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in usersArray" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
     
     <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border"><button @click="saveUserChanges" class="w-full py-2 bg-pink-500 text-white rounded-xl font-bold shadow active:scale-95">儲存</button></div></div>
     
@@ -654,8 +632,13 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
-// V46 Strict Schema: Immutable 4-User IDs.
-const defaultUsers = [{id:1,name:'吉伊',icon:'🐹',list:[...defaultPrepList]},{id:2,name:'小八',icon:'🐱',list:[...defaultPrepList]},{id:3,name:'兔兔',icon:'🐰',list:[...defaultPrepList]},{id:4,name:'小桃',icon:'🍑',list:[...defaultPrepList]}];
+// V47 Strict Object Schema for Users (Prevents Array Overwrite)
+const defaultUsersObj = {
+    "1": {id:1, name:'吉伊', icon:'🐹', list:[...defaultPrepList]},
+    "2": {id:2, name:'小八', icon:'🐱', list:[...defaultPrepList]},
+    "3": {id:3, name:'兔兔', icon:'🐰', list:[...defaultPrepList]},
+    "4": {id:4, name:'小桃', icon:'🍑', list:[...defaultPrepList]}
+};
 
 const foodSpots = {
     Tokyo: [
@@ -679,7 +662,7 @@ const foodSpots = {
 };
 
 const defaultData = {
-    users: JSON.parse(JSON.stringify(defaultUsers)),
+    users: JSON.parse(JSON.stringify(defaultUsersObj)), // Now an Object
     itinerary: [
         [{hours:"06:40",category:"Flight",name:"TPE 起飛",note:"T1 辦理登機",mapKeyword:"桃園機場 T1"},{hours:"10:40",category:"Flight",name:"NRT 抵達",note:"領取行李/購買西瓜卡",mapKeyword:"成田機場"},{hours:"14:00",category:"Sightseeing",name:"晴空塔",note:"下午行程",mapKeyword:"東京晴空塔",travelTime:"⬇ 60-90min (電車/巴士)"},{hours:"18:00",category:"Food",name:"錦糸町周遭",note:"晚餐",mapKeyword:"錦糸町站 美食",travelTime:"⬇ 15min (步行)"}],
         [{hours:"09:00",category:"Sightseeing",name:"淺草寺",note:"雷門/仲見世通",mapKeyword:"淺草寺",travelTime:"⬇ 20min (電車)"},{hours:"12:00",category:"Food",name:"淺草周遭",note:"午餐",mapKeyword:"淺草站 美食",travelTime:"⬇ 5min (步行)"},{hours:"14:00",category:"Sightseeing",name:"小網神社/上野公園",note:"強運厄除/公園散步",mapKeyword:"小網神社",travelTime:"⬇ 25min (電車)"},{hours:"18:00",category:"Shopping",name:"秋葉原/東京一番街",note:"動漫或逛街",mapKeyword:"秋葉原",travelTime:"⬇ 15min (電車)"},{hours:"20:00",category:"Food",name:"晚餐",note:"依逛街行程決定",mapKeyword:"東京車站 美食"}],
@@ -745,9 +728,10 @@ createApp({
         const isLoggedIn = ref(false);
         const syncStatus = ref('idle'); 
         
-        // Data Refs (Persistent 4-Person Structure)
-        const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        
+        // Data Refs (Now Object-Based for Users)
+        const users = ref(JSON.parse(JSON.stringify(defaultUsersObj))); 
+        const usersArray = computed(() => Object.values(users.value).sort((a,b)=>a.id-b.id)); // For display
+
         const itinerary = ref(defaultData.itinerary);
         const drivePlan = ref(defaultData.drivePlan);
         const expenses = ref([]);
@@ -770,7 +754,7 @@ createApp({
         const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
         
-        // V46 Real Weather Data
+        // V47 Real Weather Data
         const weatherLoading = ref(false);
         const weatherData = ref([
             {name:'Tokyo', displayName:'東京', temp:'--', bg:'bg-blue-400', icon:'fa-solid fa-cloud-sun'},
@@ -814,10 +798,10 @@ createApp({
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','japanese':'翻譯蒟蒻'}[view]||'關東之旅');
         
-        // V46 Online Status Logic (Improved)
+        // V47 Online Status Logic
         const isUserOnline = (id) => { const last = activeUsers.value[id]; return last && (Date.now() - last) < 65000; };
-        const getUserName = (id) => users.value.find(u=>u.id===id)?.name||'未知';
-        const getUserAvatar = (id) => users.value.find(u=>u.id===id)?.avatar || 'https://placehold.co/100x100/pink/white?text=' + getUserName(id).charAt(0);
+        const getUserName = (id) => users.value[id]?.name||'未知';
+        const getUserAvatar = (id) => users.value[id]?.avatar || 'https://placehold.co/100x100/pink/white?text=' + getUserName(id).charAt(0);
         const getClothingAdvice = (t) => t==='--'?'--': t<10?'羽絨+圍巾':t<15?'大衣+發熱衣':'洋蔥式穿搭';
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
         const flightStatusLink = (code) => code ? `https://www.flightradar24.com/data/flights/${code.toLowerCase()}` : '';
@@ -827,14 +811,14 @@ createApp({
         const getAmountInTWD = (e) => e.currency==='JPY' ? e.amount*exchangeRate.value : e.amount;
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((sum, e) => sum + getAmountInTWD(e), 0));
-        // V46 Fix: Ensure Group Expenses are derived from the synced 'expenses' array
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
-        const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
+        const settlements = computed(() => { const b={}; usersArray.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=usersArray.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
-        // V46 New Features: Map Covers & Raid Badges
+        // V47 New: Dynamic Map Cover
         const getMapCover = (loc) => {
-            const map = { 'Tokyo': '東京美食地圖.jpg', 'Kamakura': '鎌倉美食地圖.jpg', 'Fuji': '富士山美食地圖.jpg' };
-            return getImg(map[loc]);
+            const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' };
+            // Fallback to placeholder if not found, but trying to load local file
+            return map[loc]; 
         };
         const getRaidClass = (item) => {
             if(item.reserve) return 'raid-red';
@@ -860,17 +844,18 @@ createApp({
             saveData();
         };
 
-        // V46 Strict Sync: Debounce & Optimistic UI
+        // V47 Strict Sync: Object-based Update
         let saveTimeout = null;
         const saveData = async () => { 
             if(isGuest.value) return;
             syncStatus.value = 'syncing';
             clearTimeout(saveTimeout);
             
-            // Optimistic Local Save first
             saveTimeout = setTimeout(async () => {
                 const data = { 
-                    users:users.value, itinerary:itinerary.value, expenses:expenses.value, spots:spots.value, 
+                    // users is now an Object, merge works correctly in deep level
+                    users: users.value, 
+                    itinerary:itinerary.value, expenses:expenses.value, spots:spots.value, 
                     shopping:shopping.value, phrases:japanesePhrases.value, drivePlan:drivePlan.value, 
                     tickets:suggestedTickets.value, transportTickets:transportTickets.value, rentalCars:rentalCars.value,
                     hotels:hotels.value, coupons:coupons.value 
@@ -886,7 +871,7 @@ createApp({
             }, 800);
         };
         
-        // V46 Independent Heartbeat Logic
+        // V47 Heartbeat
         const updateHeartbeat = async () => {
             if(!isLoggedIn.value || !currentUser.value || isGuest.value) return;
             try {
@@ -911,13 +896,13 @@ createApp({
             weatherLoading.value = false;
         };
 
-        const showDiagnostic = () => { alert(`【V46 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
+        const showDiagnostic = () => { alert(`【V47 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
 
         // Logic
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V46_LAST_USER_ID', u.id);
+            localStorage.setItem('V47_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -927,7 +912,7 @@ createApp({
         const handleAuthClick = () => isLoggedIn.value ? (confirm('登出?')&&signOut(auth)) : showLoginModal.value=true;
         const doLogin = async () => { try{await setPersistence(auth, browserLocalPersistence); await signInWithEmailAndPassword(auth,loginForm.value.email,loginForm.value.password);showLoginModal.value=false;}catch(e){alert('登入失敗，請檢查帳號密碼');} };
         const openUserEditor = (u) => { editingUser.value={...u}; showUserEditModal.value=true; };
-        const saveUserChanges = () => { if(isGuest.value) return; const idx=users.value.findIndex(u=>u.id===editingUser.value.id); if(idx!==-1){ users.value[idx]={...editingUser.value}; if(currentUser.value && currentUser.value.id === editingUser.value.id) currentUser.value = users.value[idx]; } saveData(); showUserEditModal.value=false; };
+        const saveUserChanges = () => { if(isGuest.value) return; users.value[editingUser.value.id] = {...editingUser.value}; if(currentUser.value && currentUser.value.id === editingUser.value.id) currentUser.value = users.value[editingUser.value.id]; saveData(); showUserEditModal.value=false; };
         const processAvatarUpload = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); editingUser.value.avatar = await compressImage(res); } };
 
         const openEditItineraryModal = (item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {...item}; modalHasImg.value=false; isEditingItem.value = true; const targetArray = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; modalCallback.value = () => { targetArray[idx] = modalData.value; targetArray.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; modalDeleteCallback.value = () => { targetArray.splice(idx, 1); saveData(); }; showModal.value = true; };
@@ -956,7 +941,7 @@ createApp({
         const handleModalDelete = () => { if(confirm('確定刪除？') && modalDeleteCallback.value) { modalDeleteCallback.value(); showModal.value=false; } };
         const processModalImg = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); modalData.value.img = await compressImage(res); } };
         
-        const openExpenseModal = (mode) => { expenseMode.value = mode; modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : users.value.map(u=>u.id)}; showExpenseModal.value=true; };
+        const openExpenseModal = (mode) => { expenseMode.value = mode; modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : usersArray.value.map(u=>u.id)}; showExpenseModal.value=true; };
         const toggleShare = (id) => { const i=modalData.value.forWhom.indexOf(id); i>-1?modalData.value.forWhom.splice(i,1):modalData.value.forWhom.push(id); };
         const saveExpense = () => { expenses.value.push({...modalData.value,id:Date.now(),date:new Date().toLocaleDateString()}); saveData(); showExpenseModal.value=false; };
         const deleteExpense = (id) => { if(isGuest.value) return; if(confirm('確定刪除?')){expenses.value=expenses.value.filter(e=>e.id!==id); saveData();} };
@@ -964,7 +949,7 @@ createApp({
         const openRentalDetail = (car, idx) => { activeRental.value = rentalCars.value[idx]; showRentalModal.value = true; };
         const updateRentalStatus = (status) => { activeRental.value.status = status; };
         const editFlight = (mode) => { if(isGuest.value) return; flightMode.value = mode; tempFlightData.value.code = mode==='out' ? (currentUser.value.flightOut||'') : (currentUser.value.flightIn||''); tempFlightData.value.seat = mode==='out' ? (currentUser.value.flightOutSeat||'') : (currentUser.value.flightInSeat||''); showFlightModal.value = true; };
-        const saveFlight = () => { if(flightMode.value === 'out') { currentUser.value.flightOut = tempFlightData.value.code; currentUser.value.flightOutSeat = tempFlightData.value.seat; } else { currentUser.value.flightIn = tempFlightData.value.code; currentUser.value.flightInSeat = tempFlightData.value.seat; } const idx = users.value.findIndex(u=>u.id===currentUser.value.id); if(idx!==-1) users.value[idx] = currentUser.value; saveData(); showFlightModal.value = false; };
+        const saveFlight = () => { if(flightMode.value === 'out') { currentUser.value.flightOut = tempFlightData.value.code; currentUser.value.flightOutSeat = tempFlightData.value.seat; } else { currentUser.value.flightIn = tempFlightData.value.code; currentUser.value.flightInSeat = tempFlightData.value.seat; } const idx = users.value[currentUser.value.id] = currentUser.value; saveData(); showFlightModal.value = false; };
         
         const autoFillFoodInfo = () => { const name = modalData.value.name; if(!name) return; const n = name.toLowerCase(); if(n.includes('叙叙苑')) { modalData.value.reserve=true; modalData.value.reserveLink='https://www.tablecheck.com/zh-TW/shops/jojoen-tokyoskytreetown-solamachi/reserve'; modalData.value.note='【需訂位】午間套餐CP值最高。'; } else if(n.includes('harbs')) { modalData.value.reserve=false; modalData.value.note='【現場排隊】水果千層必點。'; } };
         const applyTicketTemplate = () => { const t = modalData.value.type; if(t==='suica') { modalData.value.name='Suica 西瓜卡'; modalData.value.icon='fa-solid fa-mobile-screen'; modalData.value.url='https://www.jreast.co.jp/tc/pass/suica.html'; } else if(t==='metro') { modalData.value.name='東京地鐵券 (72h)'; modalData.value.icon='fa-solid fa-subway'; modalData.value.url='https://www.tokyometro.jp/tcn/ticket/travel/index.html'; } else if(t==='jrpass') { modalData.value.name='JR 東京廣域周遊券'; modalData.value.icon='fa-solid fa-ticket'; modalData.value.url='https://www.jreast.co.jp/multi/zh-CHT/pass/tokyowide.html'; } else if(t==='fuji') { modalData.value.name='富士回遊號 (JR)'; modalData.value.icon='fa-solid fa-train'; modalData.value.url='https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index'; } };
@@ -974,26 +959,6 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
         
-        // V46: Strict 4-Slot Fixed Merge
-        const mergeFixedUsers = (cloudUsers) => {
-            if(!Array.isArray(cloudUsers)) return defaultUsers;
-            const final = JSON.parse(JSON.stringify(defaultUsers));
-            // Only update properties of ID 1,2,3,4. Ignore any extra IDs.
-            cloudUsers.forEach(cu => {
-                const target = final.find(u => u.id === cu.id);
-                if(target) { 
-                    target.name = cu.name || target.name; 
-                    target.avatar = cu.avatar || target.avatar; 
-                    target.list = cu.list || target.list;
-                    target.flightOut = cu.flightOut;
-                    target.flightOutSeat = cu.flightOutSeat;
-                    target.flightIn = cu.flightIn;
-                    target.flightInSeat = cu.flightInSeat;
-                }
-            });
-            return final;
-        };
-
         onMounted(() => {
             initSakura();
             fetchRealWeather();
@@ -1004,7 +969,13 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
-                            if(dt.users) users.value = mergeFixedUsers(dt.users); // USE FIXED MERGE
+                            // Deep Merge for Users Object to prevent overwrite
+                            if(dt.users) {
+                                // Merge remote users into local, key by key
+                                Object.keys(dt.users).forEach(k => {
+                                    users.value[k] = dt.users[k];
+                                });
+                            }
                             if(dt.itinerary) itinerary.value = dt.itinerary;
                             if(dt.drivePlan) drivePlan.value = dt.drivePlan;
                             if(dt.expenses) expenses.value = dt.expenses;
@@ -1032,12 +1003,12 @@ createApp({
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V46_LAST_USER_ID');
-            if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
+            const lastId = localStorage.getItem('V47_LAST_USER_ID');
+            if(lastId) { const u = users.value[lastId]; if(u) currentUser.value = u; }
         });
 
         return {
-            users, currentView, isWelcomeClosed, enterSite, enterAsGuest, isGuest, apps, getPageTitle,
+            users, usersArray, currentView, isWelcomeClosed, enterSite, enterAsGuest, isGuest, apps, getPageTitle,
             daysUntilTrip, smartReminders, tripDays, selectedDayIndex, getCurrentItinerary,
             moneyTab, exchangeRate, myPrivateExpenses, myPrivateTotalTWD, groupExpenses, settlements, getUserName, openExpenseModal, showExpenseModal, modalData, toggleShare, saveExpense, deleteExpense, expenseMode, getPaymentIcon,
             hotelTab, shopCat, shopping, openAddShopModal, currentLoc, spots, openAddSpotModal, weatherData, getClothingAdvice, japanesePhrases, expandCard, expandedPhrase, openAddPhraseModal,
@@ -1049,7 +1020,6 @@ createApp({
             transportTickets, openAddTransTicketModal, getAirlineInfo, flightStatusLink, getDirLink, applyTicketTemplate,
             rentalCars, openAddCarModal, deleteCar, openAddFoodModal, autoFillFoodInfo,
             coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal, fetchRealWeather, weatherLoading, openAddCouponModal,
-            // V46 New Exports
             getMapCover, getRaidClass, getRaidLabel, getRaidIcon, toggleFoodVote, getUserAvatar
         };
     }
