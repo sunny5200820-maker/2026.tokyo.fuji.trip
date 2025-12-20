@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#FFF6F8">
+<meta name="theme-color" content="#FFF0F5">
 <title>關東之旅 2026 (V60.0 Ultimate)</title>
 
 <script>
@@ -15,24 +15,25 @@
                 extend: {
                     colors: {
                         'chii-bg': '#FFF6F8', // 奶油粉底
-                        'chii-pink': '#FFD1DC', // 溫暖粉
-                        'chii-blue': '#A2D2FF', // 安心藍
-                        'chii-green': '#D0F0C0', // 希望薄綠
+                        'chii-pink': '#FFD1DC',
+                        'chii-blue': '#A2D2FF',
+                        'chii-green': '#D0F0C0', // 薄綠
                         'chii-text': '#5D4037'
                     },
-                    fontFamily: {sans:['Zen Maru Gothic','Noto Sans JP','sans-serif']},
+                    fontFamily: { sans: ['Zen Maru Gothic', 'sans-serif'] },
                     animation: {
-                        'wiggle':'wiggle 3s ease-in-out infinite',
-                        'float':'float 6s ease-in-out infinite',
-                        'fade-in':'fadeIn 0.5s ease-out forwards',
-                        'pop': 'pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                        'pulse-slow': 'pulse 3s infinite'
+                        'wiggle': 'wiggle 3s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'spin-slow': 'spin 8s linear infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pop': 'pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                     },
                     keyframes: {
-                        wiggle: {'0%,100%':{transform:'rotate(-3deg)'},'50%':{transform:'rotate(3deg)'}},
-                        float: {'0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-10px)'}},
-                        fadeIn: {from:{opacity:0,transform:'translateY(10px)'},to:{opacity:1,transform:'translateY(0)'}},
-                        pop: {'0%':{transform:'scale(0)'},'100%':{transform:'scale(1)'}}
+                        wiggle: { '0%,100%': { transform: 'rotate(-3deg)' }, '50%': { transform: 'rotate(3deg)' } },
+                        float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        fadeIn: { from: { opacity: 0, transform: 'translateY(10px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+                        pop: { '0%': { transform: 'scale(0)' }, '100%': { transform: 'scale(1)' } }
                     }
                 }
             }
@@ -41,158 +42,358 @@
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V60.0 Core Optimizations */
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: "Zen Maru Gothic", sans-serif; color: #5D4037; overflow: hidden; -webkit-tap-highlight-color: transparent; background-color: #FFF6F8; overscroll-behavior: none; }
-    input, textarea, select { font-size: 16px !important; font-family: inherit; } 
-    * { -webkit-overflow-scrolling: touch; }
-    
-    /* Dynamic Viewport Height for Mobile Safari */
-    #app-content { height: 100dvh; overflow-y: auto; overflow-x: hidden; padding-bottom: calc(100px + env(safe-area-inset-bottom)); padding-top: env(safe-area-inset-top); }
-    
+    /* V60 核心樣式修復 */
+    html, body {
+        margin: 0; padding: 0; width: 100%; height: 100%;
+        font-family: "Zen Maru Gothic", sans-serif;
+        color: #5D4037;
+        overflow: hidden; 
+        -webkit-tap-highlight-color: transparent;
+        background-color: #FFF6F8; /* 奶油粉底 */
+        overscroll-behavior: none;
+    }
+
+    /* 背景裝飾 */
+    #fixed-bg { 
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; 
+        background-color: #FFF6F8; 
+        background-image: 
+            radial-gradient(#FFD1DC 15%, transparent 16%), 
+            radial-gradient(#D0F0C0 10%, transparent 11%),
+            radial-gradient(#A2D2FF 10%, transparent 11%);
+        background-size: 60px 60px, 120px 120px, 90px 90px;
+        background-position: 0 0, 40px 40px, 20px 80px;
+        opacity: 0.6;
+    }
+
+    #app-content {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-bottom: 180px; 
+        padding-top: env(safe-area-inset-top);
+    }
+    #app-content.view-shopping { padding-bottom: 250px !important; }
+
+    /* 通用卡片樣式 */
+    .card { 
+        background: rgba(255,255,255,0.95); 
+        border-radius: 24px; 
+        box-shadow: 0 8px 30px rgba(255,105,180,0.12); 
+        border: 2px solid rgba(255,255,255,0.8); 
+        margin-bottom: 16px; 
+        position: relative; 
+        backdrop-filter: blur(10px); 
+        transition: all 0.2s ease; 
+        overflow: hidden; 
+        transform: translateZ(0); 
+    }
+    .card:active { transform: scale(0.98); }
+
+    /* 緊急救助地圖專用樣式 (漫畫風格) */
+    .comic-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 12px;
+        padding: 10px;
+    }
+    .comic-box {
+        background: white;
+        border-radius: 20px;
+        border: 3px solid #5D4037;
+        padding: 10px;
+        position: relative;
+        overflow: hidden;
+        min-height: 160px;
+        box-shadow: 4px 4px 0px rgba(93, 64, 55, 0.1);
+        display: flex;
+        flex-col: column;
+    }
+    .comic-box.full-width { grid-column: span 2; }
+    .comic-title {
+        font-weight: 900;
+        font-size: 14px;
+        margin-bottom: 5px;
+        z-index: 10;
+        position: relative;
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        color: white;
+    }
+    .comic-bubble {
+        background: white;
+        border: 2px solid #5D4037;
+        border-radius: 12px;
+        padding: 6px;
+        font-size: 10px;
+        font-weight: bold;
+        position: relative;
+        z-index: 10;
+        margin-bottom: 4px;
+        box-shadow: 2px 2px 0 #eee;
+    }
+    .comic-bubble::after {
+        content: ''; position: absolute; bottom: -6px; left: 10px;
+        border-width: 6px 6px 0; border-style: solid;
+        border-color: #5D4037 transparent; display: block; width: 0;
+    }
+    .comic-info {
+        background: rgba(255,255,255,0.9);
+        border-radius: 8px;
+        padding: 6px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #555;
+        margin-top: auto;
+        z-index: 10;
+        border: 1px dashed #ccc;
+    }
+    .comic-bg-icon {
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        font-size: 80px;
+        opacity: 0.1;
+        z-index: 0;
+    }
+
+    /* V60 Gamification CSS */
+    .hp-bar-container { width: 100%; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+    .hp-bar-fill { height: 100%; transition: width 0.5s ease, background-color 0.5s ease; }
+    .hp-low { background-color: #ef4444; } .hp-med { background-color: #f59e0b; } .hp-high { background-color: #10b981; }
+
+    .packing-suitcase { 
+        width: 80px; height: 60px; background: #3b82f6; border-radius: 12px; 
+        position: relative; overflow: hidden; border: 3px solid #1e40af; 
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 900; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+    .packing-fill { 
+        position: absolute; bottom: 0; left: 0; right: 0; 
+        background: #60a5fa; transition: height 0.5s ease; z-index: 0; 
+    }
+
+    /* 其他輔助樣式 */
     [v-cloak] { display: none !important; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
-    
-    /* Card System */
-    .card { background: rgba(255,255,255,0.95); border-radius: 24px; box-shadow: 0 4px 20px rgba(255,182,193,0.15); border: 2px solid rgba(255,255,255,0.8); margin-bottom: 16px; position: relative; backdrop-filter: blur(10px); overflow: hidden; transform: translateZ(0); }
-    .card:active { transform: scale(0.99); transition: 0.1s; }
-    
-    /* Comic Map Style (Emergency) */
-    .comic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px; }
-    .comic-box { background: white; border: 3px solid #5D4037; border-radius: 16px; padding: 10px; position: relative; overflow: hidden; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
-    .comic-header { grid-column: span 2; background: #E0F7FA; border-color: #4DD0E1; text-align: center; min-height: auto; padding: 15px; }
-    .comic-footer { grid-column: span 2; background: #FFF9C4; border-color: #FFF176; }
-    .speech-bubble { background: white; border: 2px solid #333; border-radius: 12px; padding: 5px 8px; font-size: 10px; font-weight: bold; position: relative; display: inline-block; margin-bottom: 5px; box-shadow: 2px 2px 0 rgba(0,0,0,0.1); z-index: 10; }
-    .speech-bubble::after { content: ''; position: absolute; bottom: -6px; left: 10px; border-width: 6px 6px 0; border-style: solid; border-color: #333 transparent; display: block; width: 0; }
-    
-    /* Visuals */
-    .visual-card, .food-card { background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid white; position: relative; }
-    .item-img-container { height: 180px; width: 100%; background-color: #f3f4f6; position: relative; overflow: hidden; cursor: zoom-in; }
-    .item-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; will-change: transform; }
-    .img-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #999; font-weight: bold; font-size: 12px; z-index: 0; background: #eee; }
-    
-    /* UI Elements */
-    .fab-home { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; z-index: 90; border: 4px solid white; box-shadow: 0 10px 25px rgba(255,105,180,0.4); background: linear-gradient(135deg,#FF9EAC,#FFD1DC); cursor: pointer; }
-    .fab-main { position: fixed; bottom: calc(90px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; z-index: 80; border: 3px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    
-    /* Loading Skeleton */
-    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; }
-    @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .fab-home { position: fixed; bottom: calc(25px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; z-index: 90; border: 4px solid white; box-shadow: 0 10px 25px rgba(255,105,180,0.5); background: linear-gradient(135deg,#FF9EAC,#FFD1DC); cursor: pointer; }
+    .fab-main { position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; z-index: 80; border: 3px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: all 0.3s; }
+    .fab-search { position: fixed; bottom: calc(30px + env(safe-area-inset-bottom)); left: 20px; width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #5D4037; z-index: 90; border: 2px solid white; background: rgba(255,255,255,0.9); backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+
+    /* 圖片容器優化 */
+    .img-container { width: 100%; padding-bottom: 75%; position: relative; overflow: hidden; background: #eee; }
+    .img-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+    .img-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; }
+
+    /* 雲端狀態燈 */
+    .cloud-status { position: fixed; top: calc(15px + env(safe-area-inset-top)); left: 15px; font-size: 10px; font-weight: bold; color: #555; display: flex; align-items: center; gap: 4px; z-index: 300; background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
 </style>
 </head>
 <body>
 
 <div id="fixed-bg"></div>
+<div id="sakura-container"></div>
 
 <div id="app" v-cloak class="h-full flex flex-col">
-    
-    <div v-if="!isWelcomeClosed" class="fixed inset-0 z-[9999] flex flex-col items-center justify-between bg-black">
-        <div class="absolute inset-0 z-0 opacity-80">
-            <img :src="getImg('welcome.jpg')" class="w-full h-full object-cover object-center" @error="handleImgError">
+
+    <div v-if="!isWelcomeClosed" class="welcome-screen h-full flex flex-col items-center justify-between relative overflow-hidden">
+        <div class="absolute inset-0 z-0"><img :src="getImg('welcome.jpg')" class="w-full h-full object-cover opacity-80" @error="handleImgError"></div>
+        <div class="absolute top-6 right-6 z-50 pt-[env(safe-area-inset-top)]">
+            <button @click.stop="handleAuthClick" :class="['flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/50 shadow-lg font-bold text-sm transition', isLoggedIn ? 'bg-green-500/80 text-white' : 'bg-white/40 text-gray-800']">
+                <i :class="isLoggedIn ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-arrow-up'"></i> {{ isLoggedIn ? '已連線' : '雲端同步' }}
+            </button>
         </div>
-        <div class="relative z-10 w-full h-full flex flex-col justify-between pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-6">
-            <div class="mt-20 text-center">
-                <div class="inline-block px-4 py-1 rounded-full border border-white/60 bg-black/20 text-white text-[10px] font-black tracking-[0.3em] backdrop-blur-md mb-4 shadow-lg">V60.0 ULTIMATE</div>
-                <h1 class="text-6xl font-black text-white drop-shadow-lg tracking-widest font-sans" style="text-shadow: 0 4px 20px rgba(0,0,0,0.6);">關東之旅</h1>
-                <p class="text-2xl text-white/90 font-bold tracking-[0.2em] mt-2 drop-shadow-md">2026.03.27</p>
-            </div>
-            <div class="mb-12 space-y-3">
-                <button @click="enterSite" class="w-full bg-white/90 text-pink-500 font-black py-4 rounded-full shadow-2xl backdrop-blur-xl text-lg flex items-center justify-center gap-2 border border-white active:scale-95 transition">
-                    <span>🌸</span> 旅伴登入
-                </button>
-                <button @click="enterAsGuest" class="w-full bg-gray-900/60 text-white font-bold py-3 rounded-full backdrop-blur-md text-sm border border-white/20 active:scale-95 transition">
-                    訪客模式 (唯讀)
-                </button>
-            </div>
+        <div class="relative z-10 mt-32 text-center px-6">
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V60.0 ULTIMATE</div>
+            <h1 class="text-6xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.5);">關東之旅</h1>
+            <p class="text-2xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
+        </div>
+        <div class="relative z-10 mb-20 w-full px-10 pb-[env(safe-area-inset-bottom)] space-y-4">
+            <button @click="enterSite" class="w-full bg-white/90 text-pink-500 font-black py-4 rounded-full shadow-2xl backdrop-blur-xl text-xl flex items-center justify-center gap-3 border border-white animate-pulse-fast">
+                <span class="animate-spin-slow">🌸</span> 旅伴登入
+            </button>
+            <button @click="enterAsGuest" class="w-full bg-gray-800/60 text-white font-bold py-3 rounded-full backdrop-blur-md text-sm border border-white/30 hover:bg-gray-800/80 transition">
+                <i class="fa-solid fa-user-secret"></i> 訪客參觀
+            </button>
         </div>
     </div>
-    
     <div v-if="isWelcomeClosed" class="h-full flex flex-col relative">
         
-        <div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[56px] bg-[#FFF6F8]/95 backdrop-blur-md z-30 flex items-center justify-between px-4 border-b border-pink-100 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
-            <button @click="currentView='menu'" class="w-9 h-9 bg-white rounded-full flex items-center justify-center text-pink-400 shadow border border-pink-50 active:scale-90 transition"><i class="fa-solid fa-chevron-left"></i></button>
-            <h1 class="font-black text-gray-700 text-lg flex items-center gap-2 absolute left-1/2 transform -translate-x-1/2 w-full justify-center pointer-events-none">
-                <i class="fa-solid fa-sakura text-pink-300 animate-spin-slow"></i> {{getPageTitle(currentView)}}
-            </h1>
-            <div class="w-9"></div> 
+        <div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[60px] bg-[#FFF6F8]/90 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
+            <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-95 transition"><i class="fa-solid fa-chevron-left"></i></button>
+            <h1 class="font-black text-gray-700 text-lg flex items-center gap-2 absolute left-1/2 transform -translate-x-1/2"><i class="fa-solid fa-sakura text-pink-300"></i> {{getPageTitle(currentView)}}</h1>
+            <div class="w-10"></div>
         </div>
-        <div v-if="currentView !== 'menu'" class="h-[56px] pt-[env(safe-area-inset-top)] box-content shrink-0"></div>
+        <div v-if="currentView !== 'menu'" class="h-[60px] pt-[env(safe-area-inset-top)] box-content shrink-0"></div>
 
-        <div id="app-content" class="flex-1 overflow-x-hidden">
+        <div class="cloud-status" @click="showDiagnostic">
+            <div class="status-dot" :class="statusColor"></div>
+            <span class="ml-1">{{ statusText }}</span>
+        </div>
+        <div class="fixed top-[calc(12px+env(safe-area-inset-top))] right-12 z-30 flex gap-1 pointer-events-none">
+             <div v-for="u in users" :key="u.id" :class="['w-8 h-8 rounded-full border-2 bg-white overflow-hidden transition-all', isUserOnline(u.id)?'border-green-400 -translate-y-1 shadow-md':'border-white opacity-50']">
+                 <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
+                 <div v-else class="w-full h-full flex items-center justify-center text-xs">{{u.icon}}</div>
+             </div>
+        </div>
 
-            <div v-if="currentView==='menu'" class="p-6 pt-12 pb-32 animate-fade-in min-h-full flex flex-col">
-                <div class="flex justify-between items-center mb-8 pt-[env(safe-area-inset-top)]">
-                    <div class="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-full shadow-sm backdrop-blur border border-white">
-                        <div class="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center text-lg">{{ getBudgetMood() }}</div>
-                        <div class="text-[10px] font-bold text-gray-500">預算監控</div>
+        <div id="app-content" class="flex-1" :class="{'view-shopping': currentView === 'shopping'}">
+
+            <div v-if="currentView==='menu'" class="p-6 pt-12 animate-fade-in pb-32">
+                <div class="absolute top-6 left-6 pt-[env(safe-area-inset-top)] flex items-center gap-2 cursor-pointer" @click="currentView='money'">
+                    <div class="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center text-2xl border-2 border-pink-100 animate-pop">
+                        {{ getBudgetMood() }}
                     </div>
-                    <div @click="handleAuthClick" :class="['text-[10px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1 cursor-pointer transition', isLoggedIn ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500']">
-                        <i :class="isLoggedIn ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-arrow-up'"></i> {{ isLoggedIn ? '已同步' : '本地模式' }}
-                    </div>
+                    <div class="text-[10px] font-bold text-gray-400 bg-white/60 px-2 py-1 rounded-full backdrop-blur-sm">預算監控</div>
                 </div>
 
-                <h2 class="text-3xl font-black text-gray-700 mb-6 text-center">{{ getGreeting() }}</h2>
+                <h2 class="text-2xl font-black text-gray-700 mb-8 text-center pt-[env(safe-area-inset-top)] whitespace-pre-line leading-relaxed">{{ getGreeting() }}</h2>
                 
-                <div class="mb-8 bg-white/80 backdrop-blur-xl border-2 border-white rounded-[32px] p-5 shadow-xl relative overflow-hidden group">
-                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-300 via-yellow-200 to-blue-300"></div>
-                     <div class="flex items-start gap-4 relative z-10">
-                         <div class="bg-gradient-to-br from-yellow-300 to-orange-300 w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl shrink-0 shadow-lg animate-wiggle"><i class="fa-solid fa-bullhorn"></i></div>
-                         <div class="flex-1">
-                             <div class="font-black text-gray-800 text-lg mb-1 flex justify-between">
-                                 <span>倒數 {{daysUntilTrip}} 天</span>
-                                 <span class="text-[10px] bg-red-100 text-red-500 px-2 py-0.5 rounded-full">Urgent</span>
-                             </div>
-                             <div class="text-xs text-gray-600 font-bold leading-relaxed space-y-2">
-                                <div v-for="(alert, idx) in smartReminders" :key="idx" class="flex items-start gap-2 bg-red-50 p-2 rounded-lg border border-red-100">
-                                    <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i> 
-                                    <div class="flex-1">
-                                        {{alert.text}}
-                                        <a v-if="alert.link" :href="alert.link" target="_blank" class="block text-blue-500 underline mt-1">前往預約 &gt;</a>
-                                    </div>
-                                </div>
-                             </div>
-                         </div>
-                     </div>
+                <div class="mb-8 bg-white/70 backdrop-blur-xl border border-white rounded-[32px] p-6 shadow-xl relative overflow-hidden group" @click="currentView='itinerary'">
+                      <div class="flex items-start gap-4 relative z-10">
+                          <div class="bg-gradient-to-br from-yellow-200 to-yellow-400 w-12 h-12 rounded-2xl flex items-center justify-center text-white text-xl shrink-0 shadow-lg"><i class="fa-solid fa-calendar-days"></i></div>
+                          <div class="flex-1">
+                              <div class="font-black text-gray-800 text-lg mb-1">倒數 {{daysUntilTrip}} 天</div>
+                              <div class="text-xs text-gray-500 font-bold leading-relaxed space-y-1">
+                                 <div v-for="alert in smartReminders" class="text-pink-500 flex items-start gap-1 font-black"><i class="fa-solid fa-circle-exclamation mt-0.5"></i> {{alert}}</div>
+                                 <div v-if="smartReminders.length===0" class="text-gray-400">目前沒有緊急事項</div>
+                              </div>
+                          </div>
+                      </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-x-4 gap-y-8 px-2">
                     <div v-for="app in apps" :key="app.id" class="flex flex-col items-center cursor-pointer active:scale-95 transition duration-300 group" @click="currentView=app.view">
-                        <div class="w-[72px] h-[72px] rounded-[28px] flex items-center justify-center text-3xl text-white shadow-lg border-[3px] border-white relative overflow-hidden group-hover:-translate-y-1 transition" :class="app.bgClass">
+                        <div class="w-[72px] h-[72px] rounded-[28px] flex items-center justify-center text-2xl text-white shadow-lg border-[4px] border-white relative overflow-hidden" :class="app.bgClass">
                             <i :class="app.icon"></i>
-                            <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition"></div>
                         </div>
-                        <span class="text-sm font-bold mt-2 text-gray-600 group-hover:text-pink-500 transition">{{app.name}}</span>
+                        <span class="text-sm font-bold mt-3 text-gray-600 group-hover:text-pink-500 transition">{{app.name}}</span>
                     </div>
                 </div>
             </div>
-<div v-if="currentView==='itinerary'" class="px-4 py-4 animate-fade-in">
-                <div class="flex overflow-x-auto gap-2 mb-4 hide-scrollbar sticky top-0 bg-[#FFF6F8]/95 z-20 py-2 -mx-4 px-4 backdrop-blur-md">
-                     <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-5 py-2 rounded-xl text-sm font-black border-2 transition shrink-0 shadow-sm flex flex-col items-center min-w-[65px]',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow-md scale-105':'bg-white text-gray-300 border-white']">
-                        <span>{{d.week}}</span><span class="text-[10px] mt-0.5 opacity-90">{{d.title}}</span>
+
+            <div v-if="currentView==='emergency'" class="animate-fade-in pb-20">
+                <div class="sticky top-0 z-20 bg-[#FFF6F8]/95 backdrop-blur px-5 py-3 flex gap-2 justify-center shadow-sm">
+                    <button @click="emergTab='map'" :class="['px-6 py-2 rounded-full font-bold text-sm transition', emergTab==='map'?'bg-red-400 text-white shadow-md':'bg-white text-gray-400']">🚨 救助地圖</button>
+                    <button @click="emergTab='trans'" :class="['px-6 py-2 rounded-full font-bold text-sm transition', emergTab==='trans'?'bg-emerald-400 text-white shadow-md':'bg-white text-gray-400']">💬 翻譯蒟蒻</button>
+                </div>
+
+                <div v-if="emergTab==='map'" class="p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="text-xl font-black text-gray-700">ちいかわの旅遊急難救助地圖 🚨</h2>
+                        <p class="text-xs text-gray-500 font-bold">安心旅程 ✿ 東京・鎌倉・富士山</p>
+                    </div>
+                    <div class="comic-grid">
+                        <div class="comic-box border-l-[6px] border-l-blue-500">
+                            <div class="comic-title bg-blue-500">警察求助 (110)</div>
+                            <div class="absolute right-2 top-10 opacity-80"><img :src="getImg('chii-police.png')" class="w-16 h-16 object-contain" @error="handleImgError"></div>
+                            <div class="comic-bubble">遇到危險就打110！<br>警察會幫忙喔～！</div>
+                            <div class="comic-info mt-auto">
+                                🚓 報警專線：110<br>
+                                📍 東京警視廳<br>
+                                📍 鎌倉警察署
+                            </div>
+                            <i class="fa-solid fa-taxi comic-bg-icon text-blue-200"></i>
+                        </div>
+                        <div class="comic-box border-l-[6px] border-l-red-400">
+                            <div class="comic-title bg-red-400">醫療急救 (119)</div>
+                            <div class="absolute right-2 top-10 opacity-80"><img :src="getImg('usagi-doc.png')" class="w-16 h-16 object-contain" @error="handleImgError"></div>
+                            <div class="comic-bubble">受傷或生病打119！<br>救護車會來～！</div>
+                            <div class="comic-info mt-auto">
+                                🚑 救護專線：119<br>
+                                🏥 東京醫療中心<br>
+                                🏥 富士吉田市立醫院
+                            </div>
+                            <i class="fa-solid fa-kit-medical comic-bg-icon text-red-200"></i>
+                        </div>
+                        <div class="comic-box border-l-[6px] border-l-green-400">
+                            <div class="comic-title bg-green-400">外國旅客支援</div>
+                            <div class="absolute right-2 top-10 opacity-80"><img :src="getImg('chii-phone.png')" class="w-16 h-16 object-contain" @error="handleImgError"></div>
+                            <div class="comic-bubble">這支電話有中文喔！<br>需要幫忙可以打～</div>
+                            <div class="comic-info mt-auto">
+                                ☎️ Visitor Hotline<br>
+                                📞 050-3816-2787<br>
+                                (24小時 中/英/韓)
+                            </div>
+                            <i class="fa-solid fa-headset comic-bg-icon text-green-200"></i>
+                        </div>
+                        <div class="comic-box border-l-[6px] border-l-pink-400">
+                            <div class="comic-title bg-pink-400">台灣旅客專區</div>
+                            <div class="absolute right-2 top-10 opacity-80"><img :src="getImg('hachi-flag.png')" class="w-16 h-16 object-contain" @error="handleImgError"></div>
+                            <div class="comic-bubble">台灣代表處在這裡！<br>護照遺失找這邊</div>
+                            <div class="comic-info mt-auto">
+                                🏛️ 駐日經濟文化代表處<br>
+                                📍 港區白金台5-20-2<br>
+                                📞 急難：090-6866-0101
+                            </div>
+                            <i class="fa-solid fa-passport comic-bg-icon text-pink-200"></i>
+                        </div>
+                        <div class="comic-box full-width bg-white/50 border-dashed border-gray-300 min-h-[100px] flex-row items-center justify-between">
+                            <div class="text-sm font-bold text-gray-600">
+                                📱 <span class="text-blue-500">110</span> (警) / <span class="text-red-500">119</span> (救)<br>
+                                📞 <span class="text-green-600">050-3816-2787</span> (支援)<br>
+                                🇹🇼 <span class="text-pink-500">03-3280-7811</span> (代表處)
+                            </div>
+                            <div class="w-24"><img :src="getImg('all-safe.png')" class="w-full" @error="handleImgError"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="emergTab==='trans'" class="p-5 space-y-3">
+                     <div v-for="(p,idx) in japanesePhrases" :key="idx" class="card p-5 flex justify-between items-center cursor-pointer hover:shadow-md transition border-l-4 border-emerald-400" @click="expandCard(p)">
+                         <div><div class="font-bold text-lg text-gray-800">{{p.jp}}</div><div class="text-xs text-gray-500 font-bold mt-1">{{p.zh}}</div></div>
+                         <i class="fa-solid fa-expand text-gray-300"></i>
+                     </div>
+                     <button v-if="!isGuest" @click="openAddPhraseModal" class="fab-main bg-emerald-500 text-white"><i class="fa-solid fa-plus"></i></button>
+                     <div class="fab-camera text-white bg-emerald-600" @click="handleCameraTranslate"><i class="fa-solid fa-camera"></i></div>
+                </div>
+            </div>
+
+            <div v-if="currentView==='itinerary'" class="px-5 py-4 animate-fade-in">
+                <div class="flex overflow-x-auto gap-3 mb-6 hide-scrollbar sticky top-0 bg-[#FFF6F8]/95 z-20 py-3 -mx-5 px-5 backdrop-blur-md">
+                     <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-6 py-3 rounded-2xl text-sm font-black border-2 transition shrink-0 shadow-sm flex flex-col items-center min-w-[70px]',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow-lg scale-105':'bg-white text-gray-300 border-white']">
+                        <span>{{d.week}}</span>
+                        <div class="hp-bar-container w-10 mt-1">
+                            <div class="hp-bar-fill" :class="getStaminaColor(i)" :style="{width: getStamina(i)+'%'}"></div>
+                        </div>
                      </button>
                 </div>
-                
-                <div class="pb-24">
+
+                <div v-if="getStamina(selectedDayIndex) < 50" class="bg-red-50 text-red-500 p-3 rounded-xl text-xs font-bold mb-4 flex items-center justify-center animate-pulse border border-red-200">
+                    <span class="mr-2 text-xl">🐰</span> Yha?? 體力消耗過大，會死掉喔？ (HP低)
+                </div>
+
+                <div v-if="[2,3].includes(selectedDayIndex)" class="flex justify-center mb-6">
+                    <div class="bg-white p-1 rounded-full border border-gray-200 shadow-sm flex">
+                        <button @click="itineraryMode='normal'" :class="['px-4 py-1.5 rounded-full text-xs font-bold transition', itineraryMode==='normal'?'bg-pink-400 text-white':'text-gray-400']">一般</button>
+                        <button @click="itineraryMode='drive'" :class="['px-4 py-1.5 rounded-full text-xs font-bold transition', itineraryMode==='drive'?'bg-green-500 text-white':'text-gray-400']"><i class="fa-solid fa-car"></i> 自駕</button>
+                    </div>
+                </div>
+
+                <div class="pb-20 relative">
                     <transition-group name="list" tag="div">
-                        <div v-for="(item,idx) in getCurrentItinerary()" :key="item.id || idx" class="mb-4">
-                            <div v-if="idx > 0" class="h-6 w-0.5 bg-gray-200 ml-[23px] -mt-2 mb-2"></div>
-                            
-                            <div class="card p-4 border-0 shadow-sm relative group z-10 !mb-0" @click="!isGuest && openEditItineraryModal(item, idx)">
-                                <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="getCategoryColor(item.category)"></div>
-                                <div class="flex gap-4">
-                                    <div class="flex flex-col items-center pt-1 min-w-[46px]">
-                                        <span class="text-xs font-black text-gray-400 mb-1">{{item.hours}}</span>
-                                        <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center border bg-white shadow-sm" :class="getCategoryIconColor(item.category)"><i :class="getIconByCategory(item.category)"></i></div>
+                        <div v-for="(item,idx) in getCurrentItinerary()" :key="item.id || idx">
+                            <div class="card p-5 border-0 shadow-sm relative group z-10 mb-4" @click="!isGuest && openEditItineraryModal(item, idx)">
+                                <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)?'bg-green-400':'bg-gradient-to-b from-pink-300 to-pink-100'"></div>
+                                <div class="flex gap-4 pr-8">
+                                    <div class="flex flex-col items-center pt-1 min-w-[50px]">
+                                        <span class="text-xs font-black text-gray-400 mb-2">{{item.hours}}</span>
+                                        <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center border" :class="itineraryMode==='drive' && [2,3].includes(selectedDayIndex)?'bg-green-50 text-green-500 border-green-100':'bg-pink-50 text-pink-400 border-pink-100'"><i :class="getIconByCategory(item.category)"></i></div>
                                     </div>
-                                    <div class="flex-1 py-0.5">
-                                        <h3 class="font-black text-gray-800 text-lg mb-1 leading-tight">{{item.name}}</h3>
-                                        <p class="text-sm text-gray-500 font-medium mb-2">{{item.note}}</p>
+                                    <div class="flex-1 py-1">
+                                        <h3 class="font-black text-gray-800 text-lg mb-1">{{item.name}}</h3>
+                                        <p class="text-sm text-gray-500 line-clamp-2 font-medium mb-2">{{item.note}}</p>
                                         <div class="flex gap-2 flex-wrap">
-                                            <a :href="getMapLink(item.mapKeyword, item.name)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-md font-bold border border-blue-100 active:scale-95"><i class="fa-solid fa-location-arrow"></i> 導航</a>
-                                            <a v-if="item.ticketLink" :href="item.ticketLink" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-yellow-50 text-yellow-600 px-2 py-1 rounded-md font-bold border border-yellow-200 active:scale-95"><i class="fa-solid fa-ticket"></i> 購票</a>
+                                            <a :href="getMapLink(item.mapKeyword, item.name)" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full font-bold border border-blue-100 hover:bg-blue-100 transition active:scale-95"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                                            <a v-if="item.name.includes('富士回遊') && item.name.includes('錦糸町')" href="https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-red-50 text-red-500 px-2 py-1 rounded-full font-bold border border-red-100"><i class="fa-solid fa-ticket"></i> 錦糸町出發購票</a>
+                                            <a v-if="item.name.includes('SHIBUYA SKY')" href="https://www.kkday.com/zh-tw/product/133300" target="_blank" @click.stop class="inline-flex items-center gap-1 text-[10px] bg-orange-50 text-orange-500 px-2 py-1 rounded-full font-bold border border-orange-100"><i class="fa-solid fa-ticket"></i> 預約黃昏票</a>
                                         </div>
                                     </div>
                                 </div>
@@ -203,397 +404,416 @@
                 </div>
             </div>
 
-            <div v-if="currentView==='emergency'" class="px-4 py-4 animate-fade-in pb-24">
-                <div class="sticky top-2 z-20 flex justify-center mb-6">
-                    <div class="bg-white/90 backdrop-blur shadow-lg rounded-full p-1.5 flex border border-pink-100">
-                        <button @click="emergencyTab='translate'" :class="['px-6 py-2 rounded-full font-bold text-sm transition-all', emergencyTab==='translate'?'bg-emerald-400 text-white shadow-md':'text-gray-400']">
-                            <i class="fa-solid fa-language mr-1"></i> 翻譯蒟蒻
-                        </button>
-                        <button @click="emergencyTab='rescue'" :class="['px-6 py-2 rounded-full font-bold text-sm transition-all', emergencyTab==='rescue'?'bg-red-400 text-white shadow-md':'text-gray-400']">
-                            <i class="fa-solid fa-truck-medical mr-1"></i> 緊急救難
-                        </button>
-                    </div>
-                </div>
+            <div v-if="currentView==='prep'" class="px-5 py-4 animate-fade-in">
+                 <div class="bg-blue-50 rounded-3xl p-6 mb-6 text-center border-4 border-blue-200 border-dashed relative overflow-hidden">
+                     <div class="text-blue-500 font-black text-sm mb-4 uppercase tracking-widest">Packing Status</div>
+                     <div class="flex justify-center mb-4">
+                         <div class="packing-suitcase" :class="{'full': getPackingProgress(currentUser)===100}">
+                             <div class="packing-fill" :style="{height: getPackingProgress(currentUser)+'%'}"></div>
+                             <span class="relative z-10 text-xl">{{getPackingProgress(currentUser)}}%</span>
+                         </div>
+                     </div>
+                     <div v-if="getPackingProgress(currentUser)===100" class="text-green-500 font-black animate-bounce">Ready to Go! ✈️</div>
+                     <div v-else class="text-gray-400 text-xs font-bold">快把行李塞滿！</div>
+                 </div>
 
-                <div v-if="emergencyTab==='translate'" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div v-for="p in japanesePhrases" :key="p.id" @click="expandCard(p)" class="card p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:shadow-xl transition h-32 active:scale-95">
-                            <div class="font-black text-xl text-gray-800 mb-2 leading-tight">{{p.zh}}</div>
-                            <div class="text-xs text-gray-400 font-bold bg-gray-100 px-2 py-1 rounded-full">點擊放大</div>
-                        </div>
-                        <div v-if="!isGuest" @click="openAddPhraseModal" class="card p-4 flex flex-col items-center justify-center text-center cursor-pointer border-dashed border-gray-300 text-gray-400 h-32 hover:bg-gray-50 active:scale-95">
-                            <i class="fa-solid fa-plus text-3xl mb-2"></i>
-                            <div class="font-bold text-xs">新增字卡</div>
-                        </div>
+                 <div v-if="!currentUser || isGuest" class="text-center text-gray-400 font-bold bg-white/50 py-10 rounded-2xl border border-dashed"><i class="fa-solid fa-suitcase text-3xl mb-2"></i><br>請登入以管理行李</div>
+                 <div v-else class="card p-0">
+                    <div class="bg-gray-50 p-3 border-b font-bold text-gray-700 flex justify-between items-center">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-blue-400"></i> {{currentUser.name}} 的裝備</span>
+                        <button @click="addPrepItem(currentUser)" class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-bold shadow-blue-200 shadow active:scale-95 transition">+ 新增</button>
                     </div>
-                    <button @click="handleCameraTranslate" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-camera"></i> Google 智慧鏡頭翻譯
-                    </button>
-                </div>
-
-                <div v-if="emergencyTab==='rescue'" class="comic-grid">
-                    <div class="comic-header comic-box">
-                        <h2 class="text-xl font-black text-gray-700">ちいかわの旅遊<br><span class="text-red-500 text-2xl">急難救助地圖 🚨</span></h2>
-                        <div class="text-xs font-bold text-blue-400 mt-1">安心旅程 ✿ 東京・鎌倉・富士山</div>
-                        <div class="absolute top-2 right-2 text-2xl animate-pulse">✨</div>
-                        <div class="mt-2 flex justify-center gap-2 text-2xl">
-                            <span>🐹</span><span>🐰</span><span>🐱</span>
-                        </div>
+                    <div v-for="(item, idx) in currentUser.list" :key="idx" class="flex items-center p-3 border-b border-gray-100 group">
+                        <input type="checkbox" v-model="item.checked" class="w-5 h-5 accent-pink-500 mr-3" @change="saveData">
+                        <input v-model="item.text" @change="saveData" :class="['flex-1 text-sm font-bold bg-transparent outline-none', item.checked?'text-gray-300 line-through':'text-gray-700']">
+                        <button @click="currentUser.list.splice(idx,1);saveData()" class="text-gray-200 hover:text-red-400 transition px-2"><i class="fa-solid fa-times"></i></button>
                     </div>
-
-                    <div class="comic-box bg-blue-50 border-blue-200">
-                        <div class="absolute -right-2 -top-2 text-4xl opacity-20">🚓</div>
-                        <div class="speech-bubble text-blue-600">遇到危險打110！</div>
-                        <div class="mt-auto">
-                            <div class="font-black text-2xl text-blue-600">110</div>
-                            <div class="text-[10px] font-bold text-gray-500">警察局 (報案)</div>
-                            <a href="tel:110" class="mt-2 block bg-blue-500 text-white text-center text-xs py-1.5 rounded-lg font-bold shadow active:scale-95">撥打</a>
-                        </div>
-                        <div class="absolute bottom-2 right-2 text-2xl">🐹</div>
-                    </div>
-
-                    <div class="comic-box bg-red-50 border-red-200">
-                        <div class="absolute -right-2 -top-2 text-4xl opacity-20">🚑</div>
-                        <div class="speech-bubble text-red-600">受傷生病打119！</div>
-                        <div class="mt-auto">
-                            <div class="font-black text-2xl text-red-600">119</div>
-                            <div class="text-[10px] font-bold text-gray-500">救護車 / 火災</div>
-                            <a href="tel:119" class="mt-2 block bg-red-500 text-white text-center text-xs py-1.5 rounded-lg font-bold shadow active:scale-95">撥打</a>
-                        </div>
-                        <div class="absolute bottom-2 right-2 text-2xl">🐰</div>
-                    </div>
-
-                    <div class="comic-box bg-green-50 border-green-200">
-                        <div class="absolute -right-2 -top-2 text-4xl opacity-20">🌏</div>
-                        <div class="speech-bubble text-green-700">有中文服務喔！</div>
-                        <div class="mt-auto">
-                            <div class="text-[10px] font-bold text-gray-500">Visitor Hotline</div>
-                            <div class="font-black text-sm text-green-700 break-all">050-3816-2787</div>
-                            <a href="tel:05038162787" class="mt-2 block bg-green-500 text-white text-center text-xs py-1.5 rounded-lg font-bold shadow active:scale-95">24h 支援</a>
-                        </div>
-                        <div class="absolute bottom-2 right-2 text-2xl">🐱</div>
-                    </div>
-
-                    <div class="comic-box bg-purple-50 border-purple-200">
-                        <div class="absolute -right-2 -top-2 text-4xl opacity-20">🇹🇼</div>
-                        <div class="speech-bubble text-purple-700">台灣旅客找這裡！</div>
-                        <div class="mt-auto">
-                            <div class="text-[10px] font-bold text-gray-500">台灣代表處</div>
-                            <div class="font-black text-sm text-purple-700 break-all">03-3280-7811</div>
-                            <a href="tel:0332807811" class="mt-2 block bg-purple-500 text-white text-center text-xs py-1.5 rounded-lg font-bold shadow active:scale-95">撥打</a>
-                        </div>
-                        <div class="absolute bottom-2 right-2 text-2xl">🚩</div>
-                    </div>
-
-                    <div class="comic-footer comic-box flex-row items-center !min-h-[60px]">
-                        <div class="text-sm font-black text-gray-600 w-full text-center">
-                            <i class="fa-solid fa-check text-green-500 mr-1"></i> 安心旅程 OK！
-                        </div>
-                    </div>
-                </div>
+                 </div>
             </div>
 
-            <div v-if="currentView==='photo'" class="px-4 py-4 animate-fade-in pb-24">
-                <div class="flex gap-2 mb-4 justify-center">
-                    <button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition active:scale-95', currentLoc===loc?'bg-rose-400 text-white shadow-lg':'bg-white text-gray-400 shadow-sm']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button>
-                </div>
-                <div class="grid grid-cols-1 gap-4">
-                    <div v-for="(item,idx) in spots.photo[currentLoc]" :key="idx" class="visual-card group">
-                        <div class="item-img-container h-48" @click.stop="openLightbox(item.img)">
-                            <div class="img-fallback">📸 點擊上傳</div>
-                            <img v-if="item.img" :src="getImg(item.img)" loading="lazy" class="relative z-10 group-hover:scale-105" @error="handleImgError">
-                            <div class="absolute bottom-2 right-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded backdrop-blur">
-                                <i class="fa-solid fa-camera"></i> {{item.tag || '機位'}}
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            <h3 class="font-black text-gray-800 text-lg">{{item.name}}</h3>
-                            <p class="text-xs text-gray-500 font-bold mb-2">{{item.desc}}</p>
-                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="w-full block bg-gray-100 text-center py-2 rounded-lg text-xs font-bold text-gray-600 hover:bg-rose-400 hover:text-white transition"><i class="fa-solid fa-location-dot"></i> 導航至拍攝點</a>
-                        </div>
-                        <button v-if="!isGuest" @click="openEditModal('spot', item, idx)" class="absolute top-2 right-2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center shadow text-blue-500"><i class="fa-solid fa-pen text-xs"></i></button>
-                    </div>
-                </div>
-                <button v-if="!isGuest" @click="openAddSpotModal" class="fab-main bg-rose-400 text-white"><i class="fa-solid fa-plus"></i></button>
-            </div>
-
-            <div v-if="currentView==='food'" class="px-4 py-4 animate-fade-in pb-24">
+            <div v-if="currentView==='food' || currentView==='photo'" class="px-5 py-4 animate-fade-in">
                 <div class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition active:scale-95', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
-                <div class="mb-4 rounded-2xl overflow-hidden shadow-lg border-2 border-white relative h-32 bg-gray-200">
-                    <img :src="getMapCover(currentLoc)" class="w-full h-full object-cover" @error="handleImgError">
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-white font-black text-xl">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[currentLoc]}}美食地圖</div>
+                
+                <div v-if="currentView==='food'" class="map-cover-container">
+                    <img :src="getMapCover(currentLoc)" class="map-cover" @error="handleImgError">
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div v-for="(item,idx) in spots.food[currentLoc]" :key="idx" class="food-card relative group">
-                        <div class="raid-badge" :class="getRaidClass(item)"><i :class="getRaidIcon(item)"></i> {{getRaidLabel(item)}}</div>
-                        <div class="item-img-container" @click="openLightbox(item.img)">
-                            <img v-if="item.img" :src="getImg(item.img)" loading="lazy" @error="handleImgError">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20 px-2">
+                    <div v-for="(item,idx) in spots[currentView][currentLoc]" :key="idx" class="food-card relative group">
+                        <div v-if="currentView==='food'" class="raid-badge" :class="getRaidClass(item)"><i :class="getRaidIcon(item)"></i> {{getRaidLabel(item)}}</div>
+                        
+                        <div class="item-img-container" @click.stop="openLightbox(item.img)">
+                            <div class="img-fallback">圖片待補</div>
+                            <img v-if="item.img" :src="getImg(item.img)" class="relative z-10 group-hover:scale-110" @error="handleImgError">
                         </div>
-                        <div class="p-4">
-                            <h3 class="font-black text-gray-800 text-lg flex justify-between">{{item.name}} <span class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-500 font-normal self-start">{{item.tag}}</span></h3>
-                            <p class="text-sm text-gray-500 font-bold mb-3 line-clamp-2">{{item.desc}}</p>
-                            <div v-if="item.reserveLink" class="mb-2"><a :href="item.reserveLink" target="_blank" class="block text-center bg-red-50 text-red-500 py-1.5 rounded font-bold text-xs border border-red-100">立即預約</a></div>
-                            <div class="flex gap-2">
-                                <button @click="quickExpense(item)" class="flex-1 bg-yellow-400 text-white py-2 rounded-lg text-xs font-bold shadow-sm active:scale-95">記帳</button>
-                                <a :href="getMapLink(item.link, item.name)" target="_blank" class="flex-1 bg-gray-100 text-gray-600 py-2 rounded-lg text-xs font-bold text-center active:scale-95">導航</a>
+
+                        <div class="p-4 relative">
+                            <h3 class="font-black text-gray-800 text-lg mb-1">{{item.name}}</h3>
+                            <p class="text-sm text-gray-500 mb-3 font-bold">{{item.desc}}</p>
+                            
+                            <div v-if="currentView==='food'" class="mb-3 space-y-2">
+                                <button @click="quickExpense(item)" class="w-full bg-yellow-400 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1 active:scale-95 transition shadow-sm"><i class="fa-solid fa-file-invoice-dollar"></i> 吃完了 (一鍵記帳)</button>
+                                <a v-if="item.reserveLink" :href="item.reserveLink" target="_blank" class="block w-full text-center bg-red-500 text-white font-bold py-2 rounded-lg text-xs active:scale-95">立即預約</a>
+                            </div>
+
+                            <a :href="getMapLink(item.link, item.name)" target="_blank" class="block w-full text-center bg-gray-100 text-gray-500 font-bold py-2 rounded-lg text-xs hover:bg-orange-400 hover:text-white transition active:scale-95"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                            
+                            <div v-if="!isGuest" class="absolute top-2 right-2 flex gap-2 z-20">
+                                <button @click="openEditModal(currentView==='food'?'food':'spot', item, idx)" class="w-8 h-8 bg-white/90 rounded-full shadow text-blue-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                <button @click="spots[currentView][currentLoc].splice(idx,1);saveData()" class="w-8 h-8 bg-white/90 rounded-full shadow text-red-500 flex items-center justify-center active:scale-90"><i class="fa-solid fa-trash text-[10px]"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button v-if="!isGuest" @click="openAddFoodModal" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
+                <button v-if="!isGuest" @click="currentView==='food'?openAddFoodModal():openAddSpotModal()" class="fab-main bg-orange-400 text-white"><i class="fa-solid fa-plus"></i></button>
             </div>
+            
+            <div v-if="currentView==='money'" class="px-5 py-4 animate-fade-in">
+                 <div v-if="isGuest" class="text-center py-20 text-gray-400 font-bold">訪客模式無法記帳</div>
+                  <div v-else>
+                      <div class="flex gap-2 mb-4 justify-center bg-white/50 p-1 rounded-full w-max mx-auto backdrop-blur-sm shadow-sm">
+                           <button @click="moneyTab='record'" :class="['px-6 py-2 rounded-full font-bold transition text-sm',moneyTab==='record'?'bg-yellow-400 text-white shadow-md':'text-gray-400']">我的私帳</button>
+                           <button @click="moneyTab='split'" :class="['px-6 py-2 rounded-full font-bold transition text-sm',moneyTab==='split'?'bg-blue-400 text-white shadow-md':'text-gray-400']">公款分帳</button>
+                      </div>
+                      <div class="space-y-3 pb-20">
+                           <div v-for="exp in (moneyTab==='record'?myPrivateExpenses:groupExpenses)" :key="exp.id" class="card p-4 flex justify-between items-center !mb-0 !rounded-2xl border-l-4" :class="moneyTab==='record'?'border-yellow-300':'border-blue-300'">
+                                <div><div class="font-bold text-gray-800">{{exp.name}}</div><div class="text-[10px] text-gray-400">{{exp.date}}</div></div>
+                                <div class="text-right"><span class="font-black text-gray-700">{{exp.currency}} {{exp.amount}}</span></div>
+                                <button @click="deleteExpense(exp.id)" class="ml-3 text-red-300"><i class="fa-solid fa-trash-can"></i></button>
+                           </div>
+                      </div>
+                      <button @click="openExpenseModal(moneyTab==='record'?'private':'split')" class="fab-main bg-yellow-400 text-white"><i class="fa-solid fa-plus"></i></button>
+                  </div>
+             </div>
 
         </div> 
         
         <div v-if="currentView!=='menu'" class="fab-home" @click="currentView='menu'"><i class="fa-solid fa-house"></i></div>
         
-        <div v-if="expandedPhrase" class="fixed inset-0 z-[5000] bg-white/95 backdrop-blur flex flex-col items-center justify-center p-8 text-center animate-pop">
-            <div class="text-[60px] leading-tight font-black mb-8 text-gray-800 break-words w-full">{{expandedPhrase.jp}}</div>
-            <div class="text-3xl font-bold text-gray-500 mb-12">{{expandedPhrase.zh}}</div>
-            <button @click.stop="speakJapanese(expandedPhrase.jp)" class="w-20 h-20 rounded-full bg-emerald-500 text-white text-3xl shadow-xl flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-volume-high"></i></button>
-            <button class="mt-12 w-12 h-12 rounded-full bg-gray-100 text-gray-400" @click="expandedPhrase=null"><i class="fa-solid fa-times"></i></button>
+        <div v-if="showPersonaModal" class="fixed inset-0 z-[2000] bg-black/85 flex items-center justify-center p-6 backdrop-blur-lg animate-fade-in">
+             <div class="bg-white/95 w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative border-[6px] border-pink-200">
+                 <h3 class="font-black text-2xl mb-8 text-pink-500 tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-paw"></i> 請問您是哪一位？</h3>
+                 <div class="grid grid-cols-2 gap-6 mb-2">
+                     <div v-for="u in users" :key="u.id" class="relative group cursor-pointer" @click="setCurrentUser(u)">
+                         <div class="w-24 h-24 mx-auto rounded-3xl bg-white border-4 border-gray-100 shadow-lg flex items-center justify-center text-4xl mb-3 overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:border-pink-400">
+                             <img v-if="u.avatar" :src="u.avatar" class="w-full h-full object-cover">
+                             <span v-else>{{u.icon}}</span>
+                         </div>
+                         <div class="font-black text-gray-600 text-lg">{{u.name}}</div>
+                         <button v-if="!isGuest" @click.stop="openUserEditor(u)" class="absolute -top-2 -right-2 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-pen text-xs"></i></button>
+                     </div>
+                 </div>
+             </div>
         </div>
+
+        <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                <h3 class="font-bold text-lg mb-4 text-center">{{modalTitle}}</h3>
+                <div class="space-y-3">
+                    <div v-for="f in modalFields" :key="f.key">
+                        <label v-if="f.label" class="text-xs font-bold text-gray-400 ml-1 mb-1 block">{{f.label}}</label>
+                        <div v-if="f.type==='checkbox'" class="flex items-center bg-gray-50 p-3 rounded-xl border">
+                             <input type="checkbox" v-model="modalData[f.key]" class="w-5 h-5 accent-pink-500 mr-3">
+                             <span class="font-bold text-gray-700 text-sm">{{f.label}}</span>
+                        </div>
+                        <textarea v-else-if="f.type==='textarea'" v-model="modalData[f.key]" class="w-full p-3 bg-gray-50 rounded-xl outline-none border h-24"></textarea>
+                        <input v-else v-model="modalData[f.key]" class="w-full p-3 bg-gray-50 rounded-xl outline-none border">
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500">取消</button>
+                    <button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg">儲存</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+                <h3 class="font-bold text-lg mb-4 text-center">記一筆</h3>
+                <input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold">
+                <div class="flex gap-2 mb-3">
+                    <input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg">
+                    <select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select>
+                </div>
+                <button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg">儲存</button>
+                <button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold">取消</button>
+            </div>
+        </div>
+
+        <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
+        <input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg">
+        <div v-if="previewImg" class="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-2" @click="closeLightbox"><img :src="previewImg" class="max-w-full max-h-full rounded-lg shadow-2xl"></div>
 
     </div>
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc, updateDoc, serverTimestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { createApp, ref, computed, onMounted, watch, reactive } from "https://unpkg.com/vue@3.3.4/dist/vue.esm-browser.js";
+import { createApp, ref, computed, onMounted, watch } from "https://unpkg.com/vue@3.3.4/dist/vue.esm-browser.js";
 
-// V60.0 Configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4",
-  authDomain: "tokyo-trip-24b28.firebaseapp.com",
-  projectId: "tokyo-trip-24b28",
-  storageBucket: "tokyo-trip-24b28.firebasestorage.app",
-  messagingSenderId: "518699705070",
-  appId: "1:518699705070:web:56e95f603210d8d5d209ff"
-};
+// Firebase Config
+const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", authDomain: "tokyo-trip-24b28.firebaseapp.com", projectId: "tokyo-trip-24b28", storageBucket: "tokyo-trip-24b28.firebasestorage.app", messagingSenderId: "518699705070", appId: "1:518699705070:web:56e95f603210d8d5d209ff" };
+let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
-// 安全初始化 Firebase
-let auth, db;
-try {
-    const app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    enableIndexedDbPersistence(db).catch(err => console.warn("Persistence override:", err.code));
-} catch (e) {
-    console.warn("Firebase failed, falling back to LocalStorage mode.");
-}
-
-// 預設資料 (包含修復後的完整內容)
+// 預設資料 (Structure Only - Data comes from Cloud first)
 const defaultUsers = [
-    {id:1,name:'吉伊',icon:'🐹',list:[{text:'護照',checked:false},{text:'網卡',checked:false}]},
-    {id:2,name:'小八',icon:'🐱',list:[{text:'護照',checked:false}]},
-    {id:3,name:'兔兔',icon:'🐰',list:[{text:'護照',checked:false}]},
-    {id:4,name:'小桃',icon:'🍑',list:[{text:'護照',checked:false}]}
+    {id:1,name:'吉伊',icon:'🐹',list:[]},{id:2,name:'小八',icon:'🐱',list:[]},{id:3,name:'兔兔',icon:'🐰',list:[]},{id:4,name:'小桃',icon:'🍑',list:[]}
 ];
-
-const defaultItinerary = [
-    [{hours:"06:40",category:"Flight",name:"TPE 起飛",note:"T1 辦理登機",mapKeyword:"桃園機場 T1"},{hours:"10:40",category:"Flight",name:"NRT 抵達",note:"領取行李/購買西瓜卡",mapKeyword:"成田機場"},{hours:"14:00",category:"Sightseeing",name:"晴空塔",note:"下午行程",mapKeyword:"東京晴空塔",travelTime:"⬇ 60-90min (電車)"},{hours:"18:00",category:"Food",name:"錦糸町晚餐",note:"周遭美食",mapKeyword:"錦糸町站 美食"}],
-    [{hours:"09:00",category:"Sightseeing",name:"淺草寺",note:"雷門/仲見世通",mapKeyword:"淺草寺"},{hours:"14:00",category:"Sightseeing",name:"小網神社",note:"強運厄除",mapKeyword:"小網神社"},{hours:"18:00",category:"Shopping",name:"秋葉原",note:"動漫行程",mapKeyword:"秋葉原"}],
-    // Day 3: 富士山 (修復：錦糸町出發 + 提醒)
-    [{hours:"07:30",category:"Transport",name:"前往錦糸町站",note:"準備搭乘富士回遊",mapKeyword:"錦糸町站"},{hours:"08:00",category:"Transport",name:"富士回遊號",note:"★務必提前取票 (錦糸町發)",mapKeyword:"錦糸町站",ticketLink:"https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index"},{hours:"10:30",category:"Transport",name:"抵達河口湖/租車",note:"Toyota Rent a Car",mapKeyword:"河口湖駅"},{hours:"13:00",category:"Sightseeing",name:"大石公園",note:"自然生活館",mapKeyword:"河口湖自然生活館"},{hours:"15:30",category:"Sightseeing",name:"下吉田/本町通",note:"網美商店街拍照",mapKeyword:"富士吉田本町通り"}],
-    [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"日出絕景",mapKeyword:"平野の浜"},{hours:"10:00",category:"Sightseeing",name:"山中湖 KABA巴士",note:"水陸兩用巴士",mapKeyword:"KABA BUS"},{hours:"14:00",category:"Sightseeing",name:"忍野八海",note:"湧泉群",mapKeyword:"忍野八海"}],
-    [{hours:"09:00",category:"Sightseeing",name:"天上山公園",note:"搭乘纜車/盪鞦韆",mapKeyword:"河口湖 富士山全景纜車"},{hours:"14:00",category:"Transport",name:"返回東京",note:"富士回遊回新宿",mapKeyword:"河口湖站"},{hours:"17:00",category:"Shopping",name:"新宿/池袋",note:"市區逛街",mapKeyword:"新宿站"}],
-    [{hours:"09:00",category:"Transport",name:"前往鎌倉",note:"小田急線",mapKeyword:"新宿站"},{hours:"10:30",category:"Sightseeing",name:"灌籃高手平交道",note:"鎌倉高校前",mapKeyword:"鎌倉高校前"},{hours:"12:00",category:"Food",name:"Bills 七里濱",note:"世界第一早餐",mapKeyword:"Bills 七里ヶ浜"},{hours:"15:00",category:"Sightseeing",name:"江之島",note:"弁財天仲見世通",mapKeyword:"江之島"}],
-    // Day 7: Shibuya Sky (修復：黃昏票提醒)
-    [{hours:"10:00",category:"Sightseeing",name:"東京鐵塔",note:"芝公園拍照",mapKeyword:"芝公園"},{hours:"14:00",category:"Shopping",name:"澀谷逛街",note:"Parco/109",mapKeyword:"澀谷 Parco"},{hours:"16:30",category:"Sightseeing",name:"SHIBUYA SKY",note:"★需提前買黃昏票 (日落前1hr入場)",mapKeyword:"SHIBUYA SKY",ticketLink:"https://www.shibuya-scramble-square.com/sky/ticket/zh_tw/"},{hours:"19:00",category:"Food",name:"澀谷晚餐",note:"燒肉或壽司",mapKeyword:"澀谷 美食"}],
-    [{hours:"10:00",category:"Shopping",name:"阿美橫丁",note:"最後補貨",mapKeyword:"阿美橫丁"},{hours:"14:00",category:"Transport",name:"前往機場",note:"Skyliner",mapKeyword:"京成上野站"},{hours:"20:00",category:"Flight",name:"返台",note:"成田機場起飛",mapKeyword:"成田機場"}]
-];
-
-const defaultPhotoSpots = {
-    Tokyo: [{name:'SHIBUYA SKY', desc:'角落玻璃點/手扶梯', link:'SHIBUYA SKY', tag:'絕景'}, {name:'東京鐵塔', desc:'芝公園/地下停車場樓梯', link:'芝公園', tag:'經典'}],
-    Kamakura: [{name:'灌籃高手平交道', desc:'電車經過瞬間', link:'鎌倉高校前', tag:'動漫'}, {name:'七里濱海岸', desc:'看江之島與富士山', link:'七里ヶ浜海岸', tag:'海景'}],
-    Fuji: [{name:'本町二丁目', desc:'昭和風街道+富士山', link:'富士吉田本町通り', tag:'街拍'}, {name:'羅森河口湖站前', desc:'便利商店+富士山', link:'ローソン 河口湖駅前店', tag:'熱門'}]
+// Updated Photo Spots (5 per loc)
+const newPhotoSpots = {
+    Tokyo: [
+        {name:'SHIBUYA SKY', desc:'絕美日落展望台', link:'SHIBUYA SKY'},
+        {name:'東京鐵塔 (芝公園)', desc:'4號地最佳機位', link:'芝公園 4號地'},
+        {name:'淺草雷門', desc:'經典紅燈籠', link:'雷門'},
+        {name:'TeamLab Planets', desc:'夢幻光影展', link:'TeamLab Planets'},
+        {name:'豪德寺', desc:'滿滿招財貓', link:'豪德寺'}
+    ],
+    Kamakura: [
+        {name:'鎌倉高校前', desc:'灌籃高手平交道', link:'鎌倉高校前駅'},
+        {name:'長谷寺', desc:'繡球花與海景', link:'長谷寺'},
+        {name:'七里濱海岸', desc:'富士山與江之電', link:'七里ヶ浜 海岸'},
+        {name:'報國寺', desc:'竹林庭園', link:'報國寺'},
+        {name:'江島神社', desc:'海上鳥居', link:'江島神社'}
+    ],
+    Fuji: [
+        {name:'新倉山淺間公園', desc:'五重塔 x 富士山', link:'新倉山淺間公園'},
+        {name:'下吉田本町通', desc:'日川時計店街景', link:'日川時計店'},
+        {name:'大石公園', desc:'湖畔花海', link:'大石公園'},
+        {name:'河口湖車站', desc:'LAWSON 富士山', link:'河口湖駅'},
+        {name:'平野之濱', desc:'逆富士倒影', link:'平野の浜'}
+    ]
 };
 
-// 輔助函式
-const getImg = (p) => { if(!p) return ''; if(p.startsWith('http')) return p; return `./images/${p}`; };
-const handleImgError = (e) => { e.target.style.display='none'; e.target.parentElement.style.backgroundColor='#eee'; };
+const getImg = (p) => {
+   if (!p) return 'https://placehold.co/600x400/pink/white?text=No+Image';
+   if (p.startsWith('data:') || p.startsWith('http')) return p;
+   return `https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/images/${p}`;
+};
+const compressImage = (base64) => { return new Promise((resolve) => { const img = new Image(); img.src = base64; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const MAX = 600; if(w>MAX){ h*=MAX/w; w=MAX; } canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; }); };
 
 createApp({
     setup() {
-        // State
         const currentView = ref('welcome');
         const isWelcomeClosed = ref(false);
-        const isLoggedIn = ref(false);
-        const isGuest = ref(false);
         const currentUser = ref(null);
+        const isGuest = ref(false);
+        const showPersonaModal = ref(false);
+        const isLoggedIn = ref(false);
+        const syncStatus = ref('idle');
+        const showLoginModal = ref(false); 
+        const loginForm = ref({email:'',password:''});
+
+        // Data Refs
+        const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
+        const itinerary = ref([]); 
+        const expenses = ref([]);
+        const spots = ref({ food:{Tokyo:[],Kamakura:[],Fuji:[]}, photo: newPhotoSpots }); // Init with new structure
+        const shopping = ref({cosme:[],ldk:[],souvenir:[]});
+        const japanesePhrases = ref([]);
+        const emergTab = ref('map');
+
+        // UI State
         const selectedDayIndex = ref(0);
         const itineraryMode = ref('normal');
-        const emergencyTab = ref('translate'); // New Tab state
+        const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
+        const moneyTab = ref('record');
         
-        // Data Containers (Reactive)
-        const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        const itinerary = ref(defaultItinerary);
-        const spots = ref({ food: {Tokyo:[],Kamakura:[],Fuji:[]}, photo: defaultPhotoSpots });
-        const japanesePhrases = ref([{zh:'不好意思',jp:'すみません'},{zh:'謝謝',jp:'ありがとうございます'},{zh:'這個多少錢?',jp:'いくらですか？'},{zh:'請給我收據',jp:'レシートをください'}]);
-        
-        // Reminders
-        const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
-        const smartReminders = computed(() => {
-            const list = [];
-            if(daysUntilTrip.value <= 30) {
-                list.push({text:"富士回遊號：開放訂票！(錦糸町發)", link:"https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index"});
-                list.push({text:"SHIBUYA SKY：搶黃昏時段門票", link:"https://www.shibuya-scramble-square.com/sky/ticket/zh_tw/"});
-            }
-            return list;
-        });
+        // Modals
+        const showModal = ref(false);
+        const showExpenseModal = ref(false);
+        const modalData = ref({});
+        const modalFields = ref([]);
+        const modalTitle = ref('');
+        const modalCallback = ref(null);
+        const modalHasImg = ref(false);
+        const isEditingItem = ref(false);
+        const previewImg = ref(null);
 
-        // 核心：Persistence Logic (強制寫入 LocalStorage)
-        const LOCAL_KEY = 'v60_ultimate_data';
-        
-        const loadFromLocal = () => {
-            const raw = localStorage.getItem(LOCAL_KEY);
-            if(raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    // Merge local data securely
-                    if(parsed.users) users.value = parsed.users;
-                    if(parsed.itinerary) itinerary.value = parsed.itinerary;
-                    if(parsed.spots) spots.value = parsed.spots;
-                    if(parsed.phrases) japanesePhrases.value = parsed.phrases;
-                    console.log("V60: Loaded data from LocalStorage");
-                } catch(e) { console.error("Local load error", e); }
-            }
-        };
-
-        const saveToLocal = () => {
-            const data = {
-                users: users.value,
-                itinerary: itinerary.value,
-                spots: spots.value,
-                phrases: japanesePhrases.value,
-                updatedAt: Date.now()
-            };
-            localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
-        };
-
-        // Watchers: 只要資料變動，立刻存檔
-        watch([users, itinerary, spots, japanesePhrases], () => {
-            saveToLocal();
-        }, { deep: true });
-
-        // Cloud Sync (Firebase)
-        const syncToCloud = async () => {
-            if(!isLoggedIn.value || isGuest.value) return;
-            try {
-                await setDoc(doc(db, "trips", "kanto2026"), {
-                    users: users.value,
-                    itinerary: itinerary.value,
-                    spots: spots.value,
-                    phrases: japanesePhrases.value,
-                    lastUpdate: serverTimestamp()
-                }, { merge: true });
-            } catch(e) { console.error("Cloud sync fail", e); }
-        };
-
-        // UI Helpers
-        const getPageTitle = (view) => {
-            const map = {
-                'menu': '旅程中心',
-                'itinerary': '行程總覽',
-                'shopping': '快樂購',
-                'weather': '天氣預報',
-                'food': '美食地圖',
-                'photo': '網美打卡',
-                'prep': '行前準備',
-                'hotel': '住宿交通',
-                'money': '小財庫',
-                'emergency': '緊急救助包' // Renamed
-            };
-            return map[view] || '關東之旅';
-        };
-
-        const getBudgetMood = () => '😊'; 
-        const getGreeting = () => currentUser.value ? `嗨，${currentUser.value.name}！` : '歡迎回來';
-        
-        const getCategoryColor = (cat) => {
-            const map = {'Flight':'bg-blue-400','Transport':'bg-green-400','Food':'bg-orange-400','Shopping':'bg-purple-400'};
-            return map[cat] || 'bg-pink-400';
-        };
-        const getCategoryIconColor = (cat) => {
-             const map = {'Flight':'text-blue-400','Transport':'text-green-400','Food':'text-orange-400','Shopping':'text-purple-400'};
-            return map[cat] || 'text-pink-400';
-        };
-        const getIconByCategory = (cat) => {
-            const map = {'Flight':'fa-plane','Transport':'fa-train','Food':'fa-utensils','Shopping':'fa-bag-shopping','Sightseeing':'fa-camera'};
-            return `fa-solid ${map[cat] || 'fa-location-dot'}`;
-        };
-        
-        const getMapLink = (k,n) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k||n)}`;
-        const getMapCover = (loc) => `./images/map_${loc.toLowerCase()}.jpg`; // 假設您有這些圖片
-        
-        // Actions
-        const enterSite = () => { isWelcomeClosed.value = true; };
-        const enterAsGuest = () => { isGuest.value = true; isWelcomeClosed.value = true; };
-        const handleAuthClick = () => { 
-            if(isLoggedIn.value) alert("目前已連線 (V60 Local-First Mode Active)"); 
-            else alert("請連接 Firebase 以同步 (目前使用本地儲存)");
-        };
-        
-        const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'},{week:'D8',title:'4/03'}];
+        // Constants
         const apps = [
             {id:1,name:'行程',icon:'fa-solid fa-map',view:'itinerary',bgClass:'bg-pink-400'},
             {id:2,name:'小財庫',icon:'fa-solid fa-yen-sign',view:'money',bgClass:'bg-yellow-400'},
-            {id:3,name:'住宿交通',icon:'fa-solid fa-hotel',view:'hotel',bgClass:'bg-indigo-400'},
-            {id:4,name:'行前準備',icon:'fa-solid fa-suitcase',view:'prep',bgClass:'bg-blue-400'},
-            {id:5,name:'吃吃喝喝',icon:'fa-solid fa-utensils',view:'food',bgClass:'bg-orange-400'},
-            {id:6,name:'網美打卡',icon:'fa-solid fa-camera',view:'photo',bgClass:'bg-rose-400'},
-            {id:7,name:'快樂購',icon:'fa-solid fa-bag-shopping',view:'shopping',bgClass:'bg-purple-400'},
-            {id:8,name:'天氣',icon:'fa-solid fa-cloud-sun',view:'weather',bgClass:'bg-sky-400'},
-            {id:9,name:'緊急救助',icon:'fa-solid fa-kit-medical',view:'emergency',bgClass:'bg-red-400'} // Renamed Icon
+            {id:3,name:'行前準備',icon:'fa-solid fa-suitcase',view:'prep',bgClass:'bg-blue-400'},
+            {id:4,name:'美食地圖',icon:'fa-solid fa-utensils',view:'food',bgClass:'bg-orange-400'},
+            {id:5,name:'推薦機位',icon:'fa-solid fa-camera',view:'photo',bgClass:'bg-rose-400'},
+            {id:6,name:'購物清單',icon:'fa-solid fa-bag-shopping',view:'shopping',bgClass:'bg-purple-400'},
+            {id:9,name:'緊急救助',icon:'fa-solid fa-kit-medical',view:'emergency',bgClass:'bg-red-400'}
         ];
+        const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'},{week:'D8',title:'4/03'}];
+        const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
+        const smartReminders = computed(() => { const l=[]; if(daysUntilTrip.value<=30) l.push("富士回遊號：該搶票了！"); if(daysUntilTrip.value<=0) l.push("旅途愉快！"); return l; });
 
-        // Lifecycle
+        // Helpers
+        const getPageTitle = (view) => apps.find(a=>a.view===view)?.name || '關東之旅';
+        const getImg = (p) => {
+            if (!p) return 'https://placehold.co/600x400/pink/white?text=No+Image';
+            if (p.startsWith('data:') || p.startsWith('http')) return p;
+            return `https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/images/${p}`;
+        };
+        const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=No+Image';
+        const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway'}[cat]||'fa-solid fa-location-dot');
+        const getMapLink = (k,n) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k||n)}`;
+        const getCurrentItinerary = () => itinerary.value[selectedDayIndex.value] || [];
+        const statusText = computed(() => !isLoggedIn.value?'Offline':syncStatus.value==='syncing'?'Syncing...':'Online');
+        const statusColor = computed(() => !isLoggedIn.value?'bg-gray-400':syncStatus.value==='syncing'?'bg-yellow-400 animate-pulse':'bg-green-400');
+        const isUserOnline = (id) => false; // Simplified
+
+        // 💰 Logic: Budget Mood
+        const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1) : []);
+        const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1));
+        const totalSpent = computed(() => myPrivateExpenses.value.reduce((s,e)=>s+parseInt(e.amount), 0));
+        const getBudgetMood = () => {
+            const budget = 30000; // Hardcoded budget
+            const r = totalSpent.value / budget;
+            if(r > 1.0) return '😱'; // Crying (Over budget)
+            if(r > 0.8) return '😰'; // Nervous
+            if(r > 0.5) return '😐'; // Neutral
+            return '😊'; // Happy
+        };
+
+        // 🎮 Logic: Gamification
+        const getPackingProgress = (u) => {
+            if(!u || !u.list || u.list.length===0) return 0;
+            return Math.round((u.list.filter(i=>i.checked).length / u.list.length)*100);
+        };
+        const getStamina = (dIdx) => {
+             // Mock logic: Count items
+             const count = (itinerary.value[dIdx] || []).length;
+             let hp = 100 - (count * 15);
+             if(dIdx===0 || dIdx===7) hp -= 20; // Flights tire you out
+             return Math.max(10, hp);
+        };
+        const getStaminaColor = (i) => { const s=getStamina(i); return s<40?'hp-low':s<70?'hp-med':'hp-high'; };
+
+        // 👋 Logic: Greeting
+        const getGreeting = () => {
+            if(!currentUser.value) return '旅程中心';
+            const n = currentUser.value.name;
+            if(n.includes('吉伊')) return '哇...哇枯哇枯...';
+            if(n.includes('小八')) return '今天也要努力喔！(微笑)';
+            if(n.includes('兔兔')) return 'Hula!!! (怪叫)';
+            if(n.includes('小桃')) return '哼...\n要在大家面前誇獎我很可愛喔！';
+            return `歡迎回來，${n}！`;
+        };
+
+        // 🔧 Core: Save Logic
+        let saveTimeout;
+        const saveData = async () => {
+            if(isGuest.value) return;
+            syncStatus.value = 'syncing';
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(async () => {
+                const data = {
+                    users: users.value,
+                    itinerary: itinerary.value,
+                    expenses: expenses.value,
+                    spots: spots.value,
+                    shopping: shopping.value,
+                    phrases: japanesePhrases.value,
+                    lastUpdate: serverTimestamp()
+                };
+                try {
+                    if(db && isLoggedIn.value) await setDoc(doc(db,"trips","kanto2026"), data, {merge:true});
+                    setTimeout(() => syncStatus.value = 'idle', 500);
+                } catch(e) { console.error("Save Fail", e); syncStatus.value = 'error'; }
+            }, 800);
+        };
+
+        // 🔧 Core: Merge Logic (The Fix for Reset Bug)
+        const mergeData = (cloudData) => {
+             if(!cloudData) return;
+             // Merge Users (Keep local ID/Avatar if not changed, but sync List)
+             if(cloudData.users) users.value = cloudData.users;
+             
+             // Merge Itinerary (Crucial)
+             if(cloudData.itinerary && cloudData.itinerary.length > 0) itinerary.value = cloudData.itinerary;
+             else if (itinerary.value.length === 0) {
+                 // Init empty itinerary structure if completely empty
+                 for(let i=0; i<8; i++) itinerary.value.push([]);
+             }
+
+             if(cloudData.expenses) expenses.value = cloudData.expenses;
+             
+             // Merge Spots (Preserve new structure while keeping old data)
+             if(cloudData.spots) {
+                 spots.value.food = cloudData.spots.food || {Tokyo:[],Kamakura:[],Fuji:[]};
+                 // Ensure new photo spots exist if cloud is old version
+                 spots.value.photo = cloudData.spots.photo || newPhotoSpots; 
+             }
+             if(cloudData.shopping) shopping.value = cloudData.shopping;
+             if(cloudData.phrases) japanesePhrases.value = cloudData.phrases;
+        };
+
+        // 🚀 Quick Expense
+        const quickExpense = (item) => {
+             if(isGuest.value) { alert('訪客無法記帳'); return; }
+             currentView.value = 'money';
+             openExpenseModal('private');
+             modalData.value.name = item.name; // Auto-fill
+             modalData.value.amount = '';
+        };
+
+        // Modals & Actions
+        const openExpenseModal = (mode) => { showExpenseModal.value=true; modalData.value={name:'',amount:'',currency:'JPY',whoPaid:currentUser.value.id,forWhom:[currentUser.value.id]}; };
+        const saveExpense = () => { expenses.value.push({...modalData.value, id:Date.now(), date:new Date().toLocaleDateString()}); saveData(); showExpenseModal.value=false; };
+        const deleteExpense = (id) => { if(confirm('確定刪除?')) { expenses.value = expenses.value.filter(e=>e.id!==id); saveData(); } };
+        const openEditItineraryModal = (item,idx) => { modalTitle.value='編輯行程'; modalData.value={...item}; modalFields.value=[{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'}]; showModal.value=true; modalCallback.value=()=>{ itinerary.value[selectedDayIndex.value][idx]=modalData.value; itinerary.value[selectedDayIndex.value].sort((a,b)=>a.hours.localeCompare(b.hours)); saveData(); }; };
+        const openAddItineraryModal = () => { modalTitle.value='新增行程'; modalData.value={hours:'',name:'',note:'',category:'Sightseeing'}; modalFields.value=[{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'}]; showModal.value=true; modalCallback.value=()=>{ itinerary.value[selectedDayIndex.value].push(modalData.value); itinerary.value[selectedDayIndex.value].sort((a,b)=>a.hours.localeCompare(b.hours)); saveData(); }; };
+        const handleModalSave = () => { if(modalCallback.value) modalCallback.value(); showModal.value=false; };
+        const setCurrentUser = (u) => { if(isGuest.value) return; currentUser.value = u; showPersonaModal.value = false; currentView.value = 'menu'; };
+        const enterSite = () => { isGuest.value=false; isWelcomeClosed.value=true; showPersonaModal.value=true; };
+        const enterAsGuest = () => { isGuest.value=true; currentUser.value={id:999,name:'訪客',list:[]}; isWelcomeClosed.value=true; currentView.value='menu'; };
+        const handleAuthClick = () => isLoggedIn.value ? signOut(auth) : showLoginModal.value=true;
+        const getMapCover = (loc) => getImg(`${loc === 'Tokyo' ? '東京' : loc === 'Kamakura' ? '鎌倉' : '富士山'}美食地圖.jpg`);
+        const getRaidClass = (i) => i.reserveLink ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
+        const getRaidIcon = (i) => i.reserveLink ? 'fa-solid fa-fire' : 'fa-solid fa-leaf';
+        const getRaidLabel = (i) => i.reserveLink ? '需預約' : '輕鬆吃';
+        const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
+        const closeLightbox = () => previewImg.value = null;
+        const addPrepItem = (u) => { u.list.push({text:'新項目',checked:false}); saveData(); };
+        const expandCard = (p) => alert(`${p.jp}\n${p.zh}`); // Simple alert for now
+        const handleCameraTranslate = () => window.open('https://translate.google.com/?sl=auto&tl=zh-TW&op=images', '_blank');
+        const openAddPhraseModal = () => { modalTitle.value='新增翻譯'; modalFields.value=[{key:'zh',label:'中文'},{key:'jp',label:'日文'}]; modalData.value={zh:'',jp:''}; showModal.value=true; modalCallback.value=()=>{japanesePhrases.value.push(modalData.value); saveData();}; };
+        const openEditModal = (type, item, idx) => { modalTitle.value='編輯'; modalData.value={...item}; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'連結'}]; showModal.value=true; modalCallback.value=()=>{ if(type==='food') spots.value.food[currentLoc.value][idx]=modalData.value; else spots.value.photo[currentLoc.value][idx]=modalData.value; saveData(); }; };
+        const openAddFoodModal = () => { modalTitle.value='新增美食'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalData.value={}; showModal.value=true; modalCallback.value=()=>{ spots.value.food[currentLoc.value].push(modalData.value); saveData(); }; };
+        const openAddSpotModal = () => { modalTitle.value='新增打卡點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'link',label:'地圖關鍵字'}]; modalData.value={}; showModal.value=true; modalCallback.value=()=>{ spots.value.photo[currentLoc.value].push(modalData.value); saveData(); }; };
+        const showDiagnostic = () => alert(`System Online.\nDB: ${!!db}\nUser: ${currentUser.value?.name}`);
+
         onMounted(() => {
-            loadFromLocal(); // 優先載入本地資料
+            // Init empty itinerary slots
+            for(let i=0; i<8; i++) itinerary.value.push([]);
             
-            // Firebase Auth Listener
-            if(auth) {
-                onAuthStateChanged(auth, (u) => {
-                    if(u) {
-                        isLoggedIn.value = true;
-                        // 登入後嘗試從雲端拉取最新資料 (可選：做版本比較)
-                        const unsub = onSnapshot(doc(db, "trips", "kanto2026"), (d) => {
-                            if(d.exists()) {
-                                const cloudData = d.data();
-                                // 簡單策略：如果雲端有資料，覆蓋本地 (實際應用可做更細緻的 merge)
-                                if(cloudData.itinerary) itinerary.value = cloudData.itinerary;
-                                console.log("V60: Cloud data synced");
-                            }
-                        });
-                    }
-                });
-            }
-            
-            // Auto-save interval
-            setInterval(syncToCloud, 10000); 
+            if(auth) onAuthStateChanged(auth, u => {
+                isLoggedIn.value = !!u;
+                if(u && db) {
+                    // Real-time listener: THIS FIXES THE RESET BUG
+                    onSnapshot(doc(db,"trips","kanto2026"), (doc) => {
+                        if(doc.exists()) {
+                            mergeData(doc.data()); // Intelligent Merge
+                        } else {
+                            // Only init defaults if DB is truly empty
+                            saveData(); 
+                        }
+                    });
+                }
+            });
         });
 
-        // 暴露給 Template
         return {
-            currentView, isWelcomeClosed, isLoggedIn, isGuest,
-            users, currentUser,
-            daysUntilTrip, smartReminders, apps, tripDays, selectedDayIndex,
-            itinerary, getCurrentItinerary: () => itinerary.value[selectedDayIndex.value] || [],
-            emergencyTab, japanesePhrases,
-            spots, currentLoc,
-            // Actions
-            enterSite, enterAsGuest, handleAuthClick,
-            getPageTitle, getBudgetMood, getGreeting,
-            getCategoryColor, getCategoryIconColor, getIconByCategory, getMapLink, getImg, getMapCover,
-            handleImgError,
-            expandedPhrase: ref(null), speakJapanese: (t) => { const u=new SpeechSynthesisUtterance(t); u.lang='ja-JP'; window.speechSynthesis.speak(u); },
-            expandCard: (p) => { alert(p.jp); }, // 簡單實作
-            handleCameraTranslate: () => window.open('https://translate.google.com/?sl=auto&tl=zh-TW&op=images'),
-            openLightbox: (img) => alert('開啟圖片: '+img), // 簡單實作
-            // Placeholders for removed complex modals to save space, logic is same as before
-            openEditItineraryModal: () => {}, openAddItineraryModal: () => {}, openEditModal: () => {}, openAddSpotModal: () => {}, openAddFoodModal: () => {}, openAddPhraseModal: () => {}
+            currentView, isWelcomeClosed, currentUser, isGuest, apps, daysUntilTrip, smartReminders, tripDays, selectedDayIndex,
+            itinerary, getCurrentItinerary, itineraryMode,
+            emergTab, japanesePhrases,
+            spots, currentLoc, getMapCover, getImg, handleImgError, getRaidClass, getRaidIcon, getRaidLabel,
+            moneyTab, myPrivateExpenses, groupExpenses, getBudgetMood, quickExpense,
+            getPackingProgress, getStamina, getStaminaColor, getGreeting,
+            statusText, statusColor, isLoggedIn, handleAuthClick, showLoginModal, loginForm,
+            showModal, modalTitle, modalFields, modalData, handleModalSave, showExpenseModal, openExpenseModal, saveExpense, deleteExpense,
+            openEditItineraryModal, openAddItineraryModal, getIconByCategory, getMapLink,
+            enterSite, enterAsGuest, showPersonaModal, setCurrentUser, openLightbox, closeLightbox, previewImg, addPrepItem, saveData,
+            handleCameraTranslate, expandCard, openAddPhraseModal, openEditModal, openAddFoodModal, openAddSpotModal, showDiagnostic,
+            getPageTitle
         };
     }
 }).mount('#app');
