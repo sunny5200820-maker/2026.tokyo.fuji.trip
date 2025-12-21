@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V62.0 Cloud Core)</title>
+<title>關東之旅 2026 (V63.0 Database Fix)</title>
 
 <script>
     window.tailwind = {
@@ -33,7 +33,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V62.0 Core */
+    /* V63.0 Core Styles */
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: "Zen Maru Gothic", sans-serif; color: #5D4037; overflow: hidden; -webkit-tap-highlight-color: transparent; background-color: #FFF0F5; overscroll-behavior: none; }
     input, textarea, select { font-size: 16px !important; font-family: inherit; } 
     * { -webkit-overflow-scrolling: touch; }
@@ -95,11 +95,11 @@
         <div class="absolute inset-0 z-0"><img :src="getImg('welcome.jpg')" class="w-full h-full object-cover opacity-90" @error="handleImgError"></div>
         <div class="absolute top-6 right-6 z-50 pt-[env(safe-area-inset-top)]">
             <button @click.stop="handleAuthClick" :class="['flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/50 shadow-lg font-bold text-sm transition', isLoggedIn ? 'bg-green-500/80 text-white' : 'bg-white/40 text-gray-800']">
-                <i :class="isLoggedIn ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-arrow-up'"></i> {{ isLoggedIn ? '已連線 (V62)' : '雲端同步' }}
+                <i :class="isLoggedIn ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-arrow-up'"></i> {{ isLoggedIn ? '已連線' : '雲端同步' }}
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V62.0 CLOUD CORE</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V63.0 FIXED</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -566,7 +566,7 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
-// V62 Strict Array: Immutable 4-User IDs.
+// V63 Strict Array: Immutable 4-User IDs.
 const defaultUsers = [{id:1,name:'吉伊',icon:'🐹',list:[...defaultPrepList]},{id:2,name:'小八',icon:'🐱',list:[...defaultPrepList]},{id:3,name:'兔兔',icon:'🐰',list:[...defaultPrepList]},{id:4,name:'小桃',icon:'🍑',list:[...defaultPrepList]}];
 
 const getImg = (p) => {
@@ -575,9 +575,8 @@ const getImg = (p) => {
     return `./images/${p}`; 
 };
 
-// --- DATA DEFINITIONS (DEFAULT CONTENT) ---
-// 這部分資料是您的「預設值」。
-// 關鍵邏輯：如果雲端是空的，程式會自動把這些內容「寫入雲端」，然後所有人就能同步看到了。
+// --- DATA DEFINITIONS (DEFAULT CONTENT RECOVERY) ---
+// 這部分是您的「預設值」備份，用來在雲端資料庫損壞時自動修復。
 const foodSpots = {
     Tokyo: [
         {name:'牛かつもと村', desc:'自行煎烤軟嫩炸牛排', tag:'新宿/澀谷', img:'gyukatsu-motomura.jpg', reserve:false, link:'牛かつもと村', reserveLink:'', votes:[]},
@@ -670,20 +669,20 @@ createApp({
         
         // Data Refs (Bind to local state)
         const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        const itinerary = ref([]); // Start empty, wait for Cloud
-        const drivePlan = ref([]);
+        const itinerary = ref(JSON.parse(JSON.stringify(defaultData.itinerary))); // 初始化避免空白
+        const drivePlan = ref(JSON.parse(JSON.stringify(defaultData.drivePlan)));
         const expenses = ref([]);
-        const spots = ref({ food: { Tokyo:[], Kamakura:[], Fuji:[] }, photo: { Tokyo:[], Kamakura:[], Fuji:[] } });
-        const shopping = ref({ cosme:[], ldk:[], souvenir:[] });
-        const japanesePhrases = ref([]);
+        const spots = ref(JSON.parse(JSON.stringify(defaultData.spots)));
+        const shopping = ref(JSON.parse(JSON.stringify(defaultData.shopping)));
+        const japanesePhrases = ref(JSON.parse(JSON.stringify(defaultData.phrases)));
         const suggestedTickets = ref([]); 
-        const transportTickets = ref([]);
-        const rentalCars = ref([]);
-        const hotels = ref([]);
-        const coupons = ref([]);
+        const transportTickets = ref(JSON.parse(JSON.stringify(defaultData.transportTickets)));
+        const rentalCars = ref(JSON.parse(JSON.stringify(defaultData.rentalCars)));
+        const hotels = ref(JSON.parse(JSON.stringify(defaultData.hotels)));
+        const coupons = ref(JSON.parse(JSON.stringify(defaultData.coupons)));
         const activeUsers = ref({}); 
         
-        // V62 Lightbox State
+        // V63 Lightbox State
         const previewImg = ref(null);
         const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
         const closeLightbox = () => { previewImg.value = null; };
@@ -754,7 +753,7 @@ createApp({
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
-        // V62 Dynamic Map Cover
+        // V63 Dynamic Map Cover
         const getMapCover = (loc) => {
             const map = { 'Tokyo': '東京美食地圖.jpg', 'Kamakura': '鎌倉美食地圖.jpg', 'Fuji': '富士山美食地圖.jpg' };
             return getImg(map[loc]); 
@@ -783,7 +782,7 @@ createApp({
             saveData();
         };
 
-        // V62 Gamification Helpers
+        // V63 Gamification Helpers
         const getGreeting = () => {
              if(!currentUser.value) return '旅程中心';
              const n = currentUser.value.name;
@@ -816,7 +815,7 @@ createApp({
             return 'hp-high';
         };
 
-        // V62 Quick Expense
+        // V63 Quick Expense
         const quickExpense = (item) => {
              if(!currentUser.value) { alert('請先登入'); return; }
              currentView.value = 'money';
@@ -826,72 +825,32 @@ createApp({
              modalData.value.amount = '';
         };
 
-        // V62 CORE FUNCTION: Init Cloud Sync
-        // 核心邏輯：如果雲端沒資料，就用預設值填滿；如果有資料，就同步下來。
-        const initCloudSync = async (user, database) => {
-            onSnapshot(doc(database, "trips", "kanto2026"), async (docSnap) => {
-                if (docSnap.exists()) {
-                    const dt = docSnap.data();
-                    
-                    // --- 關鍵修正：檢查雲端是否為空資料 (Prevent Blank Data) ---
-                    // 如果雲端上的行程陣列存在，且長度大於0，我們才相信雲端資料
-                    // 否則，我們認為雲端是壞的，需要執行「修復」
-                    if (!dt.itinerary || dt.itinerary.length === 0) {
-                        console.warn("Cloud data is blank. Auto-seeding defaults...");
-                        await forceRestoreDefaults(); // 自動修復
-                        return;
-                    }
-
-                    // --- 正常同步流程 (Sync) ---
-                    // 如果雲端資料正常，就覆蓋本地變數，這樣多人協作才能看到彼此的修改
-                    if (dt.users) users.value = dt.users;
-                    if (dt.itinerary) itinerary.value = dt.itinerary;
-                    if (dt.drivePlan) drivePlan.value = dt.drivePlan;
-                    if (dt.expenses) expenses.value = dt.expenses;
-                    if (dt.spots) spots.value = dt.spots;
-                    if (dt.shopping) shopping.value = dt.shopping;
-                    if (dt.phrases) japanesePhrases.value = dt.phrases;
-                    if (dt.tickets) suggestedTickets.value = dt.tickets;
-                    if (dt.transportTickets) transportTickets.value = dt.transportTickets;
-                    if (dt.rentalCars) rentalCars.value = dt.rentalCars;
-                    if (dt.hotels) hotels.value = dt.hotels;
-                    if (dt.coupons) coupons.value = dt.coupons;
-
-                    // Heartbeat check
-                    if (dt.heartbeats) {
-                        const map = {};
-                        for(let uid in dt.heartbeats) {
-                            if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime();
-                        }
-                        activeUsers.value = map;
-                    }
-                    syncStatus.value = 'idle';
-                } else {
-                    // 文件不存在，代表是第一次使用，強制寫入預設值
-                    console.log("No cloud doc found. Initializing...");
-                    await forceRestoreDefaults();
-                }
-            });
-        };
-
+        // V63 CORE FUNCTION: Fix Nested Arrays via JSON Stringify
+        // 這是修復您看到的錯誤的關鍵：Firebase 不支援巢狀陣列，所以我們存檔前把它轉成字串，讀取時轉回來。
         let saveTimeout = null;
         const saveData = async () => { 
             if(isGuest.value) return;
             syncStatus.value = 'syncing';
             clearTimeout(saveTimeout);
             
-            // Debounce write to avoid too many requests
             saveTimeout = setTimeout(async () => {
+                // V63 Fix: Flatten Nested Arrays to Strings
                 const data = { 
                     users: users.value, 
-                    itinerary:itinerary.value, expenses:expenses.value, spots:spots.value, 
-                    shopping:shopping.value, phrases:japanesePhrases.value, drivePlan:drivePlan.value, 
-                    tickets:suggestedTickets.value, transportTickets:transportTickets.value, rentalCars:rentalCars.value,
-                    hotels:hotels.value, coupons:coupons.value 
+                    itinerary_json: JSON.stringify(itinerary.value), // Flatten
+                    drivePlan_json: JSON.stringify(drivePlan.value), // Flatten
+                    expenses: expenses.value, 
+                    spots: spots.value, 
+                    shopping: shopping.value, 
+                    phrases: japanesePhrases.value, 
+                    tickets: suggestedTickets.value, 
+                    transportTickets: transportTickets.value, 
+                    rentalCars: rentalCars.value,
+                    hotels: hotels.value, 
+                    coupons: coupons.value 
                 };
                 try {
                     if(db && isLoggedIn.value) {
-                        // 使用 merge:true 確保不小心覆蓋掉其他欄位
                         await setDoc(doc(db,"trips","kanto2026"), data, {merge:true}); 
                         setTimeout(() => syncStatus.value = 'idle', 500);
                     } else {
@@ -904,12 +863,12 @@ createApp({
             }, 800);
         };
         
-        // 強制寫入預設值 (修復空白問題的關鍵函式)
+        // V63 Fix: Force Restore now uses the flattened format
         const forceRestoreDefaults = async () => {
              const data = { 
-                users: JSON.parse(JSON.stringify(defaultUsers)), // Reset users but keep IDs
-                itinerary: defaultData.itinerary, 
-                drivePlan: defaultData.drivePlan,
+                users: JSON.parse(JSON.stringify(defaultUsers)), 
+                itinerary_json: JSON.stringify(defaultData.itinerary), 
+                drivePlan_json: JSON.stringify(defaultData.drivePlan),
                 spots: defaultData.spots,
                 shopping: defaultData.shopping,
                 phrases: defaultData.phrases,
@@ -952,7 +911,7 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            const isReset = confirm(`【V62 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白問題？(此操作會覆蓋雲端資料)`); 
+            const isReset = confirm(`【V63 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白與巢狀陣列問題？`); 
             if(isReset) {
                 forceRestoreDefaults().then(() => {
                     alert("重置成功！頁面將重新整理。");
@@ -964,7 +923,7 @@ createApp({
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V62_LAST_USER_ID', u.id);
+            localStorage.setItem('V63_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -1021,6 +980,22 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
         
+        // V63 Intelligent Merge
+        const mergeUsers = (local, remote) => {
+            if(!remote || !Array.isArray(remote)) return local;
+            remote.forEach(rUser => {
+                const lUser = local.find(u => u.id === rUser.id);
+                if(lUser) {
+                    lUser.name = rUser.name; 
+                    lUser.avatar = rUser.avatar; 
+                    if(rUser.list && rUser.list.length > 0) lUser.list = rUser.list; 
+                    lUser.flightOut = rUser.flightOut; lUser.flightOutSeat = rUser.flightOutSeat;
+                    lUser.flightIn = rUser.flightIn; lUser.flightInSeat = rUser.flightInSeat;
+                }
+            });
+            return local;
+        };
+
         onMounted(() => {
             initSakura();
             fetchRealWeather();
@@ -1028,14 +1003,53 @@ createApp({
             if(auth) onAuthStateChanged(auth, u=>{ 
                 isLoggedIn.value=!!u; 
                 if(u && db) {
-                    // 啟動雲端同步，並傳入使用者資訊與資料庫實例
-                    initCloudSync(u, db);
+                    onSnapshot(doc(db,"trips","kanto2026"), d=>{
+                        if(d.exists()){
+                            const dt = d.data();
+                            // V63: 如果雲端沒有有效資料 (可能被之前的錯誤清空了)，就自動填補預設值
+                            // 否則就正常同步
+                            if (!dt.itinerary_json && (!dt.itinerary || dt.itinerary.length === 0)) {
+                                forceRestoreDefaults();
+                            } else {
+                                if(dt.users) users.value = mergeUsers(users.value, dt.users);
+                                
+                                // V63 Fix: Handle both Legacy Array and New JSON String format
+                                if(dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
+                                else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary;
+
+                                if(dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
+                                else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan;
+
+                                if(dt.expenses) expenses.value = dt.expenses;
+                                if(dt.spots) spots.value = dt.spots;
+                                if(dt.shopping) shopping.value = dt.shopping;
+                                if(dt.coupons) coupons.value = dt.coupons;
+                                if(dt.phrases) japanesePhrases.value = dt.phrases;
+                                if(dt.tickets) suggestedTickets.value = dt.tickets;
+                                if(dt.transportTickets) transportTickets.value = dt.transportTickets;
+                                if(dt.rentalCars) rentalCars.value = dt.rentalCars;
+                                if(dt.hotels) hotels.value = dt.hotels;
+                                
+                                if(dt.heartbeats) {
+                                    const now = Date.now();
+                                    const map = {};
+                                    for(let uid in dt.heartbeats) {
+                                        if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime();
+                                    }
+                                    activeUsers.value = map;
+                                }
+                            }
+                        } else {
+                            // First time init: Force Cloud to have Data
+                            forceRestoreDefaults();
+                        }
+                    });
                 }
             });
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V62_LAST_USER_ID');
+            const lastId = localStorage.getItem('V63_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
 
