@@ -549,47 +549,47 @@
         </div>
 <div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
 
-        <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-                <h3 class="font-bold text-lg mb-4 text-center">{{modalTitle}}</h3>
-                <div class="space-y-3">
-                    <div v-if="modalTitle==='新增交通票券'" class="mb-2"><label class="text-xs font-bold text-gray-400 ml-1">快速模版</label><select v-model="modalData.type" @change="applyTicketTemplate" class="w-full p-2 bg-gray-100 rounded-xl font-bold text-sm"><option value="">自訂</option><option value="suica">Suica</option><option value="metro">東京地鐵券</option><option value="jrpass">JR 廣域周遊券</option><option value="fuji">富士回遊號</option></select></div>
-                    <div v-for="f in modalFields" :key="f.key">
-                        <label v-if="f.label" class="text-xs font-bold text-gray-400 ml-1 mb-1 block">{{f.label}}</label>
-                        <div v-if="f.type==='checkbox'" class="flex items-center bg-gray-50 p-3 rounded-xl border">
-                            <input type="checkbox" v-model="modalData[f.key]" class="w-5 h-5 accent-pink-500 mr-3">
-                            <span class="font-bold text-gray-700 text-sm">{{f.text||f.label}}</span>
-                        </div>
-                        <div v-else-if="f.key==='note' && modalData.reserve" class="bg-red-50 p-2 rounded text-xs text-red-500 font-bold mb-2">* 提醒：請記得在下方填入預訂連結</div>
-                        <textarea v-else-if="f.type==='textarea'" v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
-                        <input v-else v-model="modalData[f.key]" @input="f.onInput?f.onInput():null" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300">
+    <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <h3 class="font-bold text-lg mb-4 text-center">{{modalTitle}}</h3>
+            <div class="space-y-3">
+                <div v-if="modalTitle==='新增交通票券'" class="mb-2"><label class="text-xs font-bold text-gray-400 ml-1">快速模版</label><select v-model="modalData.type" @change="applyTicketTemplate" class="w-full p-2 bg-gray-100 rounded-xl font-bold text-sm"><option value="">自訂</option><option value="suica">Suica</option><option value="metro">東京地鐵券</option><option value="jrpass">JR 廣域周遊券</option><option value="fuji">富士回遊號</option></select></div>
+                <div v-for="f in modalFields" :key="f.key">
+                    <label v-if="f.label" class="text-xs font-bold text-gray-400 ml-1 mb-1 block">{{f.label}}</label>
+                    <div v-if="f.type==='checkbox'" class="flex items-center bg-gray-50 p-3 rounded-xl border">
+                        <input type="checkbox" v-model="modalData[f.key]" class="w-5 h-5 accent-pink-500 mr-3">
+                        <span class="font-bold text-gray-700 text-sm">{{f.text||f.label}}</span>
                     </div>
-                    <button v-if="modalHasImg" @click="$refs.modalImgInput.click()" class="w-full py-3 bg-blue-50 text-blue-500 rounded-xl font-bold border border-blue-100">{{modalData.img?'更換圖片':'上傳圖片'}}</button>
-                    <div v-if="modalTitle==='新增翻譯'" class="text-xs text-gray-400 text-center pt-2">* 填寫中文，可按下方按鈕自動翻譯</div>
-                    <div v-if="modalTitle==='新增行程' && modalData.name" class="text-center"><a :href="getDirLink(modalData.name)" target="_blank" class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-bold border border-gray-300 shadow-sm"><i class="fa-solid fa-route"></i> 🔍 估算時間</a></div>
+                    <div v-else-if="f.key==='note' && modalData.reserve" class="bg-red-50 p-2 rounded text-xs text-red-500 font-bold mb-2">* 提醒：請記得在下方填入預訂連結</div>
+                    <textarea v-else-if="f.type==='textarea'" v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
+                    <input v-else v-model="modalData[f.key]" @input="f.onInput?f.onInput():null" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300">
                 </div>
-                <div class="flex gap-3 mt-6">
-                    <button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500 active:scale-95">取消</button>
-                    <button v-if="modalTitle==='新增翻譯'" @click="openGoogleTranslate(modalData.zh)" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg active:scale-95">G 翻譯</button>
-                    <button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button>
-                </div>
-                <button v-if="isEditingItem" @click="handleModalDelete" class="w-full mt-2 text-red-300 py-2 font-bold text-xs active:scale-95"><i class="fa-solid fa-trash"></i> 刪除此項目</button>
+                <button v-if="modalHasImg" @click="$refs.modalImgInput.click()" class="w-full py-3 bg-blue-50 text-blue-500 rounded-xl font-bold border border-blue-100">{{modalData.img?'更換圖片':'上傳圖片'}}</button>
+                <div v-if="modalTitle==='新增翻譯'" class="text-xs text-gray-400 text-center pt-2">* 填寫中文，可按下方按鈕自動翻譯</div>
+                <div v-if="modalTitle==='新增行程' && modalData.name" class="text-center"><a :href="getDirLink(modalData.name)" target="_blank" class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-bold border border-gray-300 shadow-sm"><i class="fa-solid fa-route"></i> 🔍 估算時間</a></div>
             </div>
-            <input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg">
+            <div class="flex gap-3 mt-6">
+                <button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500 active:scale-95">取消</button>
+                <button v-if="modalTitle==='新增翻譯'" @click="openGoogleTranslate(modalData.zh)" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg active:scale-95">G 翻譯</button>
+                <button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button>
+            </div>
+            <button v-if="isEditingItem" @click="handleModalDelete" class="w-full mt-2 text-red-300 py-2 font-bold text-xs active:scale-95"><i class="fa-solid fa-trash"></i> 刪除此項目</button>
         </div>
-
-        <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl active:scale-95 transition">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
-        
-        <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
-        
-        <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border"><button @click="saveUserChanges" class="w-full py-2 bg-pink-500 text-white rounded-xl font-bold shadow active:scale-95">儲存</button></div></div>
-        
-        <div v-if="showFlightModal" class="fixed inset-0 z-[1200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">編輯機票</h3><label class="text-xs font-bold text-gray-400 ml-1">航班代號</label><input v-model="tempFlightData.code" placeholder="如 TR898" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-black uppercase"><label class="text-xs font-bold text-gray-400 ml-1">座位號碼</label><input v-model="tempFlightData.seat" placeholder="如 12A" class="w-full p-3 bg-gray-50 rounded-xl mb-6 border font-black uppercase"><button @click="saveFlight" class="w-full py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">更新機票</button></div></div>
-        
-        <div v-if="expandedPhrase" class="fixed inset-0 z-[5000] bg-white flex flex-col items-center justify-center p-10 text-center"><div class="flex-1 flex flex-col items-center justify-center w-full"><div class="text-[80px] leading-tight font-black mb-10 text-gray-800 break-words w-full">{{expandedPhrase.jp}}</div><div class="text-3xl font-bold text-gray-500 mb-16">{{expandedPhrase.zh}}</div><button @click.stop="speakJapanese(expandedPhrase.jp)" class="w-24 h-24 rounded-full bg-emerald-500 text-white text-4xl shadow-xl flex items-center justify-center active:scale-90 transition animate-pulse-fast"><i class="fa-solid fa-volume-high"></i></button><div class="mt-4 text-emerald-600 font-bold">點擊播放發音</div></div><button class="mb-10 w-16 h-16 rounded-full bg-gray-100 text-gray-400 text-2xl flex items-center justify-center shadow-md active:scale-90" @click="expandedPhrase=null"><i class="fa-solid fa-times"></i></button></div>
-
-        <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
+        <input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg">
     </div>
+
+    <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl active:scale-95 transition">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
+    
+    <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
+    
+    <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border"><button @click="saveUserChanges" class="w-full py-2 bg-pink-500 text-white rounded-xl font-bold shadow active:scale-95">儲存</button></div></div>
+    
+    <div v-if="showFlightModal" class="fixed inset-0 z-[1200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">編輯機票</h3><label class="text-xs font-bold text-gray-400 ml-1">航班代號</label><input v-model="tempFlightData.code" placeholder="如 TR898" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-black uppercase"><label class="text-xs font-bold text-gray-400 ml-1">座位號碼</label><input v-model="tempFlightData.seat" placeholder="如 12A" class="w-full p-3 bg-gray-50 rounded-xl mb-6 border font-black uppercase"><button @click="saveFlight" class="w-full py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">更新機票</button></div></div>
+    
+    <div v-if="expandedPhrase" class="fixed inset-0 z-[5000] bg-white flex flex-col items-center justify-center p-10 text-center"><div class="flex-1 flex flex-col items-center justify-center w-full"><div class="text-[80px] leading-tight font-black mb-10 text-gray-800 break-words w-full">{{expandedPhrase.jp}}</div><div class="text-3xl font-bold text-gray-500 mb-16">{{expandedPhrase.zh}}</div><button @click.stop="speakJapanese(expandedPhrase.jp)" class="w-24 h-24 rounded-full bg-emerald-500 text-white text-4xl shadow-xl flex items-center justify-center active:scale-90 transition animate-pulse-fast"><i class="fa-solid fa-volume-high"></i></button><div class="mt-4 text-emerald-600 font-bold">點擊播放發音</div></div><button class="mb-10 w-16 h-16 rounded-full bg-gray-100 text-gray-400 text-2xl flex items-center justify-center shadow-md active:scale-90" @click="expandedPhrase=null"><i class="fa-solid fa-times"></i></button></div>
+
+    <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
+</div>
 
 </div>
 
@@ -606,11 +606,10 @@ const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:fa
 // V55 Strict Array: Immutable 4-User IDs.
 const defaultUsers = [{id:1,name:'吉伊',icon:'🐹',list:[...defaultPrepList]},{id:2,name:'小八',icon:'🐱',list:[...defaultPrepList]},{id:3,name:'兔兔',icon:'🐰',list:[...defaultPrepList]},{id:4,name:'小桃',icon:'🍑',list:[...defaultPrepList]}];
 
-// Intelligent Image Loader
 const getImg = (p) => {
     if (!p) return 'https://placehold.co/600x400/orange/white?text=NO+IMAGE';
     if (p.startsWith('data:') || p.startsWith('http')) return p;
-    return `./images/${p}`; // 使用相對路徑，確保 GitHub Pages 或本地端皆可讀取
+    return `./images/${p}`; 
 };
 
 const foodSpots = {
@@ -890,11 +889,27 @@ createApp({
             }, 800);
         };
         
-        const forceInitCloud = async () => {
-             const data = { users: defaultUsers, itinerary: defaultData.itinerary, shopping: defaultData.shopping }; 
-             try {
-                await setDoc(doc(db,"trips","kanto2026"), data, {merge:true});
-             } catch(e) { console.error("Init Failed:", e); }
+        const forceRestoreDefaults = async () => {
+             if(confirm('警告：這將會強制覆蓋雲端上的所有資料，還原成最初的預設值。\n\n確定要執行嗎？')) {
+                 const data = { 
+                    users: JSON.parse(JSON.stringify(defaultUsers)), 
+                    itinerary: defaultData.itinerary, 
+                    drivePlan: defaultData.drivePlan,
+                    spots: defaultData.spots,
+                    shopping: defaultData.shopping,
+                    phrases: defaultData.phrases,
+                    transportTickets: defaultData.transportTickets,
+                    rentalCars: defaultData.rentalCars,
+                    hotels: defaultData.hotels,
+                    coupons: defaultData.coupons,
+                    tickets: []
+                 }; 
+                 try {
+                    await setDoc(doc(db,"trips","kanto2026"), data, {merge:true});
+                    alert('還原成功！請重新整理頁面。');
+                    location.reload();
+                 } catch(e) { alert('還原失敗：' + e.message); }
+             }
         };
         
         const updateHeartbeat = async () => {
@@ -920,7 +935,10 @@ createApp({
             weatherLoading.value = false;
         };
 
-        const showDiagnostic = () => { alert(`【V55 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\nFirebase Project: ${firebaseConfig.projectId}`); };
+        const showDiagnostic = () => { 
+            const isReset = confirm(`【V55 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白問題？`); 
+            if(isReset) forceRestoreDefaults();
+        };
 
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
@@ -1008,20 +1026,21 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
+                            // Smart Overwrite Protection: Only overwrite local data if remote data EXISTS and IS NOT EMPTY.
                             if(dt.users) users.value = mergeUsers(users.value, dt.users);
-                            else forceInitCloud();
-
-                            if(dt.itinerary) itinerary.value = dt.itinerary;
-                            if(dt.drivePlan) drivePlan.value = dt.drivePlan;
+                            
+                            // Safe Load Logic: If cloud array is empty, KEEP local default.
+                            if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary;
+                            if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan;
                             if(dt.expenses) expenses.value = dt.expenses;
-                            if(dt.spots) spots.value = dt.spots;
-                            if(dt.shopping) shopping.value = dt.shopping;
-                            if(dt.coupons) coupons.value = dt.coupons;
-                            if(dt.phrases) japanesePhrases.value = dt.phrases;
+                            if(dt.spots && (dt.spots.food || dt.spots.photo)) spots.value = dt.spots;
+                            if(dt.shopping && dt.shopping.cosme) shopping.value = dt.shopping;
+                            if(dt.coupons && dt.coupons.length > 0) coupons.value = dt.coupons;
+                            if(dt.phrases && dt.phrases.length > 0) japanesePhrases.value = dt.phrases;
                             if(dt.tickets) suggestedTickets.value = dt.tickets;
-                            if(dt.transportTickets) transportTickets.value = dt.transportTickets;
-                            if(dt.rentalCars) rentalCars.value = dt.rentalCars;
-                            if(dt.hotels) hotels.value = dt.hotels;
+                            if(dt.transportTickets && dt.transportTickets.length > 0) transportTickets.value = dt.transportTickets;
+                            if(dt.rentalCars && dt.rentalCars.length > 0) rentalCars.value = dt.rentalCars;
+                            if(dt.hotels && dt.hotels.length > 0) hotels.value = dt.hotels;
                             
                             if(dt.heartbeats) {
                                 const now = Date.now();
@@ -1032,7 +1051,8 @@ createApp({
                                 activeUsers.value = map;
                             }
                         } else {
-                            forceInitCloud();
+                            // First time init: Force Cloud to have Data
+                            forceRestoreDefaults();
                         }
                     });
                 }
