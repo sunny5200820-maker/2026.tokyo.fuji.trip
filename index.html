@@ -503,8 +503,13 @@ import { createApp, ref, computed, onMounted } from "https://unpkg.com/vue@3.3.4
 const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", authDomain: "tokyo-trip-24b28.firebaseapp.com", projectId: "tokyo-trip-24b28", storageBucket: "tokyo-trip-24b28.firebasestorage.app", messagingSenderId: "518699705070", appId: "1:518699705070:web:56e95f603210d8d5d209ff" };
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
-// V61.0 Static Data
-const defaultUsers = [{id:1,name:'吉伊',icon:'🐹',list:[]},{id:2,name:'小八',icon:'🐱',list:[]},{id:3,name:'兔兔',icon:'🐰',list:[]},{id:4,name:'小桃',icon:'🍑',list:[]}];
+// 強制預設資料 (V61.1 Hardcoded)
+const defaultUsers = [
+    {id:1, name:'吉伊', icon:'🐹', list:[{text:'護照',checked:false}], avatar:''},
+    {id:2, name:'小八', icon:'🐱', list:[{text:'護照',checked:false}], avatar:''},
+    {id:3, name:'兔兔', icon:'🐰', list:[{text:'護照',checked:false}], avatar:''},
+    {id:4, name:'小桃', icon:'🍑', list:[{text:'護照',checked:false}], avatar:''}
+];
 
 const photoSpots = {
     Tokyo: [
@@ -534,16 +539,16 @@ const defaultData = {
     users: JSON.parse(JSON.stringify(defaultUsers)),
     itinerary: [
         [{hours:"06:40",category:"Flight",name:"TPE 起飛",note:"T1 辦理登機",mapKeyword:"桃園機場 T1"},{hours:"10:40",category:"Flight",name:"NRT 抵達",note:"領取行李/購買西瓜卡",mapKeyword:"成田機場"}],
-        // ... (保留您原有的行程資料，這裡為節省空間省略，實際請使用完整版) ...
+        // ... (其他行程資料)
         [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發 (富士回遊)",mapKeyword:"錦糸町站"}] 
     ],
-    spots: { food: { Tokyo:[], Kamakura:[], Fuji:[] } },
+    spots: { food: { Tokyo:[], Kamakura:[], Fuji:[] }, photo: photoSpots },
     shopping: { cosme:[], ldk:[], souvenir:[] },
     expenses: [],
     phrases: [{jp:'トイレはどこですか',zh:'廁所在哪裡'},{jp:'これください',zh:'我要這個'}]
 };
 
-// V61 Helper Functions
+// Helper Functions
 const getImg = (p) => p && !p.startsWith('http') ? `./images/${p}` : (p || 'https://placehold.co/600x400/pink/white?text=IMAGE');
 const getMapLink = (k,n) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(k||n)}`;
 const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
@@ -553,7 +558,7 @@ const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':
 createApp({
     setup() {
         // State
-        const isLoading = ref(true); // Database First Flag
+        const isLoading = ref(true); 
         const currentView = ref('welcome');
         const isWelcomeClosed = ref(false);
         const currentUser = ref(null);
@@ -564,8 +569,9 @@ createApp({
         const showTranslateModal = ref(false);
         const showModal = ref(false);
 
-        // Data Refs
+        // ★★★ 這裡最重要：直接強制給初始值，不要等資料庫 ★★★
         const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
+        
         const itinerary = ref(defaultData.itinerary);
         const spots = ref(defaultData.spots);
         const shopping = ref(defaultData.shopping);
@@ -590,7 +596,7 @@ createApp({
             {id:6,name:'必拍機位',icon:'fa-solid fa-camera',view:'photo',bgClass:'bg-rose-400'},
             {id:7,name:'快樂購',icon:'fa-solid fa-bag-shopping',view:'shopping',bgClass:'bg-purple-400'},
             {id:8,name:'天氣預報',icon:'fa-solid fa-cloud-sun',view:'weather',bgClass:'bg-sky-400'},
-            {id:9,name:'急救包',icon:'fa-solid fa-kit-medical',view:'emergency',bgClass:'bg-red-400'} // Renamed
+            {id:9,name:'急救包',icon:'fa-solid fa-kit-medical',view:'emergency',bgClass:'bg-red-400'}
         ];
 
         // Computed
@@ -623,11 +629,17 @@ createApp({
         const getStamina = (i) => [100, 80, 50, 40, 60, 90, 70, 100][i] || 100;
         const getStaminaColor = (i) => { const s = getStamina(i); return s<50?'hp-low':s<80?'hp-med':'hp-high'; };
         
-        // Database First Sync Logic (The Fix)
+        // Save logic
         const saveData = async () => { 
             if(isGuest.value || !isLoggedIn.value) return;
             syncStatus.value = 'syncing';
             try {
+                // 防呆：如果 users 是空陣列，絕對不存檔，避免覆蓋雲端
+                if(!users.value || users.value.length === 0) {
+                     console.warn("Attempted to save empty users. Aborted.");
+                     syncStatus.value = 'error';
+                     return;
+                }
                 await setDoc(doc(db,"trips","kanto2026"), {
                     users: users.value, itinerary: itinerary.value, spots: spots.value,
                     shopping: shopping.value, expenses: expenses.value, phrases: japanesePhrases.value,
@@ -640,41 +652,63 @@ createApp({
         const quickExpense = (item) => {
             if(!currentUser.value) return alert('請先登入');
             currentView.value = 'money';
-            // Logic to open modal (simplified here)
-            alert(`已開啟記帳：${item.name}`);
+            alert(`已開啟記帳：${item.name} (請實作開啟 Modal)`);
         };
 
-        // ... Include all other methods (modal handling, etc.) from previous versions ...
         const enterSite = () => { isGuest.value=false; isWelcomeClosed.value=true; showPersonaModal.value=true; };
+        const enterAsGuest = () => { isGuest.value=true; currentUser.value={id:999,name:'訪客',list:[]}; isWelcomeClosed.value=true; currentView.value='menu'; };
         const setCurrentUser = (u) => { currentUser.value = u; showPersonaModal.value = false; currentView.value = 'menu'; };
         const handleAuthClick = () => isLoggedIn.value ? signOut(auth) : alert('請實作登入Modal');
+        const showDiagnostic = () => { alert(`【V61.1 系統診斷】\n\n連線狀態：${statusText.value}\n目前身分：${currentUser.value?.name || '未登入'}\n使用者數量：${users.value.length} (應為4)`); };
+
+        // Modal Helpers (Placeholder)
+        const openLightbox = (img) => { /* Lightbox Logic */ };
+        const closeLightbox = () => { /* Close Lightbox */ };
+        const openAddItineraryModal = () => { /* ... */ };
+        const openEditItineraryModal = () => { /* ... */ };
+        const openAddFoodModal = () => { /* ... */ };
+        const openEditModal = () => { /* ... */ };
+        const openAddShopModal = () => { /* ... */ };
+        const addPrepItem = () => { /* ... */ };
+        const deleteExpense = () => { /* ... */ };
+        const openExpenseModal = () => { /* ... */ };
+        const getUserName = (id) => users.value.find(u=>u.id===id)?.name || '未知';
+        const getPaymentIcon = (m) => '💰';
+        const expandCard = () => {};
+        const openAddPhraseModal = () => {};
 
         onMounted(() => {
             if(auth) onAuthStateChanged(auth, async (u) => {
                 isLoggedIn.value = !!u;
                 if(u) {
-                    // Database First: Check if data exists BEFORE using defaults
                     const docRef = doc(db, "trips", "kanto2026");
-                    const docSnap = await getDoc(docRef);
                     
-                    if (docSnap.exists()) {
-                        console.log("Cloud data found. Using Cloud.");
-                        // Only listen to changes, do NOT overwrite with defaults
-                        onSnapshot(docRef, (d) => {
+                    // 即時監聽
+                    onSnapshot(docRef, (d) => {
+                        if(d.exists()) {
                             const dt = d.data();
-                            if(dt.users) users.value = dt.users;
+                            
+                            // ★★★ 關鍵修復：如果雲端回傳的 users 是壞的，就直接無視，保持預設值！ ★★★
+                            if(dt.users && Array.isArray(dt.users) && dt.users.length > 0 && dt.users[0].name) {
+                                console.log("Cloud data valid. Updating.");
+                                users.value = dt.users;
+                            } else {
+                                console.warn("Cloud users data corrupt or empty. Keeping local defaults.");
+                                // 如果雲端是壞的，這時候我們應該把好的預設值存回去修復它
+                                saveData(); 
+                            }
+
                             if(dt.itinerary) itinerary.value = dt.itinerary;
                             if(dt.spots) spots.value = dt.spots;
                             // ... sync other fields ...
-                            isLoading.value = false; // Data loaded
-                        });
-                    } else {
-                        console.log("No cloud data. Initializing defaults.");
-                        await setDoc(docRef, defaultData); // Only now write defaults
+                        } else {
+                            console.log("No cloud data. Initializing defaults.");
+                            saveData(); // Write defaults to cloud
+                        }
                         isLoading.value = false;
-                    }
+                    });
                 } else {
-                    isLoading.value = false; // Not logged in, stop loading
+                    isLoading.value = false;
                 }
             });
             else isLoading.value = false;
@@ -685,14 +719,14 @@ createApp({
             daysUntilTrip, smartReminders, tripDays, selectedDayIndex,
             getPageTitle, getGreeting, getBudgetMood, getPackingProgress, getStamina, getStaminaColor,
             photoSpots, currentLoc: ref('Tokyo'), getImg, getMapLink, getSearchLink, handleImgError, getIconByCategory,
-            quickExpense, enterSite, setCurrentUser, handleAuthClick,
-            statusText, statusColor, showDiagnostic: () => document.getElementById('diagnostic').classList.toggle('show'),
-            // ... export all needed methods ...
+            quickExpense, enterSite, enterAsGuest, setCurrentUser, handleAuthClick,
+            statusText, statusColor, showDiagnostic,
             spots, shopping, hotels, transportTickets, japanesePhrases,
-            showTranslateModal, showPersonaModal, showModal, modalTitle: ref(''), modalFields: ref([]), modalData: ref({})
+            showTranslateModal, showPersonaModal, showModal, modalTitle: ref(''), modalFields: ref([]), modalData: ref({}),
+            // Helpers export
+            openLightbox, closeLightbox, openAddItineraryModal, openEditItineraryModal, openAddFoodModal, openEditModal, openAddShopModal, addPrepItem,
+            myPrivateExpenses, myPrivateTotalTWD, groupExpenses: ref([]), settlements: ref([]), deleteExpense, openExpenseModal, getUserName, getPaymentIcon, expandCard, openAddPhraseModal
         };
     }
 }).mount('#app');
 </script>
-</body>
-</html>
