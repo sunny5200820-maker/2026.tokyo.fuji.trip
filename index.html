@@ -547,10 +547,6 @@
         </div>
 
     </div> ```
-
-### 第三段：JavaScript 核心邏輯 (Part 3/3)
-*(包含資料庫初始化檢查與備援圖片路徑)*
-
 ```html
     <div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
 
@@ -1081,3 +1077,4 @@ createApp({
 </script>
 </body>
 </html>
+
