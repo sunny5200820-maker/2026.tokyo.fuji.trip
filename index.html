@@ -34,7 +34,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V55.0 Core */
+    /* V55.0 Core Styles */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
@@ -65,7 +65,7 @@
     .card { background: rgba(255,255,255,0.95); border-radius: 24px; box-shadow: 0 8px 30px rgba(255,105,180,0.12); border: 2px solid rgba(255,255,255,0.8); margin-bottom: 0; position: relative; backdrop-filter: blur(10px); transition: all 0.2s ease; overflow: hidden; transform: translateZ(0); }
     .card:active { transform: scale(0.98); border-color: #FFD1DC; }
 
-    /* V55 Gamification */
+    /* Gamification & Visual Elements */
     .hp-bar-container { width: 100%; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-top: 5px; }
     .hp-bar-fill { height: 100%; transition: width 0.5s ease, background-color 0.5s ease; }
     .hp-low { background-color: #ef4444; } .hp-med { background-color: #f59e0b; } .hp-high { background-color: #10b981; }
@@ -74,7 +74,7 @@
     .packing-suitcase.full { background: #10b981; border-color: #047857; animation: pop 0.5s; }
     .packing-fill { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.3); transition: height 0.5s; }
 
-    /* Food Map */
+    /* Food & Map Elements */
     .map-cover-container { padding: 0 10px 20px 10px; perspective: 1000px; }
     .map-cover { width: 100%; height: auto; border-radius: 24px; border: 4px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.15); animation: float 6s ease-in-out infinite; transform-style: preserve-3d; background-color: #eee; min-height: 150px; }
     .food-card { background: #fff; border-radius: 24px; overflow: visible; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid white; position: relative; transition: all 0.3s; }
@@ -99,6 +99,7 @@
     .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
     .list-leave-active { position: absolute; }
 
+    /* Floating Action Buttons */
     .fab-home { position: fixed; bottom: calc(25px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; z-index: 90; border: 4px solid white; box-shadow: 0 10px 25px rgba(255,105,180,0.5); background: linear-gradient(135deg,#FF9EAC,#FFD1DC); cursor: pointer; }
     .fab-main { position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; z-index: 80; border: 3px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .fab-main.lifted { bottom: calc(180px + env(safe-area-inset-bottom)); }
@@ -108,6 +109,7 @@
     .coupon-fab { position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #f43f5e, #fb7185); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; border: 2px solid white; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3); z-index: 200; transition: transform 0.2s; }
     .coupon-fab:active { transform: scale(0.9); }
 
+    /* Online Status Indicators */
     .online-header-bubble { position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 12px; z-index: 300; display: flex; gap: -5px; pointer-events: none; }
     .online-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid white; background: white; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-left: -10px; position: relative; transition: transform 0.3s; pointer-events: auto; }
     .online-avatar.active { border-color: #4ade80; transform: translateY(2px); z-index: 10; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
@@ -147,7 +149,8 @@
             </button>
         </div>
     </div>
-<div v-if="isWelcomeClosed" class="h-full flex flex-col relative">
+
+    <div v-if="isWelcomeClosed" class="h-full flex flex-col relative">
         
         <div v-if="currentView !== 'menu'" class="fixed top-0 left-0 right-0 h-[60px] bg-[#FFF0F5]/90 backdrop-blur-xl z-30 flex items-center justify-between px-4 border-b border-white/50 shadow-sm pt-[env(safe-area-inset-top)] box-content transition-all">
             <button @click="currentView='menu'" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-md border border-white active:scale-95 transition"><i class="fa-solid fa-chevron-left"></i></button>
@@ -199,8 +202,7 @@
                 <button @click="isWelcomeClosed=false" class="mt-12 mx-auto text-gray-400 text-sm font-bold border-b border-gray-300 pb-1 block">回到歡迎頁面</button>
                 <div v-if="isGuest" class="text-center mt-4 text-xs font-bold text-gray-400 bg-gray-200 rounded-full py-1 w-32 mx-auto">訪客模式</div>
             </div>
-
-            <div v-if="currentView==='itinerary'" class="px-5 py-4 animate-fade-in">
+<div v-if="currentView==='itinerary'" class="px-5 py-4 animate-fade-in">
                 <div class="flex overflow-x-auto gap-3 mb-6 hide-scrollbar sticky top-0 bg-[#FFF0F5]/95 z-20 py-3 -mx-5 px-5 backdrop-blur-md">
                      <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-6 py-3 rounded-2xl text-sm font-black border-2 transition shrink-0 shadow-sm flex flex-col items-center min-w-[70px]',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow-lg scale-105':'bg-white text-gray-300 border-white']">
                         <span>{{d.week}}</span>
@@ -545,51 +547,50 @@
                 </div>
             </div>
         </div>
+<div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
 
-    </div> ```
-```html
-    <div v-if="showRentalModal" class="fixed inset-0 z-[1500] bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"><h3 class="font-black text-xl mb-4 text-center">租車詳情</h3><div class="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg"><button @click="updateRentalStatus('todo')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='todo'?'bg-red-100 text-red-600 shadow':'text-gray-400']">尚未預約</button><button @click="updateRentalStatus('done')" :class="['flex-1 py-2 rounded-lg font-bold text-xs transition', activeRental.status==='done'?'bg-green-100 text-green-600 shadow':'text-gray-400']">已完成</button></div><div v-if="activeRental.status==='done'" class="space-y-4"><div><label class="text-xs text-gray-400 font-bold block mb-1">預約編號</label><input v-model="activeRental.reservationNumber" placeholder="輸入號碼" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">保險方案</label><input v-model="activeRental.insurance" placeholder="例如：豪華全險" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div><label class="text-xs text-gray-400 font-bold block mb-1">備註/緊急電話</label><input v-model="activeRental.note" placeholder="輸入備註" class="w-full bg-gray-50 p-3 rounded-xl border font-bold"></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100"><h4 class="font-bold text-blue-600 text-sm mb-2">日本自駕必備</h4><div class="space-y-2"><div v-for="item in ['台灣駕照正本', '日文譯本', '護照', '信用卡', 'ETC 卡', 'MapCode']" class="flex items-center text-xs font-bold text-gray-600"><i class="fa-regular fa-square-check mr-2 text-blue-400"></i> {{item}}</div></div></div></div><div v-else class="text-center py-8 text-gray-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-4xl mb-3 text-red-200"></i><br>請盡快前往官網預約</div><div class="flex gap-2 mt-6"><button @click="showRentalModal=false" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">關閉</button><button @click="saveData();showRentalModal=false;" class="flex-1 py-3 bg-green-500 text-white rounded-xl font-bold shadow">儲存</button></div></div></div>
-
-    <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <h3 class="font-bold text-lg mb-4 text-center">{{modalTitle}}</h3>
-            <div class="space-y-3">
-                <div v-if="modalTitle==='新增交通票券'" class="mb-2"><label class="text-xs font-bold text-gray-400 ml-1">快速模版</label><select v-model="modalData.type" @change="applyTicketTemplate" class="w-full p-2 bg-gray-100 rounded-xl font-bold text-sm"><option value="">自訂</option><option value="suica">Suica</option><option value="metro">東京地鐵券</option><option value="jrpass">JR 廣域周遊券</option><option value="fuji">富士回遊號</option></select></div>
-                <div v-for="f in modalFields" :key="f.key">
-                    <label v-if="f.label" class="text-xs font-bold text-gray-400 ml-1 mb-1 block">{{f.label}}</label>
-                    <div v-if="f.type==='checkbox'" class="flex items-center bg-gray-50 p-3 rounded-xl border">
-                        <input type="checkbox" v-model="modalData[f.key]" class="w-5 h-5 accent-pink-500 mr-3">
-                        <span class="font-bold text-gray-700 text-sm">{{f.text||f.label}}</span>
+        <div v-if="showModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                <h3 class="font-bold text-lg mb-4 text-center">{{modalTitle}}</h3>
+                <div class="space-y-3">
+                    <div v-if="modalTitle==='新增交通票券'" class="mb-2"><label class="text-xs font-bold text-gray-400 ml-1">快速模版</label><select v-model="modalData.type" @change="applyTicketTemplate" class="w-full p-2 bg-gray-100 rounded-xl font-bold text-sm"><option value="">自訂</option><option value="suica">Suica</option><option value="metro">東京地鐵券</option><option value="jrpass">JR 廣域周遊券</option><option value="fuji">富士回遊號</option></select></div>
+                    <div v-for="f in modalFields" :key="f.key">
+                        <label v-if="f.label" class="text-xs font-bold text-gray-400 ml-1 mb-1 block">{{f.label}}</label>
+                        <div v-if="f.type==='checkbox'" class="flex items-center bg-gray-50 p-3 rounded-xl border">
+                            <input type="checkbox" v-model="modalData[f.key]" class="w-5 h-5 accent-pink-500 mr-3">
+                            <span class="font-bold text-gray-700 text-sm">{{f.text||f.label}}</span>
+                        </div>
+                        <div v-else-if="f.key==='note' && modalData.reserve" class="bg-red-50 p-2 rounded text-xs text-red-500 font-bold mb-2">* 提醒：請記得在下方填入預訂連結</div>
+                        <textarea v-else-if="f.type==='textarea'" v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
+                        <input v-else v-model="modalData[f.key]" @input="f.onInput?f.onInput():null" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300">
                     </div>
-                    <div v-else-if="f.key==='note' && modalData.reserve" class="bg-red-50 p-2 rounded text-xs text-red-500 font-bold mb-2">* 提醒：請記得在下方填入預訂連結</div>
-                    <textarea v-else-if="f.type==='textarea'" v-model="modalData[f.key]" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300 h-24"></textarea>
-                    <input v-else v-model="modalData[f.key]" @input="f.onInput?f.onInput():null" :placeholder="f.placeholder" class="w-full p-3 bg-gray-50 rounded-xl outline-none border focus:border-pink-300">
+                    <button v-if="modalHasImg" @click="$refs.modalImgInput.click()" class="w-full py-3 bg-blue-50 text-blue-500 rounded-xl font-bold border border-blue-100">{{modalData.img?'更換圖片':'上傳圖片'}}</button>
+                    <div v-if="modalTitle==='新增翻譯'" class="text-xs text-gray-400 text-center pt-2">* 填寫中文，可按下方按鈕自動翻譯</div>
+                    <div v-if="modalTitle==='新增行程' && modalData.name" class="text-center"><a :href="getDirLink(modalData.name)" target="_blank" class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-bold border border-gray-300 shadow-sm"><i class="fa-solid fa-route"></i> 🔍 估算時間</a></div>
                 </div>
-                <button v-if="modalHasImg" @click="$refs.modalImgInput.click()" class="w-full py-3 bg-blue-50 text-blue-500 rounded-xl font-bold border border-blue-100">{{modalData.img?'更換圖片':'上傳圖片'}}</button>
-                <div v-if="modalTitle==='新增翻譯'" class="text-xs text-gray-400 text-center pt-2">* 填寫中文，可按下方按鈕自動翻譯</div>
-                <div v-if="modalTitle==='新增行程' && modalData.name" class="text-center"><a :href="getDirLink(modalData.name)" target="_blank" class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-bold border border-gray-300 shadow-sm"><i class="fa-solid fa-route"></i> 🔍 估算時間</a></div>
+                <div class="flex gap-3 mt-6">
+                    <button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500 active:scale-95">取消</button>
+                    <button v-if="modalTitle==='新增翻譯'" @click="openGoogleTranslate(modalData.zh)" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg active:scale-95">G 翻譯</button>
+                    <button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button>
+                </div>
+                <button v-if="isEditingItem" @click="handleModalDelete" class="w-full mt-2 text-red-300 py-2 font-bold text-xs active:scale-95"><i class="fa-solid fa-trash"></i> 刪除此項目</button>
             </div>
-            <div class="flex gap-3 mt-6">
-                <button @click="showModal=false" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold text-gray-500 active:scale-95">取消</button>
-                <button v-if="modalTitle==='新增翻譯'" @click="openGoogleTranslate(modalData.zh)" class="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold shadow-lg active:scale-95">G 翻譯</button>
-                <button @click="handleModalSave" class="flex-1 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button>
-            </div>
-            <button v-if="isEditingItem" @click="handleModalDelete" class="w-full mt-2 text-red-300 py-2 font-bold text-xs active:scale-95"><i class="fa-solid fa-trash"></i> 刪除此項目</button>
+            <input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg">
         </div>
-        <input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg">
+
+        <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl active:scale-95 transition">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
+        
+        <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
+        
+        <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border"><button @click="saveUserChanges" class="w-full py-2 bg-pink-500 text-white rounded-xl font-bold shadow active:scale-95">儲存</button></div></div>
+        
+        <div v-if="showFlightModal" class="fixed inset-0 z-[1200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">編輯機票</h3><label class="text-xs font-bold text-gray-400 ml-1">航班代號</label><input v-model="tempFlightData.code" placeholder="如 TR898" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-black uppercase"><label class="text-xs font-bold text-gray-400 ml-1">座位號碼</label><input v-model="tempFlightData.seat" placeholder="如 12A" class="w-full p-3 bg-gray-50 rounded-xl mb-6 border font-black uppercase"><button @click="saveFlight" class="w-full py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">更新機票</button></div></div>
+        
+        <div v-if="expandedPhrase" class="fixed inset-0 z-[5000] bg-white flex flex-col items-center justify-center p-10 text-center"><div class="flex-1 flex flex-col items-center justify-center w-full"><div class="text-[80px] leading-tight font-black mb-10 text-gray-800 break-words w-full">{{expandedPhrase.jp}}</div><div class="text-3xl font-bold text-gray-500 mb-16">{{expandedPhrase.zh}}</div><button @click.stop="speakJapanese(expandedPhrase.jp)" class="w-24 h-24 rounded-full bg-emerald-500 text-white text-4xl shadow-xl flex items-center justify-center active:scale-90 transition animate-pulse-fast"><i class="fa-solid fa-volume-high"></i></button><div class="mt-4 text-emerald-600 font-bold">點擊播放發音</div></div><button class="mb-10 w-16 h-16 rounded-full bg-gray-100 text-gray-400 text-2xl flex items-center justify-center shadow-md active:scale-90" @click="expandedPhrase=null"><i class="fa-solid fa-times"></i></button></div>
+
+        <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
     </div>
 
-    <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl active:scale-95 transition">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
-    
-    <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
-    
-    <div v-if="showUserEditModal" class="fixed inset-0 z-[2100] bg-black/60 flex items-center justify-center p-6 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-xl text-center"><h3 class="font-bold text-lg mb-4">編輯身分資料</h3><div class="w-24 h-24 mx-auto rounded-full bg-gray-100 border-4 border-white shadow mb-4 overflow-hidden relative cursor-pointer" @click="$refs.avatarInput.click()"><img v-if="editingUser.avatar" :src="editingUser.avatar" class="w-full h-full object-cover"><span v-else class="text-4xl flex items-center justify-center h-full">{{editingUser.icon}}</span></div><input v-model="editingUser.name" class="w-full p-3 bg-gray-50 rounded-xl mb-4 text-center font-bold border"><button @click="saveUserChanges" class="w-full py-2 bg-pink-500 text-white rounded-xl font-bold shadow active:scale-95">儲存</button></div></div>
-    
-    <div v-if="showFlightModal" class="fixed inset-0 z-[1200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">編輯機票</h3><label class="text-xs font-bold text-gray-400 ml-1">航班代號</label><input v-model="tempFlightData.code" placeholder="如 TR898" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-black uppercase"><label class="text-xs font-bold text-gray-400 ml-1">座位號碼</label><input v-model="tempFlightData.seat" placeholder="如 12A" class="w-full p-3 bg-gray-50 rounded-xl mb-6 border font-black uppercase"><button @click="saveFlight" class="w-full py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg active:scale-95">更新機票</button></div></div>
-    
-    <div v-if="expandedPhrase" class="fixed inset-0 z-[5000] bg-white flex flex-col items-center justify-center p-10 text-center"><div class="flex-1 flex flex-col items-center justify-center w-full"><div class="text-[80px] leading-tight font-black mb-10 text-gray-800 break-words w-full">{{expandedPhrase.jp}}</div><div class="text-3xl font-bold text-gray-500 mb-16">{{expandedPhrase.zh}}</div><button @click.stop="speakJapanese(expandedPhrase.jp)" class="w-24 h-24 rounded-full bg-emerald-500 text-white text-4xl shadow-xl flex items-center justify-center active:scale-90 transition animate-pulse-fast"><i class="fa-solid fa-volume-high"></i></button><div class="mt-4 text-emerald-600 font-bold">點擊播放發音</div></div><button class="mb-10 w-16 h-16 rounded-full bg-gray-100 text-gray-400 text-2xl flex items-center justify-center shadow-md active:scale-90" @click="expandedPhrase=null"><i class="fa-solid fa-times"></i></button></div>
-
-    <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
 </div>
 
 <script type="module">
@@ -605,14 +606,11 @@ const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:fa
 // V55 Strict Array: Immutable 4-User IDs.
 const defaultUsers = [{id:1,name:'吉伊',icon:'🐹',list:[...defaultPrepList]},{id:2,name:'小八',icon:'🐱',list:[...defaultPrepList]},{id:3,name:'兔兔',icon:'🐰',list:[...defaultPrepList]},{id:4,name:'小桃',icon:'🍑',list:[...defaultPrepList]}];
 
-// V55: Github Raw Image Mapping with Fallback
-const repoUrl = "https://raw.githubusercontent.com/sunny5200820-maker/2026.tokyo.fuji.trip/main/images/";
-// Intelligent Image Loader: Tries local path first, falls back to GitHub Raw
+// Intelligent Image Loader
 const getImg = (p) => {
     if (!p) return 'https://placehold.co/600x400/orange/white?text=NO+IMAGE';
     if (p.startsWith('data:') || p.startsWith('http')) return p;
-    // Return relative path by default (fastest for local/GitHub Pages)
-    return `./images/${p}`;
+    return `./images/${p}`; // 使用相對路徑，確保 GitHub Pages 或本地端皆可讀取
 };
 
 const foodSpots = {
@@ -631,10 +629,10 @@ const foodSpots = {
         {name:'力餅家', desc:'百年老舖權五郎力餅', tag:'長谷', img:'chikaramochiya.jpg', reserve:false, link:'力餅家', reserveLink:'', votes:[]}
     ],
     Fuji: [
-        {name:'不動茶屋', desc:'雲朵建築餺飥麵', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:false, link:'不動茶屋 東戀路', reserveLink:'', votes:[]}, 
-        {name:'山麓園', desc:'圍爐裏炭火燒烤', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:true, link:'山麓園', reserveLink:'https://sanrokuen.com/', votes:[]},
-        {name:'燒肉花', desc:'眺望富士山燒肉', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:true, link:'Hana Yakiniku', reserveLink:'', votes:[]},
-        {name:'The Park', desc:'富士山鬆餅與吐司', tag:'河口湖', img:'富士山美食地圖.jpg', reserve:false, link:'The Park', reserveLink:'', votes:[]}
+        {name:'不動茶屋', desc:'雲朵建築餺飥麵', tag:'河口湖', img:'hoto-noodles.jpg', reserve:false, link:'不動茶屋 東戀路', reserveLink:'', votes:[]}, 
+        {name:'山麓園', desc:'圍爐裏炭火燒烤', tag:'河口湖', img:'sanrokuen.jpg', reserve:true, link:'山麓園', reserveLink:'https://sanrokuen.com/', votes:[]},
+        {name:'燒肉花', desc:'眺望富士山燒肉', tag:'河口湖', img:'hana-yakiniku.jpg', reserve:true, link:'Hana Yakiniku', reserveLink:'', votes:[]},
+        {name:'The Park', desc:'富士山鬆餅與吐司', tag:'河口湖', img:'the-park-fuji.jpg', reserve:false, link:'The Park', reserveLink:'', votes:[]}
     ]
 };
 
@@ -767,17 +765,11 @@ createApp({
         const statusText = computed(() => { if (!isLoggedIn.value) return 'Offline'; if (syncStatus.value === 'syncing') return 'Syncing...'; if (syncStatus.value === 'error') return 'Error: 權限不足'; return 'Online'; });
         const statusColor = computed(() => { if (!isLoggedIn.value) return 'bg-gray-400'; if (syncStatus.value === 'syncing') return 'bg-yellow-400 animate-pulse'; if (syncStatus.value === 'error') return 'bg-red-500'; return 'bg-green-400'; });
 
-        // V55: Relative Path Image Loader (The Final Solution)
-        const getImg = (p) => {
-            if (!p) return 'https://placehold.co/600x400/orange/white?text=NO+IMAGE';
-            if (p.startsWith('data:') || p.startsWith('http')) return p;
-            return `./images/${p}`; // Relative path is safest for GitHub Pages
-        };
         const compressImage = (base64) => { return new Promise((resolve) => { const img = new Image(); img.src = base64; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const MAX = 600; if(w>MAX){ h*=MAX/w; w=MAX; } canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; }); };
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
-        const getMapLink = (k,n) => { let q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; };
+        const getMapLink = (k,n) => { let q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return `http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(q)}`; };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','japanese':'翻譯蒟蒻'}[view]||'關東之旅');
@@ -789,7 +781,7 @@ createApp({
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
         const flightStatusLink = (code) => code ? `https://www.flightradar24.com/data/flights/${code.toLowerCase()}` : '';
         const getAirlineInfo = (flightCode, isShort) => { if(!flightCode) return null; const c = flightCode.toUpperCase(); if(c.startsWith('TR')) return isShort?"酷航 Scoot":"【酷航 Scoot】\n📍 報到：桃園 T1 / 成田 T1 南翼\n🧳 手提：10kg (嚴格秤重)"; if(c.startsWith('BR')) return isShort?"長榮 EVA":"【長榮 EVA】\n📍 報到：桃園 T2 / 成田 T1 南翼\n🧳 託運：計件制 23kg x 2 件"; return '請確認電子機票上的航廈資訊'; };
-        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=transit`; };
+        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return `http://googleusercontent.com/maps.google.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}&travelmode=transit`; };
 
         const getAmountInTWD = (e) => e.currency==='JPY' ? e.amount*exchangeRate.value : e.amount;
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
@@ -797,7 +789,7 @@ createApp({
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
-        // V55 Dynamic Map Cover (Relative Paths)
+        // V55 Dynamic Map Cover
         const getMapCover = (loc) => {
             const map = { 'Tokyo': '東京美食地圖.jpg', 'Kamakura': '鎌倉美食地圖.jpg', 'Fuji': '富士山美食地圖.jpg' };
             return getImg(map[loc]); 
@@ -899,7 +891,7 @@ createApp({
         };
         
         const forceInitCloud = async () => {
-             const data = { users: defaultUsers, itinerary: defaultData.itinerary }; 
+             const data = { users: defaultUsers, itinerary: defaultData.itinerary, shopping: defaultData.shopping }; 
              try {
                 await setDoc(doc(db,"trips","kanto2026"), data, {merge:true});
              } catch(e) { console.error("Init Failed:", e); }
@@ -1016,9 +1008,8 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
-                            // Smart Merge for Users
                             if(dt.users) users.value = mergeUsers(users.value, dt.users);
-                            else forceInitCloud(); // Auto-repair if empty
+                            else forceInitCloud();
 
                             if(dt.itinerary) itinerary.value = dt.itinerary;
                             if(dt.drivePlan) drivePlan.value = dt.drivePlan;
@@ -1041,7 +1032,6 @@ createApp({
                                 activeUsers.value = map;
                             }
                         } else {
-                            // First time init
                             forceInitCloud();
                         }
                     });
@@ -1068,7 +1058,6 @@ createApp({
             rentalCars, openAddCarModal, deleteCar, openAddFoodModal, autoFillFoodInfo,
             coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal, fetchRealWeather, weatherLoading, openAddCouponModal,
             getMapCover, getRaidClass, getRaidLabel, getRaidIcon, toggleFoodVote, getUserAvatar,
-            // V55 Exports
             previewImg, openLightbox, closeLightbox,
             getGreeting, getBudgetMood, getPackingProgress, getStamina, getStaminaColor, quickExpense
         };
@@ -1077,4 +1066,3 @@ createApp({
 </script>
 </body>
 </html>
-
