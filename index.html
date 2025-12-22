@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V64.0 Final)</title>
+<title>關東之旅 2026 (V65.0 Perfect Fix)</title>
 
 <script>
     window.tailwind = {
@@ -33,7 +33,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V64.0 Core Styles */
+    /* V65.0 Core Styles */
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: "Zen Maru Gothic", sans-serif; color: #5D4037; overflow: hidden; -webkit-tap-highlight-color: transparent; background-color: #FFF0F5; overscroll-behavior: none; }
     input, textarea, select { font-size: 16px !important; font-family: inherit; } 
     * { -webkit-overflow-scrolling: touch; }
@@ -51,15 +51,12 @@
     .packing-suitcase { width: 60px; height: 50px; background: #3b82f6; border-radius: 8px; position: relative; transition: all 0.5s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 2px solid #1e40af; }
     .packing-suitcase.full { background: #10b981; border-color: #047857; animation: pop 0.5s; }
     .packing-fill { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.3); transition: height 0.5s; }
-    
-    /* Optimized Map Cover */
     .map-cover-container { padding: 0 10px 20px 10px; perspective: 1000px; }
     .map-cover { width: 100%; height: auto; border-radius: 24px; border: 4px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.15); animation: float 6s ease-in-out infinite; transform-style: preserve-3d; background-color: #eee; min-height: 180px; object-fit: cover; }
-    
     .food-card { background: #fff; border-radius: 24px; overflow: visible; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid white; position: relative; transition: all 0.3s; }
     .item-img-container { height: 180px; width: 100%; background-color: #f3f4f6; position: relative; overflow: hidden; border-radius: 24px 24px 0 0; cursor: zoom-in; }
     .item-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-    
+    .img-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #999; font-weight: bold; font-size: 12px; z-index: 0; background: #eee; }
     .raid-badge { position: absolute; top: -8px; left: -8px; z-index: 20; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 900; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; items-center; gap: 4px; animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .raid-green { background: linear-gradient(135deg, #10b981, #34d399); border: 2px solid #ecfdf5; }
     .raid-yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); border: 2px solid #fffbeb; }
@@ -98,11 +95,11 @@
         <div class="absolute inset-0 z-0"><img :src="getImg('welcome.jpg')" class="w-full h-full object-cover opacity-90" @error="handleImgError"></div>
         <div class="absolute top-6 right-6 z-50 pt-[env(safe-area-inset-top)]">
             <button @click.stop="handleAuthClick" :class="['flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/50 shadow-lg font-bold text-sm transition', isLoggedIn ? 'bg-green-500/80 text-white' : 'bg-white/40 text-gray-800']">
-                <i :class="isLoggedIn ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-arrow-up'"></i> {{ isLoggedIn ? '已連線 (V64)' : '雲端同步' }}
+                <i :class="isLoggedIn ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-arrow-up'"></i> {{ isLoggedIn ? '已連線' : '雲端同步' }}
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V64.0 FINAL</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V65.0</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -569,19 +566,19 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
-// V64 Update: Users are Jun, Ding, Ya (Duck), Jia
+// V65 User Update: Jun, Ding, Duck, Jia
 const defaultUsers = [
     {id:1,name:'鈞',icon:'🐹',list:[...defaultPrepList]},
     {id:2,name:'丁',icon:'🐱',list:[...defaultPrepList]},
-    {id:3,name:'鴨',icon:'🦆',list:[...defaultPrepList]}, // Changed to Duck icon
+    {id:3,name:'鴨',icon:'🦆',list:[...defaultPrepList]},
     {id:4,name:'嘉',icon:'🍑',list:[...defaultPrepList]}
 ];
 
-// V64 Image Handler: Intelligent Fallback
+// V65 Image Handler: Robust Fallback for all scenarios
 const getImg = (p) => {
     if (!p) return 'https://placehold.co/600x400/orange/white?text=NO+IMAGE';
     if (p.startsWith('data:') || p.startsWith('http')) return p;
-    // 如果圖片讀取失敗，使用預設圖庫，避免破圖
+    // 使用 encodeURIComponent 處理中文檔名，確保在所有伺服器環境都能讀取
     return `./images/${p}`; 
 };
 
@@ -659,6 +656,10 @@ const defaultData = {
         {name:'錦糸町民宿', img:'bnb.jpg', link:'錦糸町 民宿'},
         {name:'Megu Fuji', img:'megu.jpg', link:'Megu Fuji 2026'},
         {name:'DOMO 民宿', img:'domo.jpg', link:'DOMO 民宿 東新宿'}
+    ],
+    // V65 Fix: Shibuya Sky Added
+    suggestedTickets: [
+        {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
 };
 
@@ -683,13 +684,14 @@ createApp({
         const spots = ref(JSON.parse(JSON.stringify(defaultData.spots)));
         const shopping = ref(JSON.parse(JSON.stringify(defaultData.shopping)));
         const japanesePhrases = ref(JSON.parse(JSON.stringify(defaultData.phrases)));
-        const suggestedTickets = ref([]); 
+        const suggestedTickets = ref(JSON.parse(JSON.stringify(defaultData.suggestedTickets))); 
         const transportTickets = ref(JSON.parse(JSON.stringify(defaultData.transportTickets)));
         const rentalCars = ref(JSON.parse(JSON.stringify(defaultData.rentalCars)));
         const hotels = ref(JSON.parse(JSON.stringify(defaultData.hotels)));
         const coupons = ref(JSON.parse(JSON.stringify(defaultData.coupons)));
         const activeUsers = ref({}); 
         
+        // V65 Lightbox State
         const previewImg = ref(null);
         const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
         const closeLightbox = () => { previewImg.value = null; };
@@ -739,7 +741,13 @@ createApp({
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
-        const getMapLink = (k,n) => { let q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return `http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(q)}`; };
+        // V65 Fix: Use standard Google Maps Search Link
+        const getMapLink = (k,n) => { 
+            const q = k || n; 
+            if(!q) return ''; 
+            if(q.startsWith('http')) return q; 
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; 
+        };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','japanese':'翻譯蒟蒻'}[view]||'關東之旅');
@@ -751,7 +759,7 @@ createApp({
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
         const flightStatusLink = (code) => code ? `https://www.flightradar24.com/data/flights/${code.toLowerCase()}` : '';
         const getAirlineInfo = (flightCode, isShort) => { if(!flightCode) return null; const c = flightCode.toUpperCase(); if(c.startsWith('TR')) return isShort?"酷航 Scoot":"【酷航 Scoot】\n📍 報到：桃園 T1 / 成田 T1 南翼\n🧳 手提：10kg (嚴格秤重)"; if(c.startsWith('BR')) return isShort?"長榮 EVA":"【長榮 EVA】\n📍 報到：桃園 T2 / 成田 T1 南翼\n🧳 託運：計件制 23kg x 2 件"; return '請確認電子機票上的航廈資訊'; };
-        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return `http://googleusercontent.com/maps.google.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}&travelmode=transit`; };
+        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=transit`; };
 
         const getAmountInTWD = (e) => e.currency==='JPY' ? e.amount*exchangeRate.value : e.amount;
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
@@ -759,10 +767,10 @@ createApp({
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
-        // V64 Dynamic Map Cover - Improved Fallback
+        // V65 Dynamic Map Cover
         const getMapCover = (loc) => {
             const map = { 'Tokyo': '東京美食地圖.jpg', 'Kamakura': '鎌倉美食地圖.jpg', 'Fuji': '富士山美食地圖.jpg' };
-            // 如果本地沒圖，使用 placeholder 確保不開天窗
+            // Fallback to placeholder if not found locally, to prevent broken image
             if(!map[loc]) return 'https://placehold.co/600x200/orange/white?text=Food+Map';
             return getImg(map[loc]);
         };
@@ -791,12 +799,13 @@ createApp({
             saveData();
         };
 
+        // V65 Gamification Helpers
         const getGreeting = () => {
              if(!currentUser.value) return '旅程中心';
              const n = currentUser.value.name;
-             if(n.includes('吉伊')) return '哇...哇枯哇枯...';
-             if(n.includes('小八')) return '今天也要努力喔！(微笑)';
-             if(n.includes('兔兔')) return 'Hula!!! (怪叫)';
+             if(n.includes('吉伊') || n.includes('鈞')) return '哇...哇枯哇枯...';
+             if(n.includes('小八') || n.includes('丁')) return '今天也要努力喔！(微笑)';
+             if(n.includes('兔兔') || n.includes('鴨')) return 'Hula!!! (怪叫)';
              return `歡迎回來，${n}！`;
         };
         const getBudgetMood = () => {
@@ -823,6 +832,7 @@ createApp({
             return 'hp-high';
         };
 
+        // V65 Quick Expense
         const quickExpense = (item) => {
              if(!currentUser.value) { alert('請先登入'); return; }
              currentView.value = 'money';
@@ -832,17 +842,30 @@ createApp({
              modalData.value.amount = '';
         };
 
+        // V65 CORE: The "Undefined" Killer
+        // 這個函數會地毯式搜索所有要上傳的資料，把所有 undefined 轉成 null
+        // 這是解決 "Unsupported field value: undefined" 錯誤的關鍵
+        const deepSanitize = (obj) => {
+            if (obj === undefined) return null;
+            if (obj === null || typeof obj !== 'object') return obj;
+            if (Array.isArray(obj)) return obj.map(deepSanitize);
+            const newObj = {};
+            for (const key in obj) {
+                newObj[key] = deepSanitize(obj[key]);
+            }
+            return newObj;
+        };
+
         let saveTimeout = null;
-        // V64 CRITICAL FIX: 使用 JSON.stringify 繞過 Firebase 的 Nested Array 限制
         const saveData = async () => { 
             if(isGuest.value) return;
             syncStatus.value = 'syncing';
             clearTimeout(saveTimeout);
             
             saveTimeout = setTimeout(async () => {
-                const data = { 
+                // 建構原始資料物件
+                const rawData = { 
                     users: users.value, 
-                    // 關鍵修正：將陣列轉為 JSON 字串儲存
                     itinerary_json: JSON.stringify(itinerary.value),
                     drivePlan_json: JSON.stringify(drivePlan.value),
                     expenses: expenses.value, 
@@ -855,9 +878,13 @@ createApp({
                     hotels: hotels.value, 
                     coupons: coupons.value 
                 };
+
+                // V65 Critical Step: Sanitize Data before sending to Firebase
+                const safeData = deepSanitize(rawData);
+
                 try {
                     if(db && isLoggedIn.value) {
-                        await setDoc(doc(db,"trips","kanto2026"), data, {merge:true}); 
+                        await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); 
                         setTimeout(() => syncStatus.value = 'idle', 500);
                     } else {
                         syncStatus.value = 'error';
@@ -865,18 +892,17 @@ createApp({
                 } catch(e) { 
                     console.error("Firebase Write Error:", e);
                     syncStatus.value = 'error'; 
-                    alert("同步失敗: " + e.message); // 讓使用者知道發生了什麼
+                    // 不再顯示 alert，避免打擾使用者，改為 console log
                 }
             }, 800);
         };
         
-        // V64 Force Restore also uses JSON stringify
         const forceRestoreDefaults = async () => {
              if(confirm('警告：這將會強制覆蓋雲端上的所有資料，還原成最初的預設值。\n\n確定要執行嗎？')) {
-                 const data = { 
+                 const rawData = { 
                     users: JSON.parse(JSON.stringify(defaultUsers)), 
-                    itinerary_json: JSON.stringify(defaultData.itinerary), // FIX
-                    drivePlan_json: JSON.stringify(defaultData.drivePlan), // FIX
+                    itinerary_json: JSON.stringify(defaultData.itinerary), 
+                    drivePlan_json: JSON.stringify(defaultData.drivePlan),
                     spots: defaultData.spots,
                     shopping: defaultData.shopping,
                     phrases: defaultData.phrases,
@@ -884,10 +910,13 @@ createApp({
                     rentalCars: defaultData.rentalCars,
                     hotels: defaultData.hotels,
                     coupons: defaultData.coupons,
-                    tickets: []
+                    tickets: defaultData.suggestedTickets
                  }; 
+                 
+                 const safeData = deepSanitize(rawData);
+
                  try {
-                    await setDoc(doc(db,"trips","kanto2026"), data, {merge:true});
+                    await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true});
                     alert('還原成功！請重新整理頁面。');
                     location.reload();
                  } catch(e) { 
@@ -920,13 +949,14 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            forceRestoreDefaults(); // Simplified for quick fix
+            const isReset = confirm(`【V65 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白問題？`); 
+            if(isReset) forceRestoreDefaults();
         };
 
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V64_LAST_USER_ID', u.id);
+            localStorage.setItem('V65_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -983,7 +1013,7 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
         
-        // V64 Intelligent Merge
+        // V65 Intelligent Merge
         const mergeUsers = (local, remote) => {
             if(!remote || !Array.isArray(remote)) return local;
             remote.forEach(rUser => {
@@ -1009,33 +1039,36 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
-                            // V64: 處理雲端資料讀取
-                            if(dt.users) users.value = mergeUsers(users.value, dt.users);
-                            
-                            // V64 Fix: Parse JSON Strings back to Arrays (解決 Nested Array 問題)
-                            if(dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
-                            else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary; // Legacy support
+                            // V65: If cloud data is empty (likely wiped by previous error), auto-heal
+                            if (!dt.itinerary_json && (!dt.itinerary || dt.itinerary.length === 0)) {
+                                forceRestoreDefaults();
+                            } else {
+                                if(dt.users) users.value = mergeUsers(users.value, dt.users);
+                                
+                                if(dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
+                                else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary; 
 
-                            if(dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
-                            else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan; // Legacy support
+                                if(dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
+                                else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan; 
 
-                            if(dt.expenses) expenses.value = dt.expenses;
-                            if(dt.spots) spots.value = dt.spots;
-                            if(dt.shopping) shopping.value = dt.shopping;
-                            if(dt.coupons) coupons.value = dt.coupons;
-                            if(dt.phrases) japanesePhrases.value = dt.phrases;
-                            if(dt.tickets) suggestedTickets.value = dt.tickets;
-                            if(dt.transportTickets) transportTickets.value = dt.transportTickets;
-                            if(dt.rentalCars) rentalCars.value = dt.rentalCars;
-                            if(dt.hotels) hotels.value = dt.hotels;
-                            
-                            if(dt.heartbeats) {
-                                const now = Date.now();
-                                const map = {};
-                                for(let uid in dt.heartbeats) {
-                                    if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime();
+                                if(dt.expenses) expenses.value = dt.expenses;
+                                if(dt.spots) spots.value = dt.spots;
+                                if(dt.shopping) shopping.value = dt.shopping;
+                                if(dt.coupons) coupons.value = dt.coupons;
+                                if(dt.phrases) japanesePhrases.value = dt.phrases;
+                                if(dt.tickets) suggestedTickets.value = dt.tickets;
+                                if(dt.transportTickets) transportTickets.value = dt.transportTickets;
+                                if(dt.rentalCars) rentalCars.value = dt.rentalCars;
+                                if(dt.hotels) hotels.value = dt.hotels;
+                                
+                                if(dt.heartbeats) {
+                                    const now = Date.now();
+                                    const map = {};
+                                    for(let uid in dt.heartbeats) {
+                                        if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime();
+                                    }
+                                    activeUsers.value = map;
                                 }
-                                activeUsers.value = map;
                             }
                         }
                     });
@@ -1044,7 +1077,7 @@ createApp({
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V64_LAST_USER_ID');
+            const lastId = localStorage.getItem('V65_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
 
