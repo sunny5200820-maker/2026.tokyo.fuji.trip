@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V65.0 Perfect Fix)</title>
+<title>關東之旅 2026 (V66.0 Map & Konbini)</title>
 
 <script>
     window.tailwind = {
@@ -33,7 +33,7 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V65.0 Core Styles */
+    /* V66.0 Core Styles */
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: "Zen Maru Gothic", sans-serif; color: #5D4037; overflow: hidden; -webkit-tap-highlight-color: transparent; background-color: #FFF0F5; overscroll-behavior: none; }
     input, textarea, select { font-size: 16px !important; font-family: inherit; } 
     * { -webkit-overflow-scrolling: touch; }
@@ -51,8 +51,16 @@
     .packing-suitcase { width: 60px; height: 50px; background: #3b82f6; border-radius: 8px; position: relative; transition: all 0.5s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 2px solid #1e40af; }
     .packing-suitcase.full { background: #10b981; border-color: #047857; animation: pop 0.5s; }
     .packing-fill { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.3); transition: height 0.5s; }
+    
+    /* V66 Map & Konbini Styles */
     .map-cover-container { padding: 0 10px 20px 10px; perspective: 1000px; }
     .map-cover { width: 100%; height: auto; border-radius: 24px; border: 4px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.15); animation: float 6s ease-in-out infinite; transform-style: preserve-3d; background-color: #eee; min-height: 180px; object-fit: cover; }
+    
+    .konbini-card { border-left: 6px solid; padding: 15px; background: white; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .konbini-711 { border-color: #EF3340; } /* 7-11 Red */
+    .konbini-fam { border-color: #009245; } /* FamilyMart Green */
+    .konbini-law { border-color: #0068B7; } /* Lawson Blue */
+
     .food-card { background: #fff; border-radius: 24px; overflow: visible; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid white; position: relative; transition: all 0.3s; }
     .item-img-container { height: 180px; width: 100%; background-color: #f3f4f6; position: relative; overflow: hidden; border-radius: 24px 24px 0 0; cursor: zoom-in; }
     .item-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
@@ -99,7 +107,7 @@
             </button>
         </div>
         <div class="relative z-10 mt-32 text-center px-6">
-            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V65.0</div>
+            <div class="inline-block bg-white/40 backdrop-blur-md px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/50 mb-6 animate-float shadow-lg">V66.0</div>
             <h1 class="text-7xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans" style="text-shadow: 0 4px 10px rgba(255,105,180,0.3);">關東之旅</h1>
             <p class="text-3xl text-white/90 font-bold tracking-widest drop-shadow-md">2026.03.27</p>
         </div>
@@ -221,8 +229,14 @@
             <div v-if="currentView==='food' || currentView==='photo'" class="px-5 py-4 animate-fade-in">
                 <div class="flex gap-2 mb-4 justify-center"><button v-for="loc in ['Tokyo','Kamakura','Fuji']" @click="currentLoc=loc" :class="['px-5 py-2 rounded-full font-bold text-xs transition active:scale-95', currentLoc===loc?'bg-orange-400 text-white':'bg-white text-gray-400']">{{{'Tokyo':'東京','Kamakura':'鎌倉','Fuji':'富士山'}[loc]}}</button></div>
                 
-                <div v-if="currentView==='food'" class="map-cover-container">
-                    <img :src="getMapCover(currentLoc)" class="map-cover" @error="handleImgError">
+                <div v-if="currentView==='food'" class="map-cover-container mb-6">
+                    <img :src="getMapCover(currentLoc)" class="map-cover w-full shadow-lg border-4 border-white" @error="handleImgError">
+                </div>
+
+                <div v-if="currentView==='food'" class="mb-6">
+                    <button @click="showKonbiniModal=true" class="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white font-black py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition border-2 border-white">
+                        <i class="fa-solid fa-store"></i> 🇯🇵 日本三大超商必買攻略
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20 px-2">
@@ -232,7 +246,7 @@
                         </div>
                         
                         <div class="item-img-container" @click.stop="openLightbox(item.img)">
-                            <div class="img-fallback">圖片待補</div>
+                            <div class="img-fallback">圖片載入中...</div>
                             <img v-if="item.img" :src="getImg(item.img)" class="relative z-10 group-hover:scale-110" @error="handleImgError">
                             <div class="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition z-20"><i class="fa-solid fa-magnifying-glass-plus text-white text-2xl drop-shadow-md"></i></div>
                         </div>
@@ -541,6 +555,39 @@
             <input type="file" ref="modalImgInput" accept="image/*" class="hidden" @change="processModalImg">
         </div>
 
+        <div v-if="showKonbiniModal" class="fixed inset-0 z-[1600] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl h-[80vh] flex flex-col animate-fade-in relative">
+                <button @click="showKonbiniModal=false" class="absolute top-4 right-4 text-gray-400 active:scale-90"><i class="fa-solid fa-times text-2xl"></i></button>
+                <h3 class="font-black text-2xl mb-6 text-center text-gray-700">🏪 超商必買攻略</h3>
+                <div class="flex-1 overflow-y-auto pb-6">
+                    <div class="mb-6">
+                        <h4 class="font-bold text-lg mb-3 flex items-center gap-2"><span class="w-1 h-6 bg-[#EF3340] rounded-full"></span> 7-Eleven</h4>
+                        <div class="space-y-2">
+                            <div class="konbini-card konbini-711"><div><div class="font-bold text-gray-700">焦糖布丁冰淇淋</div><div class="text-[10px] text-gray-400">冷凍櫃必拿</div></div><i class="fa-solid fa-ice-cream text-[#EF3340]"></i></div>
+                            <div class="konbini-card konbini-711"><div><div class="font-bold text-gray-700">蛋沙拉三明治</div><div class="text-[10px] text-gray-400">早餐神物</div></div><i class="fa-solid fa-bread-slice text-[#EF3340]"></i></div>
+                            <div class="konbini-card konbini-711"><div><div class="font-bold text-gray-700">蒙古湯麵泡麵</div><div class="text-[10px] text-gray-400">辛辣中毒性</div></div><i class="fa-solid fa-bowl-food text-[#EF3340]"></i></div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <h4 class="font-bold text-lg mb-3 flex items-center gap-2"><span class="w-1 h-6 bg-[#009245] rounded-full"></span> FamilyMart</h4>
+                        <div class="space-y-2">
+                            <div class="konbini-card konbini-fam"><div><div class="font-bold text-gray-700">Famichiki 炸雞</div><div class="text-[10px] text-gray-400">結帳櫃檯直接點</div></div><i class="fa-solid fa-drumstick-bite text-[#009245]"></i></div>
+                            <div class="konbini-card konbini-fam"><div><div class="font-bold text-gray-700">舒芙蕾布丁</div><div class="text-[10px] text-gray-400">甜點櫃王者</div></div><i class="fa-solid fa-cookie text-[#009245]"></i></div>
+                            <div class="konbini-card konbini-fam"><div><div class="font-bold text-gray-700">牧場牛奶冰沙</div><div class="text-[10px] text-gray-400">需至咖啡機加熱牛奶</div></div><i class="fa-solid fa-mug-hot text-[#009245]"></i></div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <h4 class="font-bold text-lg mb-3 flex items-center gap-2"><span class="w-1 h-6 bg-[#0068B7] rounded-full"></span> Lawson</h4>
+                        <div class="space-y-2">
+                            <div class="konbini-card konbini-law"><div><div class="font-bold text-gray-700">Premium 生乳捲</div><div class="text-[10px] text-gray-400">每月22號有草莓版</div></div><i class="fa-solid fa-cake-candles text-[#0068B7]"></i></div>
+                            <div class="konbini-card konbini-law"><div><div class="font-bold text-gray-700">炸雞君 (原味/起司)</div><div class="text-[10px] text-gray-400">包裝可愛一口接一口</div></div><i class="fa-solid fa-drumstick-bite text-[#0068B7]"></i></div>
+                            <div class="konbini-card konbini-law"><div><div class="font-bold text-gray-700">BASCHEE 巴斯克</div><div class="text-[10px] text-gray-400">濃郁起司口感</div></div><i class="fa-solid fa-cheese text-[#0068B7]"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div v-if="showLoginModal" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"><div class="bg-white w-full max-w-xs rounded-3xl p-8 shadow-2xl"><h3 class="text-2xl font-black text-center mb-6">同步雲端</h3><input v-model="loginForm.email" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Email"><input v-model="loginForm.password" type="password" class="w-full p-4 bg-gray-50 rounded-2xl mb-4 font-bold" placeholder="Password"><button @click="doLogin" class="w-full py-4 bg-pink-500 text-white font-black rounded-2xl active:scale-95 transition">登入</button><button @click="showLoginModal=false" class="w-full py-2 mt-2 text-gray-400 font-bold">取消</button></div></div>
         
         <div v-if="showExpenseModal" class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl"><h3 class="font-bold text-lg mb-4 text-center">{{expenseMode==='private'?'記一筆私帳':'公款分帳'}}</h3><input v-model="modalData.name" placeholder="消費項目" class="w-full p-3 bg-gray-50 rounded-xl mb-3 border font-bold"><div class="flex gap-2 mb-3"><input type="number" v-model="modalData.amount" placeholder="金額" class="flex-1 p-3 bg-gray-50 rounded-xl border font-black text-lg"><select v-model="modalData.currency" class="bg-gray-100 rounded-xl px-2 font-bold text-sm outline-none"><option value="JPY">JPY</option><option value="TWD">TWD</option></select></div><div class="mb-4"><label class="text-xs font-bold text-gray-400 ml-1 mb-1 block">付款方式</label><div class="grid grid-cols-4 gap-2"><button v-for="m in ['cash','card','suica','other']" :key="m" @click="modalData.method=m" :class="['py-2 rounded-xl text-xs font-bold border transition', modalData.method===m?'bg-yellow-400 text-white border-yellow-400':'bg-white text-gray-400 border-gray-200']">{{ {'cash':'現金','card':'信用卡','suica':'西瓜卡','other':'其他'}[m] }}</button></div></div><div v-if="expenseMode==='split'" class="mb-4 bg-blue-50 p-3 rounded-xl"><label class="text-xs text-blue-500 font-bold ml-1 block mb-2">誰先墊錢?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="modalData.whoPaid=u.id" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.whoPaid===u.id?'bg-blue-500 text-white':'bg-white text-gray-400']">{{u.name}}</button></div><label class="text-xs text-blue-500 font-bold ml-1 block mt-3 mb-2">平分給誰?</label><div class="flex gap-2 overflow-x-auto hide-scrollbar"><button v-for="u in users" :key="u.id" @click="toggleShare(u.id)" :class="['px-3 py-1 rounded-full text-xs font-bold border transition whitespace-nowrap', modalData.forWhom.includes(u.id)?'bg-pink-400 text-white':'bg-white text-gray-400']">{{u.name}}</button></div></div><button @click="saveExpense" class="w-full py-3 bg-yellow-400 text-white rounded-xl font-bold shadow-lg active:scale-95">儲存</button><button @click="showExpenseModal=false" class="w-full py-3 mt-2 text-gray-400 font-bold active:scale-95">取消</button></div></div>
@@ -566,7 +613,7 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
-// V65 User Update: Jun, Ding, Duck, Jia
+// V66 Update: Jun, Ding, Duck, Jia
 const defaultUsers = [
     {id:1,name:'鈞',icon:'🐹',list:[...defaultPrepList]},
     {id:2,name:'丁',icon:'🐱',list:[...defaultPrepList]},
@@ -574,15 +621,16 @@ const defaultUsers = [
     {id:4,name:'嘉',icon:'🍑',list:[...defaultPrepList]}
 ];
 
-// V65 Image Handler: Robust Fallback for all scenarios
+// V66 Image Handler: Intelligent Fallback & Correct Filenames
 const getImg = (p) => {
     if (!p) return 'https://placehold.co/600x400/orange/white?text=NO+IMAGE';
     if (p.startsWith('data:') || p.startsWith('http')) return p;
-    // 使用 encodeURIComponent 處理中文檔名，確保在所有伺服器環境都能讀取
+    // encodeURIComponent handles filenames with spaces or special chars if any
     return `./images/${p}`; 
 };
 
 // --- DATA DEFINITIONS ---
+// V66 Fix: Use exact filenames from your GitHub (tokyo_map.jpg, etc.)
 const foodSpots = {
     Tokyo: [
         {name:'牛かつもと村', desc:'自行煎烤軟嫩炸牛排', tag:'新宿/澀谷', img:'gyukatsu-motomura.jpg', reserve:false, link:'牛かつもと村', reserveLink:'', votes:[]},
@@ -599,10 +647,10 @@ const foodSpots = {
         {name:'力餅家', desc:'百年老舖權五郎力餅', tag:'長谷', img:'chikaramochiya.jpg', reserve:false, link:'力餅家', reserveLink:'', votes:[]}
     ],
     Fuji: [
-        {name:'不動茶屋', desc:'雲朵建築餺飥麵', tag:'河口湖', img:'hoto-noodles.jpg', reserve:false, link:'不動茶屋 東戀路', reserveLink:'', votes:[]}, 
-        {name:'山麓園', desc:'圍爐裏炭火燒烤', tag:'河口湖', img:'sanrokuen.jpg', reserve:true, link:'山麓園', reserveLink:'https://sanrokuen.com/', votes:[]},
+        {name:'不動茶屋', desc:'雲朵建築餺飥麵', tag:'河口湖', img:'houtouhoutou-fudou-noodles.jpg', reserve:false, link:'不動茶屋 東戀路', reserveLink:'', votes:[]}, 
+        {name:'山麓園', desc:'圍爐裏炭火燒烤', tag:'河口湖', img:'sanrokuen-robatayaki.jpg', reserve:true, link:'山麓園', reserveLink:'https://sanrokuen.com/', votes:[]},
         {name:'燒肉花', desc:'眺望富士山燒肉', tag:'河口湖', img:'hana-yakiniku.jpg', reserve:true, link:'Hana Yakiniku', reserveLink:'', votes:[]},
-        {name:'The Park', desc:'富士山鬆餅與吐司', tag:'河口湖', img:'the-park-fuji.jpg', reserve:false, link:'The Park', reserveLink:'', votes:[]}
+        {name:'The Park', desc:'富士山鬆餅與吐司', tag:'河口湖', img:'the-park.jpg', reserve:false, link:'The Park', reserveLink:'', votes:[]}
     ]
 };
 
@@ -657,7 +705,7 @@ const defaultData = {
         {name:'Megu Fuji', img:'megu.jpg', link:'Megu Fuji 2026'},
         {name:'DOMO 民宿', img:'domo.jpg', link:'DOMO 民宿 東新宿'}
     ],
-    // V65 Fix: Shibuya Sky Added
+    // V66 Fix: Added Shibuya Sky
     suggestedTickets: [
         {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
@@ -691,7 +739,7 @@ createApp({
         const coupons = ref(JSON.parse(JSON.stringify(defaultData.coupons)));
         const activeUsers = ref({}); 
         
-        // V65 Lightbox State
+        // V66 Lightbox State
         const previewImg = ref(null);
         const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
         const closeLightbox = () => { previewImg.value = null; };
@@ -704,6 +752,8 @@ createApp({
         const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
         
+        const showKonbiniModal = ref(false); // New for V66
+
         const weatherLoading = ref(false);
         const weatherData = ref([
             {name:'Tokyo', displayName:'東京', temp:'--', bg:'bg-blue-400', icon:'fa-solid fa-cloud-sun'},
@@ -741,7 +791,6 @@ createApp({
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
-        // V65 Fix: Use standard Google Maps Search Link
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
@@ -767,10 +816,10 @@ createApp({
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         const settlements = computed(() => { const b={}; users.value.forEach(u=>b[u.id]=0); groupExpenses.value.forEach(e=>{ const t=getAmountInTWD(e); b[e.whoPaid]+=t; const s=t/e.forWhom.length; e.forWhom.forEach(i=>b[i]-=s); }); const r=[]; const n=users.value.map(u=>({id:u.id,v:b[u.id]})); const d=n.filter(x=>x.v<-1).sort((x,y)=>x.v-y.v); const c=n.filter(x=>x.v>1).sort((x,y)=>y.v-x.v); let i=0,j=0; while(i<d.length&&j<c.length){ let a=Math.min(-d[i].v,c[j].v); r.push({from:d[i].id,to:c[j].id,amount:Math.round(a)}); d[i].v+=a; c[j].v-=a; if(Math.abs(d[i].v)<1)i++; if(Math.abs(c[j].v)<1)j++; } return r; });
 
-        // V65 Dynamic Map Cover
+        // V66 Dynamic Map Cover - Use Correct Filenames
         const getMapCover = (loc) => {
-            const map = { 'Tokyo': '東京美食地圖.jpg', 'Kamakura': '鎌倉美食地圖.jpg', 'Fuji': '富士山美食地圖.jpg' };
-            // Fallback to placeholder if not found locally, to prevent broken image
+            const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' };
+            // Fallback
             if(!map[loc]) return 'https://placehold.co/600x200/orange/white?text=Food+Map';
             return getImg(map[loc]);
         };
@@ -799,7 +848,6 @@ createApp({
             saveData();
         };
 
-        // V65 Gamification Helpers
         const getGreeting = () => {
              if(!currentUser.value) return '旅程中心';
              const n = currentUser.value.name;
@@ -832,7 +880,6 @@ createApp({
             return 'hp-high';
         };
 
-        // V65 Quick Expense
         const quickExpense = (item) => {
              if(!currentUser.value) { alert('請先登入'); return; }
              currentView.value = 'money';
@@ -842,9 +889,7 @@ createApp({
              modalData.value.amount = '';
         };
 
-        // V65 CORE: The "Undefined" Killer
-        // 這個函數會地毯式搜索所有要上傳的資料，把所有 undefined 轉成 null
-        // 這是解決 "Unsupported field value: undefined" 錯誤的關鍵
+        // V66 Data Sanitizer (Proven to work)
         const deepSanitize = (obj) => {
             if (obj === undefined) return null;
             if (obj === null || typeof obj !== 'object') return obj;
@@ -863,7 +908,6 @@ createApp({
             clearTimeout(saveTimeout);
             
             saveTimeout = setTimeout(async () => {
-                // 建構原始資料物件
                 const rawData = { 
                     users: users.value, 
                     itinerary_json: JSON.stringify(itinerary.value),
@@ -879,7 +923,6 @@ createApp({
                     coupons: coupons.value 
                 };
 
-                // V65 Critical Step: Sanitize Data before sending to Firebase
                 const safeData = deepSanitize(rawData);
 
                 try {
@@ -892,7 +935,6 @@ createApp({
                 } catch(e) { 
                     console.error("Firebase Write Error:", e);
                     syncStatus.value = 'error'; 
-                    // 不再顯示 alert，避免打擾使用者，改為 console log
                 }
             }, 800);
         };
@@ -949,14 +991,14 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            const isReset = confirm(`【V65 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白問題？`); 
+            const isReset = confirm(`【V66 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白問題？`); 
             if(isReset) forceRestoreDefaults();
         };
 
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V65_LAST_USER_ID', u.id);
+            localStorage.setItem('V66_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -1013,7 +1055,7 @@ createApp({
         const expandCard = (p) => expandedPhrase.value=p;
         const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
         
-        // V65 Intelligent Merge
+        // V66 Intelligent Merge
         const mergeUsers = (local, remote) => {
             if(!remote || !Array.isArray(remote)) return local;
             remote.forEach(rUser => {
@@ -1039,7 +1081,7 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
-                            // V65: If cloud data is empty (likely wiped by previous error), auto-heal
+                            // V66: If cloud data is empty (likely wiped by previous error), auto-heal
                             if (!dt.itinerary_json && (!dt.itinerary || dt.itinerary.length === 0)) {
                                 forceRestoreDefaults();
                             } else {
@@ -1077,7 +1119,7 @@ createApp({
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V65_LAST_USER_ID');
+            const lastId = localStorage.getItem('V66_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
 
@@ -1095,7 +1137,7 @@ createApp({
             rentalCars, openAddCarModal, deleteCar, openAddFoodModal, autoFillFoodInfo,
             coupons, showCouponModal, handleCameraTranslate, hotels, openEditHotelModal, toggleCarStatus: updateRentalStatus, showRentalModal, activeRental, openRentalDetail, updateRentalStatus, isUserOnline, showDiagnostic, openAddCouponModal, fetchRealWeather, weatherLoading, openAddCouponModal,
             getMapCover, getRaidClass, getRaidLabel, getRaidIcon, toggleFoodVote, getUserAvatar,
-            previewImg, openLightbox, closeLightbox,
+            previewImg, openLightbox, closeLightbox, showKonbiniModal, // Export Konbini Modal State
             getGreeting, getBudgetMood, getPackingProgress, getStamina, getStaminaColor, quickExpense
         };
     }
