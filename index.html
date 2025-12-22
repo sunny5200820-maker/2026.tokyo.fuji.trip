@@ -588,6 +588,7 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPe
 import { getFirestore, doc, onSnapshot, setDoc, updateDoc, serverTimestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { createApp, ref, computed, onMounted, watch } from "https://unpkg.com/vue@3.3.4/dist/vue.esm-browser.js";
 
+// Firebase 設定 (維持不變)
 const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", authDomain: "tokyo-trip-24b28.firebaseapp.com", projectId: "tokyo-trip-24b28", storageBucket: "tokyo-trip-24b28.firebasestorage.app", messagingSenderId: "518699705070", appId: "1:518699705070:web:56e95f603210d8d5d209ff" };
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
@@ -605,7 +606,8 @@ const getImg = (p) => {
     return `./images/${p}`; 
 };
 
-// --- DATA DEFINITIONS ---
+// --- 資料區 ---
+
 const foodSpots = {
     Tokyo: [
         {name:'牛かつもと村', desc:'自行煎烤軟嫩炸牛排', tag:'新宿/澀谷', img:'gyukatsu-motomura.jpg', reserve:false, link:'牛かつもと村', reserveLink:'', votes:[]},
@@ -629,28 +631,133 @@ const foodSpots = {
     ]
 };
 
-// V71 Update: Detailed Photo Spots
+// ★★★ V71 重點更新：詳細的拍攝機位與排隊攻略 ★★★
 const photoSpots = {
     Tokyo: [
-        {name:'SHIBUYA SKY', desc:'東京最美展望台', img:'shibuya_sky.jpg', bestTime:'🌇 日落前 1 小時 (Magic Hour)', queueTip:'需提前 30 天官網搶票，現場無票', link:'SHIBUYA SKY'},
-        {name:'豪德寺', desc:'滿滿招財貓', img:'gotokuji.jpg', bestTime:'☀️ 上午 10:00 (光線柔和)', queueTip:'週末人多，建議平日前往', link:'豪德寺'},
-        {name:'東京鐵塔', desc:'芝公園最佳機位', img:'tokyo_tower.jpg', bestTime:'🌙 傍晚點燈後 / 下午 3:00', queueTip:'地下停車場樓梯口常排隊', link:'芝公園 4號地'},
-        {name:'淺草雷門', desc:'經典地標大燈籠', img:'kaminarimon.jpg', bestTime:'🌅 清晨 7:00 或 晚上 9:00', queueTip:'仲見世通 9 點後人潮極多', link:'雷門'},
-        {name:'TeamLab', desc:'光影藝術展', img:'teamlab.jpg', bestTime:'📅 預約時段', queueTip:'需赤腳入場，建議穿短褲/好穿脫的鞋', link:'TeamLab Planets'}
+        {
+            name:'SHIBUYA SKY', 
+            desc:'東京最美展望台', 
+            img:'shibuya_sky.jpg', 
+            bestTime:'🌇 日落前1小時抵達。先拍透明手扶梯，再拍「SKY EDGE」角落(需廣角)。', 
+            queueTip:'⚠️ 門票極難搶！開放預約當日(4週前)的台灣時間晚上11點準時搶。現場通常無票。', 
+            link:'SHIBUYA SKY'
+        },
+        {
+            name:'豪德寺', 
+            desc:'滿滿招財貓', 
+            img:'gotokuji.jpg', 
+            bestTime:'☀️ 上午 10:00-11:00 光線灑在貓咪區最美。陰天拍攝效果較差。', 
+            queueTip:'週末人潮多到需管制入場。建議平日上午前往，並保持安靜。', 
+            link:'豪德寺'
+        },
+        {
+            name:'東京鐵塔 (芝公園)', 
+            desc:'地下停車場樓梯機位', 
+            img:'tokyo_tower.jpg', 
+            bestTime:'🌙 傍晚藍調時刻 (Blue Hour) 點燈後。人像可打閃光燈。', 
+            queueTip:'「地下停車場出口」是排隊熱點，需排 30-60 分鐘。若不想排隊，可去旁邊的「王子飯店花園」拍攝。', 
+            link:'芝公園 4號地'
+        },
+        {
+            name:'淺草雷門', 
+            desc:'經典地標大燈籠', 
+            img:'kaminarimon.jpg', 
+            bestTime:'🌅 清晨 7:00 前 (店鋪未開，人少) 或 晚上 9:00 後 (商店街鐵捲門有彩繪)。', 
+            queueTip:'9:00 後仲見世通人山人海，幾乎無法拍到空景。建議住淺草一晚。', 
+            link:'雷門'
+        },
+        {
+            name:'TeamLab Planets', 
+            desc:'光影藝術展', 
+            img:'teamlab.jpg', 
+            bestTime:'📅 預約最早或最晚場次。水晶燈區與水面區最適合錄影。', 
+            queueTip:'全預約制。需脫鞋赤腳，水深及膝，建議穿著短褲或易捲起的褲子。', 
+            link:'TeamLab Planets'
+        }
     ],
     Kamakura: [
-        {name:'鎌倉高校前', desc:'灌籃高手平交道', img:'kamakura_koko.jpg', bestTime:'🌅 清晨 7:00 (避開人潮)', queueTip:'遊客極多，請勿站在馬路中間', link:'鎌倉高校前駅'},
-        {name:'長谷寺', desc:'眺望湘南海岸', img:'hasedera.jpg', bestTime:'🌺 繡球花季需一早 / 平時下午', queueTip:'旺季需領整理券，等待約 1-2 小時', link:'長谷寺'},
-        {name:'報國寺', desc:'絕美竹林', img:'hokokuji.jpg', bestTime:'☀️ 上午 9:00 開門時', queueTip:'抹茶席需排隊，建議先買票', link:'報國寺'},
-        {name:'江島神社', desc:'海上鳥居', img:'enoshima_shrine.jpg', bestTime:'🌇 日落時分 (能看見富士山剪影)', queueTip:'需爬階梯，可購買手扶梯票 (Escar)', link:'江島神社'},
-        {name:'七里濱', desc:'最美海岸線', img:'shichirigahama.jpg', bestTime:'🌇 夕陽 (金色海面)', queueTip:'沿岸堤防皆可拍，注意老鷹搶食', link:'七里ヶ浜 海岸'}
+        {
+            name:'鎌倉高校前', 
+            desc:'灌籃高手平交道', 
+            img:'kamakura_koko.jpg', 
+            bestTime:'🌅 清晨 7:00-8:00。太陽升起後，背景海面會波光粼粼。', 
+            queueTip:'❌ 禁止站在馬路中間！警衛會趕人。建議站在坡道上方用長焦鏡頭壓縮畫面。', 
+            link:'鎌倉高校前駅'
+        },
+        {
+            name:'長谷寺', 
+            desc:'眺望湘南海岸', 
+            img:'hasedera.jpg', 
+            bestTime:'🌺 6月繡球花季需清晨排隊。平時下午順光，海景最藍。', 
+            queueTip:'花季期間需領「整理券」，等待時間可能超過 2 小時。', 
+            link:'長谷寺'
+        },
+        {
+            name:'報國寺', 
+            desc:'絕美竹林 (米其林三星)', 
+            img:'hokokuji.jpg', 
+            bestTime:'☀️ 上午 9:00 開門第一批。陽光穿過竹林的光斑最美。', 
+            queueTip:'抹茶席非常熱門，建議入園先買抹茶票，再去拍照。', 
+            link:'報國寺'
+        },
+        {
+            name:'江島神社', 
+            desc:'海上鳥居與參道', 
+            img:'enoshima_shrine.jpg', 
+            bestTime:'🌇 日落時分。天氣好時，從稚兒之淵可看見富士山剪影。', 
+            queueTip:'島上階梯多，建議購買「Escar (電扶梯)」套票省體力。', 
+            link:'江島神社'
+        },
+        {
+            name:'七里濱', 
+            desc:'最美海岸線', 
+            img:'shichirigahama.jpg', 
+            bestTime:'🌇 夕陽時刻 (Golden Hour)。海面會呈現金黃色。', 
+            queueTip:'沿岸堤防皆可拍，無須排隊。注意上空老鷹會搶食手中食物！', 
+            link:'七里ヶ浜 海岸'
+        }
     ],
     Fuji: [
-        {name:'新倉山淺間公園', desc:'五重塔與富士山', img:'chureito_pagoda.jpg', bestTime:'🌅 清晨 6:00-8:00 (順光)', queueTip:'需爬 398 階梯，展望台空間有限', link:'新倉山淺間公園'},
-        {name:'下吉田', desc:'日川時計店本町通', img:'honcho_street.jpg', bestTime:'☀️ 清晨或傍晚', queueTip:'人車分流，請遵守交通規則', link:'日川時計店'},
-        {name:'大石公園', desc:'花海富士山', img:'oishi_park.jpg', bestTime:'☀️ 上午順光', queueTip:'免費入場，遊覽車團客多', link:'大石公園'},
-        {name:'河口湖車站', desc:'LAWSON 富士山', img:'kawaguchiko_station.jpg', bestTime:'🌅 清晨', queueTip:'LAWSON 門口現已設屏障，建議改去隔壁全家', link:'河口湖駅'},
-        {name:'平野之濱', desc:'寧靜湖畔倒影', img:'hirano_beach.jpg', bestTime:'🌅 日出 (逆富士機率高)', queueTip:'無大眾運輸，建議自駕前往', link:'平野の浜'}
+        {
+            name:'新倉山淺間公園', 
+            desc:'五重塔與富士山', 
+            img:'chureito_pagoda.jpg', 
+            bestTime:'🌅 清晨 6:00-8:00 (順光，富士山最清晰)。下午會逆光。', 
+            queueTip:'需爬 398 階梯。展望台空間小，旺季會限制拍攝時間 (約5分鐘換一批)。', 
+            link:'新倉山淺間公園'
+        },
+        {
+            name:'下吉田 (本町二丁目)', 
+            desc:'日川時計店', 
+            img:'honcho_street.jpg', 
+            bestTime:'☀️ 清晨人最少。建議用「長焦鏡頭」壓縮畫面，讓富士山看起來巨大。', 
+            queueTip:'⚠️ 目前有嚴格交通管制，禁止在路中停留。只能在人行道拍攝。', 
+            link:'日川時計店'
+        },
+        {
+            name:'大石公園', 
+            desc:'花海富士山 (薰衣草/掃帚草)', 
+            img:'oishi_park.jpg', 
+            bestTime:'☀️ 上午順光。夏天薰衣草(6-7月)、秋天掃帚草(10月)。', 
+            queueTip:'免費入場，但遊覽車團客極多。想避開人頭需往公園深處走。', 
+            link:'大石公園'
+        },
+        {
+            name:'河口湖車站', 
+            desc:'LAWSON 富士山', 
+            img:'kawaguchiko_station.jpg', 
+            bestTime:'🌅 清晨。', 
+            queueTip:'⚠️ 站前店因遊客違規已架設黑幕屏障。建議改去「河口湖役場前店」或車站旁的全家。', 
+            link:'河口湖駅'
+        },
+        {
+            name:'平野之濱', 
+            desc:'寧靜湖畔倒影 (逆富士)', 
+            img:'hirano_beach.jpg', 
+            bestTime:'🌅 日出前後 30 分鐘，且無風時，最容易拍到「逆富士」倒影。', 
+            queueTip:'無大眾運輸，強烈建議自駕。湖邊泥土鬆軟，車子不要開太近湖邊以免受困。', 
+            link:'平野の浜'
+        }
     ]
 };
 
@@ -882,7 +989,6 @@ createApp({
              modalData.value.amount = '';
         };
         
-        // --- V71 New Logic: Itinerary Move ---
         const moveItineraryItem = (direction, idx) => {
             if (isGuest.value) return;
             const list = (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) 
@@ -895,15 +1001,33 @@ createApp({
             saveData();
         };
 
-        // --- V71 New Logic: Data Repair (Ensure detailed explanation exists) ---
         const repairSpotData = (remoteSpots) => {
             if (!remoteSpots || !remoteSpots.photo) return remoteSpots;
+            
+            // 強制將本地的詳細攻略覆蓋到雲端資料上，避免雲端舊資料蓋掉新攻略
+            // 注意：這會以本地程式碼的資料為準
             ['Tokyo', 'Kamakura', 'Fuji'].forEach(loc => {
-                if (remoteSpots.photo[loc]) {
-                    remoteSpots.photo[loc].forEach(item => {
-                        // If fields are missing in Cloud Data, use placeholders or basic values
-                        if (!item.bestTime) item.bestTime = '';
-                        if (!item.queueTip) item.queueTip = '';
+                if (photoSpots[loc]) {
+                    if (!remoteSpots.photo[loc]) remoteSpots.photo[loc] = [];
+                    
+                    // 遍歷本地最新的詳細資料
+                    photoSpots[loc].forEach((localItem, index) => {
+                        // 嘗試在雲端資料中找到對應的景點 (用名稱匹配)
+                        let remoteItem = remoteSpots.photo[loc].find(r => r.name === localItem.name);
+                        
+                        if (remoteItem) {
+                            // 如果雲端有這筆資料，檢查是否缺欄位
+                            if (!remoteItem.bestTime || remoteItem.bestTime === '建議查詢') {
+                                remoteItem.bestTime = localItem.bestTime;
+                            }
+                            if (!remoteItem.queueTip || remoteItem.queueTip === '一般人潮') {
+                                remoteItem.queueTip = localItem.queueTip;
+                            }
+                        } else {
+                            // 如果雲端沒有這筆資料 (例如新加的)，直接加進去
+                            // 但要小心不要重複添加，這裡簡單處理：若名稱對不上就不強求，避免陣列亂掉
+                            // 實務上通常以雲端為準，但為了「修復」我們選擇性更新
+                        }
                     });
                 }
             });
@@ -1011,7 +1135,7 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            const isReset = confirm(`【V71 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，解決資料缺漏問題。`); 
+            const isReset = confirm(`【V71 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
             if(isReset) forceRestoreDefaults();
         };
 
@@ -1043,7 +1167,6 @@ createApp({
             
             if(type === 'shopping') { modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); }; } 
             else if (type === 'spot') { 
-                // V71 Update: Added fields for Best Shot and Queue Tips
                 modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; 
                 modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); }; 
                 modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); }; 
@@ -1056,7 +1179,6 @@ createApp({
         
         const openAddSpotModal = () => { 
             modalTitle.value='新增景點'; 
-            // V71 Update
             modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; 
             modalData.value={name:'',desc:'',bestTime:'',queueTip:'',link:'',img:''}; 
             modalHasImg.value=true; 
