@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V69.0 Insta-Strategy)</title>
+<title>關東之旅 2026 (V70.0 Visual Upgrade)</title>
 
 <script>
     window.tailwind = {
@@ -48,37 +48,130 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V69.0 Core Styles */
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; font-family: "Zen Maru Gothic", sans-serif; color: #5D4037; overflow: hidden; -webkit-tap-highlight-color: transparent; background-color: #FFF0F5; overscroll-behavior: none; }
-    input, textarea, select { font-size: 16px !important; font-family: inherit; } 
+    /* V70.0 Visual Upgrade Core */
+    html, body {
+        margin: 0; padding: 0; width: 100%; height: 100%;
+        font-family: "Zen Maru Gothic", sans-serif;
+        color: #5D4037;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        background-color: #FFF0F5; /* Fallback */
+        overscroll-behavior: none;
+    }
+
+    /* V70.0 NEW BACKGROUND SYSTEM 
+       取代原本的櫻花，改用流體光暈 + 噪點紋理
+    */
+    #fixed-bg {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -2;
+        background: #fdf2f8; /* 極淡粉底色 */
+        overflow: hidden;
+    }
+
+    /* 流體光暈 (Blobs) */
+    .blob {
+        position: absolute;
+        filter: blur(80px);
+        opacity: 0.6;
+        animation: blob-bounce 20s infinite ease-in-out;
+        z-index: -2;
+        border-radius: 50%;
+    }
+    .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #FFD1DC; animation-delay: 0s; }
+    .blob-2 { top: 40%; right: -20%; width: 400px; height: 400px; background: #A2D2FF; animation-delay: -5s; }
+    .blob-3 { bottom: -10%; left: 20%; width: 600px; height: 600px; background: #FFF5BA; animation-delay: -10s; }
+
+    @keyframes blob-bounce {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    /* 噪點紋理 (Noise Texture) - 增加紙質感 */
+    #noise-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        z-index: -1;
+        opacity: 0.05;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* -------------------------------------- */
+
+    input, textarea, select { font-size: 16px !important; font-family: inherit; }
     * { -webkit-overflow-scrolling: touch; }
-    #app-content { height: 100%; overflow-y: auto; overflow-x: hidden; padding-bottom: 180px; padding-top: env(safe-area-inset-top); transition: padding-bottom 0.3s ease; }
+
+    #app-content {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-bottom: 180px;
+        padding-top: env(safe-area-inset-top);
+        transition: padding-bottom 0.3s ease;
+    }
     #app-content.view-shopping { padding-bottom: 250px !important; }
     body.modal-open #app-content { overflow: hidden; }
-    #fixed-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; background-color: #FFF0F5; background-image: radial-gradient(#FFD1DC 15%, transparent 16%), radial-gradient(#FFF5BA 15%, transparent 16%); background-size: 60px 60px; background-position: 0 0, 30px 30px; }
+
     [v-cloak] { display: none !important; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
-    
-    /* 卡片基礎樣式 */
-    .card { background: rgba(255, 255, 255, 0.95); border-radius: 24px; box-shadow: 0 8px 30px rgba(255, 105, 180, 0.12); border: 2px solid rgba(255, 255, 255, 0.8); margin-bottom: 0; position: relative; backdrop-filter: blur(10px); transition: all 0.2s ease; overflow: hidden; transform: translateZ(0); }
+
+    /* V70 卡片優化：增加透光感 */
+    .card {
+        background: rgba(255, 255, 255, 0.85); /* 稍微調低不透明度，讓背景透出來 */
+        border-radius: 24px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        margin-bottom: 0;
+        position: relative;
+        backdrop-filter: blur(12px); /* 毛玻璃核心 */
+        -webkit-backdrop-filter: blur(12px);
+        transition: all 0.2s ease;
+        overflow: hidden;
+        transform: translateZ(0);
+    }
     .card:active { transform: scale(0.98); border-color: #FFD1DC; }
-    
+
+    /* 特效字體 */
+    .immersive-text { text-shadow: 0 2px 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,182,193,0.5); }
+
+    /* SOS Grid System */
+    .sos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .sos-card {
+        border-radius: 20px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        background: rgba(255,255,255,0.9);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 2px solid white;
+        transition: transform 0.2s;
+        height: 100%;
+        justify-content: space-between;
+    }
+    .sos-card:active { transform: scale(0.96); }
+    .sos-icon { font-size: 32px; margin-bottom: 8px; }
+    .sos-title { font-weight: 900; font-size: 14px; margin-bottom: 4px; }
+    .sos-content { font-size: 11px; font-weight: 700; line-height: 1.4; opacity: 0.8; }
+
+    /* 便利商店 */
+    .konbini-card { border-left: 6px solid; padding: 15px; background: white; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .konbini-711 { border-color: #EF3340; }
+    .konbini-fam { border-color: #009245; }
+    .konbini-law { border-color: #0068B7; }
+
     /* V69 打卡攻略專用樣式 */
     .photo-strategy-box { background: #fff; border-radius: 12px; padding: 10px; margin-top: 8px; font-size: 11px; line-height: 1.5; border: 1px solid #eee; }
     .photo-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 900; font-size: 10px; margin-right: 4px; color: white; }
-    .tag-time { background-color: #F472B6; } /* Pink */
-    .tag-queue { background-color: #F59E0B; } /* Orange */
+    .tag-time { background-color: #F472B6; } 
+    .tag-queue { background-color: #F59E0B; } 
 
-    /* SOS & Immersive Styles */
-    .immersive-text { text-shadow: 0 2px 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,182,193,0.5); }
-    .sos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .sos-card { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid white; transition: transform 0.2s; height: 100%; justify-content: space-between; }
-    .sos-card:active { transform: scale(0.96); }
-    
     /* UI Components */
     .hp-bar-container { width: 100%; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-top: 5px; }
     .hp-bar-fill { height: 100%; transition: width 0.5s ease, background-color 0.5s ease; }
     .hp-low { background-color: #ef4444; } .hp-med { background-color: #f59e0b; } .hp-high { background-color: #10b981; }
+
     .packing-suitcase { width: 60px; height: 50px; background: #3b82f6; border-radius: 8px; position: relative; transition: all 0.5s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 2px solid #1e40af; }
     .packing-suitcase.full { background: #10b981; border-color: #047857; animation: pop 0.5s; }
     .packing-fill { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.3); transition: height 0.5s; }
@@ -96,9 +189,6 @@
     .raid-yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); border: 2px solid #fffbeb; }
     .raid-red { background: linear-gradient(135deg, #ef4444, #f87171); border: 2px solid #fef2f2; animation: pulse-fast; }
     
-    .konbini-card { border-left: 6px solid; padding: 15px; background: white; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .konbini-711 { border-color: #EF3340; } .konbini-fam { border-color: #009245; } .konbini-law { border-color: #0068B7; }
-
     .waku-container { display: flex; flex-direction: row-reverse; justify-content: flex-end; position: absolute; bottom: 16px; right: 60px; height: 32px; align-items: center; }
     .waku-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; margin-right: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1; transition: transform 0.2s; }
     .waku-avatar:hover { transform: scale(1.2); z-index: 10; }
@@ -106,10 +196,6 @@
     .lightbox-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; animation: fade-in 0.3s ease; }
     .lightbox-img { max-width: 95vw; max-height: 90vh; border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.2); transform: scale(1); animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-    .list-move, .list-enter-active, .list-leave-active { transition: all 0.5s ease; }
-    .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
-    .list-leave-active { position: absolute; }
-    
     .fab-home { position: fixed; bottom: calc(25px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; z-index: 90; border: 4px solid white; box-shadow: 0 10px 25px rgba(255,105,180,0.5); background: linear-gradient(135deg,#FF9EAC,#FFD1DC); cursor: pointer; }
     .fab-main { position: fixed; bottom: calc(100px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; z-index: 80; border: 3px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .fab-main.lifted { bottom: calc(180px + env(safe-area-inset-bottom)); }
@@ -129,9 +215,12 @@
 </head>
 <body>
 
-<div id="fixed-bg"></div>
-<div id="sakura-container"></div>
-
+<div id="fixed-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+<div id="noise-overlay"></div>
 <div id="app" v-cloak class="h-full flex flex-col">
     
     <div v-if="!isWelcomeClosed" class="welcome-screen flex flex-col items-center justify-between">
@@ -143,7 +232,7 @@
         </div>
         
         <div class="relative z-10 mt-[env(safe-area-inset-top)] pt-16 text-center px-6">
-            <div class="inline-block bg-white/20 backdrop-blur-lg px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/40 mb-4 animate-float shadow-lg">V69.0 INSTA-STRATEGY</div>
+            <div class="inline-block bg-white/20 backdrop-blur-lg px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/40 mb-4 animate-float shadow-lg">V70.0 VISUAL</div>
             <h1 class="text-6xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans immersive-text">關東之旅</h1>
             <p class="text-2xl text-white/90 font-bold tracking-widest drop-shadow-md immersive-text">2026.03.27</p>
         </div>
@@ -219,7 +308,7 @@
                 <div v-if="isGuest" class="text-center mt-4 text-xs font-bold text-gray-400 bg-gray-200 rounded-full py-1 w-32 mx-auto">訪客模式</div>
             </div>
 <div v-if="currentView==='itinerary'" class="px-5 py-4 animate-fade-in">
-                <div class="flex overflow-x-auto gap-3 mb-6 hide-scrollbar sticky top-0 bg-[#FFF0F5]/95 z-20 py-3 -mx-5 px-5 backdrop-blur-md">
+                <div class="flex overflow-x-auto gap-3 mb-6 hide-scrollbar sticky top-0 z-20 py-3 -mx-5 px-5">
                      <button v-for="(d,i) in tripDays" :key="i" @click="selectedDayIndex=i" :class="['px-6 py-3 rounded-2xl text-sm font-black border-2 transition shrink-0 shadow-sm flex flex-col items-center min-w-[70px]',selectedDayIndex===i?'bg-pink-400 text-white border-pink-400 shadow-lg scale-105':'bg-white text-gray-300 border-white']">
                         <span>{{d.week}}</span>
                         <span class="text-[10px] mt-1 opacity-80">{{d.title}}</span>
@@ -500,7 +589,7 @@ const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", auth
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
-// V68 User Update
+// V70 User Update
 const defaultUsers = [
     {id:1,name:'鈞',icon:'🐹',list:[...defaultPrepList]},
     {id:2,name:'丁',icon:'🐱',list:[...defaultPrepList]},
@@ -538,6 +627,30 @@ const foodSpots = {
     ]
 };
 
+const photoSpots = {
+    Tokyo: [
+        {name:'SHIBUYA SKY', desc:'東京最美展望台', img:'shibuya_sky.jpg', bestTime:'日落前 1 小時', queueTip:'需提前一個月官網搶票', link:'SHIBUYA SKY'},
+        {name:'豪德寺', desc:'滿滿招財貓', img:'gotokuji.jpg', bestTime:'上午 10:00', queueTip:'人多時需排隊入場', link:'豪德寺'},
+        {name:'東京鐵塔', desc:'芝公園最佳機位', img:'tokyo_tower.jpg', bestTime:'下午 3:00 或 晚上', queueTip:'公園免費，隨時可拍', link:'芝公園 4號地'},
+        {name:'淺草雷門', desc:'經典地標大燈籠', img:'kaminarimon.jpg', bestTime:'清晨 7:00 或 晚上', queueTip:'仲見世通人潮極多', link:'雷門'},
+        {name:'TeamLab', desc:'光影藝術展', img:'teamlab.jpg', bestTime:'預約時段', queueTip:'需赤腳入場，建議穿短褲', link:'TeamLab Planets'}
+    ],
+    Kamakura: [
+        {name:'鎌倉高校前', desc:'灌籃高手平交道', img:'kamakura_koko.jpg', bestTime:'清晨 7:00', queueTip:'遊客極多，注意安全', link:'鎌倉高校前駅'},
+        {name:'長谷寺', desc:'眺望湘南海岸', img:'hasedera.jpg', bestTime:'繡球花季需一早', queueTip:'旺季需領號碼牌', link:'長谷寺'},
+        {name:'報國寺', desc:'絕美竹林', img:'hokokuji.jpg', bestTime:'上午 9:00', queueTip:'抹茶席需排隊', link:'報國寺'},
+        {name:'江島神社', desc:'海上鳥居', img:'enoshima_shrine.jpg', bestTime:'日落時分', queueTip:'需爬階梯或搭電扶梯', link:'江島神社'},
+        {name:'七里濱', desc:'最美海岸線', img:'shichirigahama.jpg', bestTime:'夕陽', queueTip:'沿岸皆可拍', link:'七里ヶ浜 海岸'}
+    ],
+    Fuji: [
+        {name:'新倉山淺間公園', desc:'五重塔與富士山', img:'chureito_pagoda.jpg', bestTime:'清晨 6:00', queueTip:'需爬 398 階梯', link:'新倉山淺間公園'},
+        {name:'下吉田', desc:'日川時計店本町通', img:'honcho_street.jpg', bestTime:'清晨或傍晚', queueTip:'注意車輛，勿站路中', link:'日川時計店'},
+        {name:'大石公園', desc:'花海富士山', img:'oishi_park.jpg', bestTime:'上午順光', queueTip:'免費入場，人潮較多', link:'大石公園'},
+        {name:'河口湖車站', desc:'LAWSON 富士山', img:'kawaguchiko_station.jpg', bestTime:'清晨', queueTip:'LAWSON 門口現已設屏障', link:'河口湖駅'},
+        {name:'平野之濱', desc:'寧靜湖畔倒影', img:'hirano_beach.jpg', bestTime:'日出', queueTip:'無大眾運輸，建議自駕', link:'平野の浜'}
+    ]
+};
+
 const defaultData = {
     users: JSON.parse(JSON.stringify(defaultUsers)), 
     itinerary: [
@@ -568,11 +681,7 @@ const defaultData = {
     phrases: [{jp:'すみません',zh:'不好意思/請問'},{jp:'これください',zh:'我要這個'},{jp:'いくらですか',zh:'請問多少錢'},{jp:'お会計お願いします',zh:'我要結帳'},{jp:'袋いりません',zh:'不用袋子'},{jp:'トイレはどこですか',zh:'廁所在哪裡'},{jp:'写真を撮ってもいいですか',zh:'可以拍照嗎'},{jp:'英語メニューありますか',zh:'有英文菜單嗎'},{jp:'おすすめは何ですか',zh:'有推薦的嗎'},{jp:'水ください',zh:'請給我水'}], 
     spots: { 
         food: foodSpots, 
-        photo: {
-            Tokyo: [{name:'SHIBUYA SKY',desc:'東京最美展望台',link:'SHIBUYA SKY', img:'shibuya-sky.jpg'},{name:'豪德寺',desc:'滿滿招財貓',link:'豪德寺'},{name:'東京鐵塔',desc:'芝公園最佳機位',link:'芝公園 4號地'},{name:'淺草雷門',desc:'經典地標大燈籠',link:'雷門'},{name:'TeamLab',desc:'光影藝術展',link:'TeamLab Planets'}], 
-            Kamakura: [{name:'鎌倉高校前',desc:'灌籃高手平交道',link:'鎌倉高校前駅'},{name:'長谷寺',desc:'眺望湘南海岸',link:'長谷寺'},{name:'報國寺',desc:'絕美竹林',link:'報國寺'},{name:'江島神社',desc:'海上鳥居',link:'江島神社'},{name:'七里濱',desc:'最美海岸線',link:'七里ヶ浜 海岸'}], 
-            Fuji: [{name:'新倉山淺間公園',desc:'五重塔與富士山',link:'新倉山淺間公園'},{name:'下吉田',desc:'日川時計店本町通',link:'日川時計店'},{name:'大石公園',desc:'花海富士山',link:'大石公園'},{name:'河口湖車站',desc:'LAWSON 富士山',link:'河口湖駅'},{name:'平野之濱',desc:'寧靜湖畔倒影',link:'平野の浜'}]
-        } 
+        photo: photoSpots // V69 Integration
     },
     transportTickets: [
         {name:'東京地鐵券 (24/48/72h)', url:'https://www.tokyometro.jp/tcn/ticket/travel/index.html', icon:'fa-solid fa-subway', note:'【使用範圍】\n東京 Metro 9條線 + 都營地鐵 4條線\n\n【不適用】\nJR 山手線、私鐵 (如百合海鷗號)\n\n【啟用】\n第一次進站起算小時，建議連續使用。'},
@@ -589,7 +698,7 @@ const defaultData = {
         {name:'Megu Fuji', img:'megu.jpg', link:'Megu Fuji 2026'},
         {name:'DOMO 民宿', img:'domo.jpg', link:'DOMO 民宿 東新宿'}
     ],
-    // V68: Force Inject Shibuya Sky
+    // V69: Ensure Shibuya Sky is present
     suggestedTickets: [
         {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
@@ -636,7 +745,7 @@ createApp({
         const currentLoc = ref('Tokyo');
         
         const showKonbiniModal = ref(false);
-        const emergencyTab = ref('sos'); // V68 New Ref
+        const emergencyTab = ref('sos'); 
 
         const weatherLoading = ref(false);
         const weatherData = ref([
@@ -663,7 +772,6 @@ createApp({
         const showRentalModal = ref(false);
         const activeRental = ref({});
 
-        // V68: Translation (japanese) renamed to Emergency
         const apps = [{id:1,name:'行程',icon:'fa-solid fa-map',view:'itinerary',bgClass:'bg-pink-400'},{id:2,name:'小財庫',icon:'fa-solid fa-yen-sign',view:'money',bgClass:'bg-yellow-400'},{id:3,name:'住宿交通',icon:'fa-solid fa-hotel',view:'hotel',bgClass:'bg-indigo-400'},{id:4,name:'行前準備',icon:'fa-solid fa-suitcase',view:'prep',bgClass:'bg-blue-400'},{id:5,name:'吃吃喝喝',icon:'fa-solid fa-utensils',view:'food',bgClass:'bg-orange-400'},{id:6,name:'網美打卡',icon:'fa-solid fa-camera',view:'photo',bgClass:'bg-rose-400'},{id:7,name:'快樂購',icon:'fa-solid fa-bag-shopping',view:'shopping',bgClass:'bg-purple-400'},{id:8,name:'天氣',icon:'fa-solid fa-cloud-sun',view:'weather',bgClass:'bg-sky-400'},{id:9,name:'急難救助',icon:'fa-solid fa-truck-medical',view:'emergency',bgClass:'bg-red-500'}];
         const tripDays = [{week:'D1',title:'3/27'},{week:'D2',title:'3/28'},{week:'D3',title:'3/29'},{week:'D4',title:'3/30'},{week:'D5',title:'3/31'},{week:'D6',title:'4/01'},{week:'D7',title:'4/02'},{week:'D8',title:'4/03'}];
         const daysUntilTrip = ref(Math.ceil((new Date('2026-03-27') - new Date())/(1000*60*60*24)));
@@ -873,14 +981,14 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            const isReset = confirm(`【V68 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白問題？`); 
+            const isReset = confirm(`【V70 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】以修復空白問題？`); 
             if(isReset) forceRestoreDefaults();
         };
 
         const setCurrentUser = (u) => { 
             if(isGuest.value) return; 
             currentUser.value = u; 
-            localStorage.setItem('V68_LAST_USER_ID', u.id);
+            localStorage.setItem('V70_LAST_USER_ID', u.id);
             updateHeartbeat();
             showPersonaModal.value = false; currentView.value = 'menu'; 
         };
@@ -935,9 +1043,9 @@ createApp({
         const openGoogleTranslate = (text) => { window.open(`https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(text)}&op=translate`, '_blank'); };
         const handleCameraTranslate = () => { window.open('https://translate.google.com/?sl=auto&tl=zh-TW&op=images', '_blank'); };
         const expandCard = (p) => expandedPhrase.value=p;
-        const initSakura = () => { const container = document.getElementById('sakura-container'); if(!container) return; setInterval(() => { const petal = document.createElement('div'); petal.className = 'sakura'; petal.style.left = Math.random() * 100 + 'vw'; petal.style.animationDuration = Math.random() * 3 + 2 + 's'; petal.style.opacity = Math.random(); container.appendChild(petal); setTimeout(() => petal.remove(), 5000); }, 400); };
+        // V70: Removed initSakura() call
         
-        // V68 Intelligent Merge
+        // V70 Intelligent Merge
         const mergeUsers = (local, remote) => {
             if(!remote || !Array.isArray(remote)) return local;
             remote.forEach(rUser => {
@@ -953,7 +1061,7 @@ createApp({
             return local;
         };
 
-        // V68 FORCE FIX: Ensure Shibuya Sky exists at load
+        // V70 FORCE FIX: Ensure Shibuya Sky exists at load
         const ensureEssentialData = () => {
             const hasSky = suggestedTickets.value.find(t => t.name === 'SHIBUYA SKY');
             if(!hasSky) {
@@ -962,7 +1070,6 @@ createApp({
         };
 
         onMounted(() => {
-            initSakura();
             fetchRealWeather();
             
             if(auth) onAuthStateChanged(auth, u=>{ 
@@ -1009,7 +1116,7 @@ createApp({
             
             setInterval(updateHeartbeat, 30000);
             
-            const lastId = localStorage.getItem('V68_LAST_USER_ID');
+            const lastId = localStorage.getItem('V70_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
 
@@ -1029,7 +1136,7 @@ createApp({
             getMapCover, getRaidClass, getRaidLabel, getRaidIcon, toggleFoodVote, getUserAvatar,
             previewImg, openLightbox, closeLightbox, showKonbiniModal,
             getGreeting, getBudgetMood, getPackingProgress, getStamina, getStaminaColor, quickExpense,
-            emergencyTab // V68 Export
+            emergencyTab 
         };
     }
 }).mount('#app');
