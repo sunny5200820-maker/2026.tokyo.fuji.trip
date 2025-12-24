@@ -681,13 +681,11 @@ const defaultData = {
         [{hours:"09:00",category:"Sightseeing",name:"東京鐵塔/麻布台",note:"六本木周遭拍照",mapKeyword:"麻布台Hills",travelTime:"⬇ 30min (地鐵)"},{hours:"12:00",category:"Food",name:"六本木餐廳",note:"午餐",mapKeyword:"六本木 美食",travelTime:"⬇ 10min (步行)"},{hours:"14:00",category:"Shopping",name:"前往澀谷",note:"逛街",mapKeyword:"澀谷站",travelTime:"⬇ 15min (地鐵)"},{hours:"17:00",category:"Sightseeing",name:"SHIBUYA SKY",note:"絕美日落/十字路口",mapKeyword:"SHIBUYA SKY",travelTime:"⬇ 5min (步行)"},{hours:"20:00",category:"Food",name:"澀谷餐廳",note:"晚餐",mapKeyword:"澀谷 美食"}],
         [{hours:"10:00",category:"Sightseeing",name:"自由行程",note:"最後採買",mapKeyword:"上野阿美橫丁",travelTime:"⬇ 0min"},{hours:"20:40",category:"Flight",name:"NRT 起飛",note:"成田機場報到",mapKeyword:"成田機場"},{hours:"23:20",category:"Flight",name:"TPE 抵達",note:"回到溫暖的家",mapKeyword:"桃園機場"}]
     ],
-    // V71.3 Fix: 確保 drivePlan 有 3 個陣列 (Day3, Day4, Day5)
     drivePlan: [
         [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發",travelTime:"🚗 120min"}, {hours:"10:30",category:"Transport",name:"開始租車",note:"河口湖 租車",travelTime:"🚗 20min",parkingLink:"河口湖駅 駐車場"}, {hours:"13:00",category:"Sightseeing",name:"河口湖自然生活館",note:"大石公園絕景",travelTime:"🚗 20min",parkingLink:"大石公園 駐車場"}, {hours:"15:00",category:"Sightseeing",name:"新倉山淺間公園",note:"忠靈塔瞭望台",travelTime:"🚗 15min",parkingLink:"新倉山淺間公園 駐車場"}, {hours:"17:30",category:"Sightseeing",name:"金鳥居/本町商店街",note:"日川時計店拍照",travelTime:"🚗 10min",parkingLink:"富士吉田市営 本町通り駐車場"}, {hours:"19:00",category:"Food",name:"晚餐",note:"自行烹飪或商店街"}],
         [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出",travelTime:"🚗 30min",parkingLink:"平野の浜 駐車場"}, {hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",travelTime:"🚗 15min",parkingLink:"長池親水公園 駐車場"}, {hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",travelTime:"🚗 20min"}, {hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",travelTime:"🚗 30min",parkingLink:"旭日丘湖畔緑地公園 駐車場"}, {hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)"}],
         [{hours:"09:00",category:"Sightseeing",name:"河口湖纜車",note:"天上山公園絕景",travelTime:"🚗 15min",parkingLink:"河口湖畔県営駐車場"}, {hours:"11:00",category:"Shopping",name:"Fujisan Shokupan",note:"富士山吐司伴手禮",travelTime:"🚗 10min",parkingLink:"Fujisan Shokupan Parking"}, {hours:"12:30",category:"Food",name:"河口湖午餐",note:"最後的富士山美食",travelTime:"🚗 15min"}, {hours:"13:30",category:"Transport",name:"加油/還車",note:"加滿油後歸還",travelTime:"🚶 5min"}, {hours:"14:00",category:"Transport",name:"富士回遊",note:"前往新宿 (車上補眠)",travelTime:"⬇ 120min (JR特急)"}, {hours:"16:30",category:"Shopping",name:"池袋太陽城",note:"東京市區逛街",travelTime:"⬇ 20min"}]
     ],
-    // V71.5 Update: 完整的購物清單 (包含 Fashion, Toys, Others)
     shopping: {
         cosme: [
             {name:'Canmake 臥蠶盤', link:'https://www.canmake.com/', img:'canmake.jpg'},
@@ -710,7 +708,6 @@ const defaultData = {
             {name:'Tokyo Banana', link:'https://www.tokyobanana.jp/'},
             {name:'白色戀人', link:'https://www.ishiya.co.jp/'}
         ],
-        // ★★★ 新增：流行服飾 ★★★
         fashion: [
             {name:'GU (比台灣便宜)', link:'https://www.gu-global.com/jp/ja/'},
             {name:'UNIQLO 旗艦店', link:'https://www.uniqlo.com/jp/ja/'},
@@ -718,7 +715,6 @@ const defaultData = {
             {name:'Workman Girl', link:'https://www.workman.co.jp/'},
             {name:'WEGO 原宿', link:'https://wego.jp/'}
         ],
-        // ★★★ 新增：扭蛋/玩具 ★★★
         toy: [
             {name:'池袋 扭蛋百貨店 (太陽城)', link:'https://bandainamco-am.co.jp/others/gashapon-dept/'},
             {name:'Nintendo Tokyo (澀谷)', link:'https://www.nintendo.co.jp/officialstore/'},
@@ -726,7 +722,6 @@ const defaultData = {
             {name:'Pokemon Center', link:'https://www.pokemon.co.jp/shop/'},
             {name:'駿河屋 (二手動漫)', link:'https://www.suruga-ya.jp/'}
         ],
-        // ★★★ 新增：生活雜貨 ★★★
         other: [
             {name:'Standard Products (高級大創)', link:'https://standardproducts.jp/'},
             {name:'3COINS (300圓好物)', link:'https://www.3coins.jp/'},
@@ -845,20 +840,21 @@ createApp({
         const compressImage = (base64) => { return new Promise((resolve) => { const img = new Image(); img.src = base64; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const MAX = 600; if(w>MAX){ h*=MAX/w; w=MAX; } canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); resolve(canvas.toDataURL('image/jpeg', 0.6)); }; }); };
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
-        
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
         
-        // V71.1 Fix: Google Maps URL
+        // ★★★ V71.7 Fix: Google Maps URL syntax error fixed ($) ★★★
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
             if(q.startsWith('http')) return q; 
-            return `https://maps.google.com/?q=...2{encodeURIComponent(q)}`; 
+            // 修正：補上 $ 符號，並使用最穩定的 Google Maps 搜尋格式
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; 
         };
         const getDirLink = (dest) => { 
             const list = getCurrentItinerary(); 
             let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
-            return `https://maps.google.com/?q=...3{encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}&travelmode=transit`; 
+            // 修正：補上 $ 符號
+            return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=transit`; 
         };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
         
@@ -878,12 +874,12 @@ createApp({
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((sum, e) => sum + getAmountInTWD(e), 0));
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         
-        // ★★★ V71 嚴格版智慧分帳演算法 ★★★
+        // V71.1 Fix: 嚴格分帳邏輯 (防 NaN)
         const settlements = computed(() => {
             const b = {}; 
             users.value.forEach(u => b[u.id] = 0);
             groupExpenses.value.forEach(e => {
-                if (b[e.whoPaid] === undefined) return; // 防呆
+                if (b[e.whoPaid] === undefined) return; 
                 const amountTWD = e.currency === 'JPY' ? (e.amount * exchangeRate.value) : parseFloat(e.amount);
                 const validTargets = e.forWhom.filter(uid => b[uid] !== undefined);
                 if (validTargets.length === 0) return;
@@ -935,7 +931,6 @@ createApp({
             return 'fa-solid fa-seedling';
         };
         
-        // V71.6 新增：頭像投票邏輯
         const toggleFoodVote = (item) => {
             if(!currentUser.value) return;
             if(!item.votes) item.votes = [];
@@ -1116,7 +1111,7 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            const isReset = confirm(`【V71.6 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
+            const isReset = confirm(`【V71.7 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
             if(isReset) forceRestoreDefaults();
         };
 
@@ -1241,11 +1236,12 @@ createApp({
                                 if(dt.expenses) expenses.value = dt.expenses;
                                 
                                 if(dt.spots) {
+                                    // V71 Update: Repair spot data on load
                                     spots.value = repairSpotData(dt.spots);
                                 }
                                 
-                                // ★★★ V71.5 自動修復 Shopping：確保新分類存在 ★★★
                                 if(dt.shopping) {
+                                    // V71.5 Update: 自動補齊 Shopping 資料
                                     shopping.value = {
                                         cosme: dt.shopping.cosme || defaultData.shopping.cosme,
                                         ldk: dt.shopping.ldk || defaultData.shopping.ldk,
@@ -1255,7 +1251,7 @@ createApp({
                                         other: dt.shopping.other || defaultData.shopping.other
                                     };
                                 } else {
-                                    shopping.value = defaultData.shopping;
+                                    shopping.value = dt.shopping || defaultData.shopping;
                                 }
 
                                 if(dt.coupons) coupons.value = dt.coupons;
@@ -1274,6 +1270,7 @@ createApp({
                                 }
                                 ensureEssentialData();
 
+                                // V71.4 Update: 自動補齊 Day 5 自駕資料
                                 if (drivePlan.value.length < 3) {
                                     for (let i = drivePlan.value.length; i < 3; i++) {
                                         drivePlan.value.push(JSON.parse(JSON.stringify(defaultData.drivePlan[i])));
