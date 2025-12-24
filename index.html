@@ -631,7 +631,6 @@ const foodSpots = {
     ]
 };
 
-// 完整的打卡攻略資料
 const photoSpots = {
     Tokyo: [
         {name:'SHIBUYA SKY', desc:'東京最美展望台', img:'shibuya_sky.jpg', bestTime:'🌇 日落前 1 小時 (Magic Hour)', queueTip:'⚠️ 門票極難搶！開放預約當日(4週前)的台灣時間晚上11點準時搶。現場通常無票。', link:'SHIBUYA SKY'},
@@ -788,13 +787,23 @@ createApp({
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
+        
+        // ★★★ V71.1 Link Fix: Use standard Google Maps URL format ★★★
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
             if(q.startsWith('http')) return q; 
-            return `http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(q)}`; 
+            // Correct format: https://www.google.com/maps/search/?api=1&query=...
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; 
+        };
+        const getDirLink = (dest) => { 
+            const list = getCurrentItinerary(); 
+            let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
+            // Correct format: https://www.google.com/maps/dir/?api=1&origin=...
+            return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=transit`; 
         };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
+        
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','emergency':'急難救助'}[view]||'關東之旅');
         
@@ -805,7 +814,6 @@ createApp({
         const getPaymentIcon = (m) => ({'cash':'💵','card':'💳','suica':'🐧','other':'🔖'}[m]||'💵');
         const flightStatusLink = (code) => code ? `https://www.flightradar24.com/data/flights/${code.toLowerCase()}` : '';
         const getAirlineInfo = (flightCode, isShort) => { if(!flightCode) return null; const c = flightCode.toUpperCase(); if(c.startsWith('TR')) return isShort?"酷航 Scoot":"【酷航 Scoot】\n📍 報到：桃園 T1 / 成田 T1 南翼\n🧳 手提：10kg (嚴格秤重)"; if(c.startsWith('BR')) return isShort?"長榮 EVA":"【長榮 EVA】\n📍 報到：桃園 T2 / 成田 T1 南翼\n🧳 託運：計件制 23kg x 2 件"; return '請確認電子機票上的航廈資訊'; };
-        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return `http://googleusercontent.com/maps.google.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}&travelmode=transit`; };
 
         const getAmountInTWD = (e) => e.currency==='JPY' ? e.amount*exchangeRate.value : e.amount;
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
@@ -930,13 +938,11 @@ createApp({
             saveData();
         };
 
-        // --- V71 修復資料：強制補上詳細攻略 ---
         const repairSpotData = (remoteSpots) => {
             if (!remoteSpots || !remoteSpots.photo) return remoteSpots;
             ['Tokyo', 'Kamakura', 'Fuji'].forEach(loc => {
                 if (photoSpots[loc]) {
                     if (!remoteSpots.photo[loc]) remoteSpots.photo[loc] = [];
-                    // 用本地詳細資料去更新雲端回來的簡略資料
                     photoSpots[loc].forEach((localItem) => {
                         let remoteItem = remoteSpots.photo[loc].find(r => r.name === localItem.name);
                         if (remoteItem) {
@@ -1050,7 +1056,7 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            const isReset = confirm(`【V71 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
+            const isReset = confirm(`【V71.1 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
             if(isReset) forceRestoreDefaults();
         };
 
@@ -1230,3 +1236,4 @@ createApp({
 </script>
 </body>
 </html>
+
