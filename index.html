@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF0F5">
-<title>關東之旅 2026 (V71.3 Final)</title>
+<title>關東之旅 2026 (V71.5 Shopping Upgrade)</title>
 
 <script>
     window.tailwind = {
@@ -48,14 +48,14 @@
 <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
 
 <style>
-    /* V71.3 Visual Repair: 透明化背景，讓特效顯現 */
+    /* V71.5 Core Style */
     html, body {
         margin: 0; padding: 0; width: 100%; height: 100%;
         font-family: "Zen Maru Gothic", sans-serif;
         color: #5D4037;
         overflow: hidden;
         -webkit-tap-highlight-color: transparent;
-        background-color: transparent !important; /* 關鍵修改：背景透明 */
+        background-color: transparent !important; /* 背景透明化 */
         overscroll-behavior: none;
     }
 
@@ -230,7 +230,7 @@
         </div>
         
         <div class="relative z-10 mt-[env(safe-area-inset-top)] pt-16 text-center px-6">
-            <div class="inline-block bg-white/20 backdrop-blur-lg px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/40 mb-4 animate-float shadow-lg">V71.3 ULTIMATE</div>
+            <div class="inline-block bg-white/20 backdrop-blur-lg px-6 py-2 rounded-full text-white text-xs font-black tracking-[0.2em] border border-white/40 mb-4 animate-float shadow-lg">V71.5 SHOPPING</div>
             <h1 class="text-6xl font-black text-white drop-shadow-lg tracking-widest mb-2 font-sans immersive-text">關東之旅</h1>
             <p class="text-2xl text-white/90 font-bold tracking-widest drop-shadow-md immersive-text">2026.03.27</p>
         </div>
@@ -449,7 +449,15 @@
 
             <div v-if="currentView==='shopping'" class="px-5 py-4 animate-fade-in">
                 <div class="grid grid-cols-2 gap-3 mb-6"><a href="https://www.cosme.net/ranking/" target="_blank" class="bg-green-50 text-green-600 p-3 rounded-xl text-center font-bold text-xs border border-green-200 block active:scale-95 transition">👑 COSME 大賞</a><a href="https://www.shinyusha.co.jp/media/ldk-the-beauty/" target="_blank" class="bg-pink-50 text-pink-600 p-3 rounded-xl text-center font-bold text-xs border border-pink-200 block active:scale-95 transition">💄 LDK 毒舌雜誌</a></div>
-                <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar"><button v-for="cat in ['cosme','ldk','souvenir']" @click="shopCat=cat" :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition active:scale-95', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">{{{'cosme':'藥妝清單','ldk':'LDK推薦','souvenir':'伴手禮'}[cat]}}</button></div>
+                
+                <div class="flex gap-2 mb-4 overflow-x-auto hide-scrollbar">
+                    <button v-for="cat in ['cosme','ldk','souvenir','fashion','toy','other']" 
+                            @click="shopCat=cat" 
+                            :class="['px-5 py-2 rounded-full font-bold text-xs whitespace-nowrap transition active:scale-95', shopCat===cat?'bg-pink-400 text-white':'bg-white text-gray-400']">
+                        {{ {'cosme':'💄 藥妝','ldk':'👑 LDK','souvenir':'🎁 伴手禮','fashion':'👗 服飾','toy':'💊 扭蛋玩具','other':'🛍️ 雜貨其他'}[cat] }}
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4"><div v-for="(item,idx) in shopping[shopCat]" class="food-card relative group" :key="idx"><div class="item-img-container" @click.stop="openLightbox(item.img)"><div class="img-fallback">圖片待補</div><img v-if="item.img" :src="getImg(item.img)" class="relative z-10 group-hover:scale-110" @error="handleImgError"></div><div class="p-3"><div class="font-bold text-gray-800 text-sm mb-1 truncate">{{item.name}}</div><a :href="item.link || getSearchLink(item.name)" target="_blank" class="block text-center bg-gray-50 text-gray-500 text-[10px] py-1.5 rounded font-bold hover:bg-pink-500 hover:text-white transition active:scale-95">前往官網 / 搜尋</a></div><div v-if="!isGuest" class="absolute top-1 right-1 flex gap-1 z-20"><button @click="openEditModal('shopping', item, idx)" class="bg-white/90 p-1.5 rounded-full text-blue-400 shadow w-7 h-7 flex items-center justify-center active:scale-90"><i class="fa-solid fa-pen text-[10px]"></i></button></div></div></div>
                 <button v-if="!isGuest" @click="openAddShopModal" class="fab-main bg-purple-400 text-white" :class="{'lifted': currentView === 'shopping'}"><i class="fa-solid fa-plus"></i></button>
                 <button @click="showCouponModal=true" class="coupon-fab"><i class="fa-solid fa-ticket"></i></button>
@@ -660,22 +668,63 @@ const defaultData = {
         [{hours:"09:00",category:"Sightseeing",name:"淺草寺",note:"雷門/仲見世通",mapKeyword:"淺草寺",travelTime:"⬇ 20min (電車)"},{hours:"12:00",category:"Food",name:"淺草周遭",note:"午餐",mapKeyword:"淺草站 美食",travelTime:"⬇ 5min (步行)"},{hours:"14:00",category:"Sightseeing",name:"小網神社/上野公園",note:"強運厄除/公園散步",mapKeyword:"小網神社",travelTime:"⬇ 25min (電車)"},{hours:"18:00",category:"Shopping",name:"秋葉原/東京一番街",note:"動漫或逛街",mapKeyword:"秋葉原",travelTime:"⬇ 15min (電車)"},{hours:"20:00",category:"Food",name:"晚餐",note:"依逛街行程決定",mapKeyword:"東京車站 美食"}],
         [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發 (富士回遊)",mapKeyword:"錦糸町站",travelTime:"⬇ 120min (JR特急)"},{hours:"10:30",category:"Transport",name:"開始租車",note:"富士山租車 3天2夜",mapKeyword:"河口湖 租車",travelTime:"⬇ 0min"},{hours:"13:00",category:"Sightseeing",name:"河口湖自然生活館",note:"大石公園絕景",mapKeyword:"河口湖自然生活館",travelTime:"⬇ 20min (車)"},{hours:"15:00",category:"Sightseeing",name:"新倉山淺間公園",note:"忠靈塔瞭望台 (需爬階梯)",mapKeyword:"新倉山淺間公園",travelTime:"⬇ 25min (車)"},{hours:"17:30",category:"Sightseeing",name:"金鳥居/本町商店街",note:"日川時計店拍照",mapKeyword:"富士吉田本町通り",travelTime:"⬇ 10min (車)"},{hours:"19:00",category:"Food",name:"晚餐",note:"自行烹飪或商店街",mapKeyword:"Ogino 河口湖店"}],
         [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出 (視天氣)",mapKeyword:"平野の浜",travelTime:"⬇ 30min (車)"},{hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",mapKeyword:"長池親水公園",travelTime:"⬇ 15min (車)"},{hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",mapKeyword:"山中湖 美食",travelTime:"⬇ 0min"},{hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",mapKeyword:"KABA BUS",travelTime:"⬇ 10min (車)"},{hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)",mapKeyword:"Ogino 河口湖店",travelTime:"⬇ 30min (車)"}],
-        // V71.3 Fix: Day 5 自駕資料
-        [{hours:"09:00",category:"Sightseeing",name:"河口湖纜車",note:"天上山公園絕景",travelTime:"⬇ 20min (車)"},{hours:"11:00",category:"Shopping",name:"Fujisan Shokupan",note:"購買伴手禮點心",travelTime:"⬇ 10min (車)"},{hours:"14:00",category:"Transport",name:"富士回遊",note:"返回東京新宿 (放行李)",travelTime:"⬇ 120min (JR特急)"},{hours:"16:30",category:"Shopping",name:"池袋太陽城",note:"逛街行程",travelTime:"⬇ 20min (電車)"},{hours:"19:00",category:"Food",name:"太陽城餐廳",note:"晚餐",mapKeyword:"池袋太陽城 美食"}],
+        [{hours:"09:00",category:"Sightseeing",name:"河口湖纜車",note:"金鳥居/絕景鞦韆",mapKeyword:"河口湖 富士山全景纜車",travelTime:"⬇ 20min (車)"},{hours:"11:00",category:"Shopping",name:"Fujisan Shokupan",note:"購買伴手禮點心",mapKeyword:"Fujisan Shokupan",travelTime:"⬇ 10min (車)"},{hours:"14:00",category:"Transport",name:"富士回遊",note:"返回東京新宿 (放行李)",mapKeyword:"河口湖站",travelTime:"⬇ 120min (JR特急)"},{hours:"16:30",category:"Shopping",name:"池袋太陽城",note:"逛街行程",mapKeyword:"池袋太陽城",travelTime:"⬇ 20min (電車)"},{hours:"19:00",category:"Food",name:"太陽城餐廳",note:"晚餐",mapKeyword:"池袋太陽城 美食"}],
         [{hours:"09:00",category:"Transport",name:"前往藤澤",note:"新宿出發 (江之電一日遊)",mapKeyword:"新宿站",travelTime:"⬇ 60min (小田急)"},{hours:"10:30",category:"Sightseeing",name:"江之島/鎌倉高校",note:"灌籃高手平交道",mapKeyword:"鎌倉高校前站",travelTime:"⬇ 20min (江之電)"},{hours:"13:00",category:"Food",name:"七里濱餐廳",note:"午餐",mapKeyword:"七里濱 美食",travelTime:"⬇ 10min (江之電)"},{hours:"15:00",category:"Sightseeing",name:"鎌倉/鶴岡八幡宮",note:"小町通逛街",mapKeyword:"鶴岡八幡宮",travelTime:"⬇ 20min (江之電)"},{hours:"18:00",category:"Transport",name:"返回新宿",note:"晚餐: 新宿或烹飪",mapKeyword:"新宿站",travelTime:"⬇ 60min (小田急)"}],
         [{hours:"09:00",category:"Sightseeing",name:"東京鐵塔/麻布台",note:"六本木周遭拍照",mapKeyword:"麻布台Hills",travelTime:"⬇ 30min (地鐵)"},{hours:"12:00",category:"Food",name:"六本木餐廳",note:"午餐",mapKeyword:"六本木 美食",travelTime:"⬇ 10min (步行)"},{hours:"14:00",category:"Shopping",name:"前往澀谷",note:"逛街",mapKeyword:"澀谷站",travelTime:"⬇ 15min (地鐵)"},{hours:"17:00",category:"Sightseeing",name:"SHIBUYA SKY",note:"絕美日落/十字路口",mapKeyword:"SHIBUYA SKY",travelTime:"⬇ 5min (步行)"},{hours:"20:00",category:"Food",name:"澀谷餐廳",note:"晚餐",mapKeyword:"澀谷 美食"}],
         [{hours:"10:00",category:"Sightseeing",name:"自由行程",note:"最後採買",mapKeyword:"上野阿美橫丁",travelTime:"⬇ 0min"},{hours:"20:40",category:"Flight",name:"NRT 起飛",note:"成田機場報到",mapKeyword:"成田機場"},{hours:"23:20",category:"Flight",name:"TPE 抵達",note:"回到溫暖的家",mapKeyword:"桃園機場"}]
     ],
-    // V71.3 Fix: 確保 drivePlan 有 3 個陣列 (Day3, Day4, Day5)
     drivePlan: [
         [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發",travelTime:"🚗 120min"}, {hours:"10:30",category:"Transport",name:"開始租車",note:"河口湖 租車",travelTime:"🚗 20min",parkingLink:"河口湖駅 駐車場"}, {hours:"13:00",category:"Sightseeing",name:"河口湖自然生活館",note:"大石公園絕景",travelTime:"🚗 20min",parkingLink:"大石公園 駐車場"}, {hours:"15:00",category:"Sightseeing",name:"新倉山淺間公園",note:"忠靈塔瞭望台",travelTime:"🚗 15min",parkingLink:"新倉山淺間公園 駐車場"}, {hours:"17:30",category:"Sightseeing",name:"金鳥居/本町商店街",note:"日川時計店拍照",travelTime:"🚗 10min",parkingLink:"富士吉田市営 本町通り駐車場"}, {hours:"19:00",category:"Food",name:"晚餐",note:"自行烹飪或商店街"}],
         [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出",travelTime:"🚗 30min",parkingLink:"平野の浜 駐車場"}, {hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",travelTime:"🚗 15min",parkingLink:"長池親水公園 駐車場"}, {hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",travelTime:"🚗 20min"}, {hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",travelTime:"🚗 30min",parkingLink:"旭日丘湖畔緑地公園 駐車場"}, {hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)"}],
         [{hours:"09:00",category:"Sightseeing",name:"河口湖纜車",note:"天上山公園絕景",travelTime:"🚗 15min",parkingLink:"河口湖畔県営駐車場"}, {hours:"11:00",category:"Shopping",name:"Fujisan Shokupan",note:"富士山吐司伴手禮",travelTime:"🚗 10min",parkingLink:"Fujisan Shokupan Parking"}, {hours:"12:30",category:"Food",name:"河口湖午餐",note:"最後的富士山美食",travelTime:"🚗 15min"}, {hours:"13:30",category:"Transport",name:"加油/還車",note:"加滿油後歸還",travelTime:"🚶 5min"}, {hours:"14:00",category:"Transport",name:"富士回遊",note:"前往新宿 (車上補眠)",travelTime:"⬇ 120min (JR特急)"}, {hours:"16:30",category:"Shopping",name:"池袋太陽城",note:"東京市區逛街",travelTime:"⬇ 20min"}]
     ],
+    // V71.5 Update: 完整的購物清單 (包含 Fashion, Toys, Others)
     shopping: {
-        cosme: [{name:'Canmake 臥蠶盤',link:'https://www.canmake.com/', img:'canmake.jpg'},{name:'Kate 怪獸唇膏',link:'https://www.nomorerules.net/'},{name:'Tirtir 氣墊粉餅',link:''},{name:'Cezanne 珠光修容',link:'https://www.cezanne.co.jp/'},{name:'Excel 眼影',link:'https://noevirgroup.jp/excel/'}],
-        ldk: [{name:'MINON 胺基酸面膜',link:'https://www.daiichisankyo-hc.co.jp/site_minon/'},{name:'Quality 1st 面膜',link:''},{name:'IHADA 化妝水',link:''},{name:'Elixir 小金管',link:''},{name:'Fino 髮膜',link:''}],
-        souvenir: [{name:'NY Perfect Cheese',link:''},{name:'Press Butter Sand',link:'https://buttersand.com/'},{name:'Sugar Butter Tree',link:''},{name:'Tokyo Banana',link:'https://www.tokyobanana.jp/'},{name:'白色戀人',link:'https://www.ishiya.co.jp/'}]
+        cosme: [
+            {name:'Canmake 臥蠶盤', link:'https://www.canmake.com/', img:'canmake.jpg'},
+            {name:'Kate 怪獸唇膏', link:'https://www.nomorerules.net/'},
+            {name:'Tirtir 氣墊粉餅', link:''},
+            {name:'Cezanne 珠光修容', link:'https://www.cezanne.co.jp/'},
+            {name:'Excel 眼影', link:'https://noevirgroup.jp/excel/'}
+        ],
+        ldk: [
+            {name:'MINON 胺基酸面膜', link:'https://www.daiichisankyo-hc.co.jp/site_minon/'},
+            {name:'Quality 1st 面膜', link:''},
+            {name:'IHADA 化妝水', link:''},
+            {name:'Elixir 小金管', link:''},
+            {name:'Fino 髮膜', link:''}
+        ],
+        souvenir: [
+            {name:'NY Perfect Cheese', link:''},
+            {name:'Press Butter Sand', link:'https://buttersand.com/'},
+            {name:'Sugar Butter Tree', link:''},
+            {name:'Tokyo Banana', link:'https://www.tokyobanana.jp/'},
+            {name:'白色戀人', link:'https://www.ishiya.co.jp/'}
+        ],
+        // ★★★ 新增：流行服飾 ★★★
+        fashion: [
+            {name:'GU (比台灣便宜)', link:'https://www.gu-global.com/jp/ja/'},
+            {name:'UNIQLO 旗艦店', link:'https://www.uniqlo.com/jp/ja/'},
+            {name:'ABC-MART Grand Stage', link:'https://gs.abc-mart.net/'},
+            {name:'Workman Girl', link:'https://www.workman.co.jp/'},
+            {name:'WEGO 原宿', link:'https://wego.jp/'}
+        ],
+        // ★★★ 新增：扭蛋/玩具 ★★★
+        toy: [
+            {name:'池袋 扭蛋百貨店 (太陽城)', link:'https://bandainamco-am.co.jp/others/gashapon-dept/'},
+            {name:'Nintendo Tokyo (澀谷)', link:'https://www.nintendo.co.jp/officialstore/'},
+            {name:'Kiddy Land (原宿)', link:'https://www.kiddyland.co.jp/harajuku/'},
+            {name:'Pokemon Center', link:'https://www.pokemon.co.jp/shop/'},
+            {name:'駿河屋 (二手動漫)', link:'https://www.suruga-ya.jp/'}
+        ],
+        // ★★★ 新增：生活雜貨 ★★★
+        other: [
+            {name:'Standard Products (高級大創)', link:'https://standardproducts.jp/'},
+            {name:'3COINS (300圓好物)', link:'https://www.3coins.jp/'},
+            {name:'LOFT 文具雜貨', link:'https://www.loft.co.jp/'},
+            {name:'Seria (100圓店)', link:'https://www.seria-group.com/'},
+            {name:'Donki 唐吉訶德', link:'https://www.donki.com/'}
+        ]
     },
     coupons: [
         {name: '唐吉訶德', discount: '10% (免稅) + 5%', link: 'https://www.djapanpass.com/coupon/0002000103', note: '未稅滿 1萬日圓'},
@@ -795,12 +844,12 @@ createApp({
             const q = k || n; 
             if(!q) return ''; 
             if(q.startsWith('http')) return q; 
-            return `https://www.google.com/maps/search/?api=1&query=...8{encodeURIComponent(q)}`; 
+            return `https://maps.google.com/?q=...0{encodeURIComponent(q)}`; 
         };
         const getDirLink = (dest) => { 
             const list = getCurrentItinerary(); 
             let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
-            return `https://www.google.com/maps/search/?api=1&query=...9{encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}&travelmode=transit`; 
+            return `https://maps.google.com/?q=...1{encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}&travelmode=transit`; 
         };
         const getSearchLink = (n) => `https://www.google.com/search?q=${encodeURIComponent(n)}`;
         
@@ -1056,7 +1105,7 @@ createApp({
         };
 
         const showDiagnostic = () => { 
-            const isReset = confirm(`【V71.4 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
+            const isReset = confirm(`【V71.5 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
             if(isReset) forceRestoreDefaults();
         };
 
@@ -1181,11 +1230,25 @@ createApp({
                                 if(dt.expenses) expenses.value = dt.expenses;
                                 
                                 if(dt.spots) {
-                                    // V71 Update: Repair spot data on load
                                     spots.value = repairSpotData(dt.spots);
                                 }
                                 
-                                if(dt.shopping) shopping.value = dt.shopping;
+                                // ★★★ V71.5 自動修復 Shopping：確保新分類存在 ★★★
+                                if(dt.shopping) {
+                                    // 使用 "展開運算符" 將預設資料與雲端資料合併
+                                    // 這樣如果雲端缺了 fashion/toy，會自動補上；如果有了，就用雲端的
+                                    shopping.value = {
+                                        cosme: dt.shopping.cosme || defaultData.shopping.cosme,
+                                        ldk: dt.shopping.ldk || defaultData.shopping.ldk,
+                                        souvenir: dt.shopping.souvenir || defaultData.shopping.souvenir,
+                                        fashion: dt.shopping.fashion || defaultData.shopping.fashion,
+                                        toy: dt.shopping.toy || defaultData.shopping.toy,
+                                        other: dt.shopping.other || defaultData.shopping.other
+                                    };
+                                } else {
+                                    shopping.value = defaultData.shopping;
+                                }
+
                                 if(dt.coupons) coupons.value = dt.coupons;
                                 if(dt.phrases) japanesePhrases.value = dt.phrases;
                                 if(dt.tickets) suggestedTickets.value = dt.tickets;
@@ -1202,13 +1265,10 @@ createApp({
                                 }
                                 ensureEssentialData();
 
-                                // ★★★ V71.4 自動修復：如果您不想重置資料，這段會幫您補上缺失的第五天自駕資料 ★★★
                                 if (drivePlan.value.length < 3) {
-                                    // 從預設值補齊缺失的天數 (例如 Day 5)
                                     for (let i = drivePlan.value.length; i < 3; i++) {
                                         drivePlan.value.push(JSON.parse(JSON.stringify(defaultData.drivePlan[i])));
                                     }
-                                    // 觸發一次存檔以更新雲端
                                     saveData();
                                 }
                             }
