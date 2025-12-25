@@ -843,8 +843,13 @@ createApp({
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
-        const getMapLink = (k,n) => { const q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return 'http://googleusercontent.com/maps.google.com/?q=' + encodeURIComponent(q); };
-        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return 'http://googleusercontent.com/maps.google.com/?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; };
+        
+        // ★★★ 修正點 1：地圖連結 ★★★
+        const getMapLink = (k,n) => { const q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return 'https://www.google.com/maps?q=' + encodeURIComponent(q); };
+        
+        // ★★★ 修正點 2：導航連結 ★★★
+        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return 'https://www.google.com/maps?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; };
+        
         const getSearchLink = (n) => 'https://www.google.com/search?q=' + encodeURIComponent(n);
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','emergency':'急難救助'}[view]||'關東之旅');
