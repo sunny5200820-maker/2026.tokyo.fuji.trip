@@ -763,7 +763,8 @@ const defaultData = {
         {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
 };
-// --- 應用程式邏輯區 (V72.3 最終修正：資料防護 + 地圖修復) ---
+// --- 應用程式邏輯區 (V74.0：雲端資料優先 + 地圖連結修復) ---
+
 createApp({
     setup() {
         // 狀態變數
@@ -779,12 +780,12 @@ createApp({
         const isLoggedIn = ref(false);
         const syncStatus = ref('idle'); 
         
-        // ★★★ V72.3 關鍵修正：初始值改回讀取 defaultData，防止變空白 ★★★
+        // --- 資料容器初始化 ---
+        // 這裡先放預設值，是為了防止「網頁剛打開、雲端還沒載入」的那 0.5 秒出現白畫面
+        // 等到下方的 onSnapshot 收到雲端資料後，會立刻把這裡的資料替換成您編輯過的版本
         const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        // 這裡一定要讀取 defaultData，這樣就算雲端還沒載入，畫面也不會是白的
         const itinerary = ref(JSON.parse(JSON.stringify(defaultData.itinerary)));
         const drivePlan = ref(JSON.parse(JSON.stringify(defaultData.drivePlan)));
-        
         const expenses = ref([]);
         const spots = ref(JSON.parse(JSON.stringify(defaultData.spots)));
         const shopping = ref(JSON.parse(JSON.stringify(defaultData.shopping)));
@@ -846,17 +847,19 @@ createApp({
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
         
-        // ★★★ V72.3 地圖連結修復 (使用正確的 googleusercontent 格式) ★★★
+        // ★★★ V74.0 地圖連結修正 (使用最穩定的官方標準) ★★★
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
             if(q.startsWith('http')) return q; 
-            return 'http://googleusercontent.com/maps.google.com/?q=' + encodeURIComponent(q); 
+            // 改用 https://www.google.com/maps?q= 這是一定能用的
+            return 'https://www.google.com/maps?q=' + encodeURIComponent(q); 
         };
         const getDirLink = (dest) => { 
             const list = getCurrentItinerary(); 
             let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
-            return 'http://googleusercontent.com/maps.google.com/?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; 
+            // 改用 https://www.google.com/maps?saddr=...
+            return 'https://www.google.com/maps?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; 
         };
         const getSearchLink = (n) => 'https://www.google.com/search?q=' + encodeURIComponent(n);
         
@@ -939,8 +942,7 @@ createApp({
         const saveData = async () => { 
             if(isGuest.value) return; 
             
-            // ★★★ V72.3 絕對防護鎖：如果行程表是空的，禁止存檔！ ★★★
-            // 這能防止因為雲端讀取失敗，而把空白資料覆蓋回去
+            // 安全鎖：只有當行程表「有內容」時才允許存檔，避免空白覆蓋雲端
             if (!itinerary.value || itinerary.value.length === 0) {
                 console.warn("Safety Lock: Itinerary is empty, save aborted.");
                 return;
@@ -970,7 +972,7 @@ createApp({
         const updateHeartbeat = async () => { if(!isLoggedIn.value || !currentUser.value || isGuest.value) return; try { await updateDoc(doc(db,"trips","kanto2026"), { [`heartbeats.${currentUser.value.id}`]: serverTimestamp() }); } catch(e) { console.log("Heartbeat skip"); } };
         const fetchRealWeather = async () => { weatherLoading.value = true; try { const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ]; for(let l of locs) { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`); const d = await res.json(); const target = weatherData.value.find(w => w.name === l.key); if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); } } } catch(e) { console.error("Weather Error", e); } weatherLoading.value = false; };
         const fetchExchangeRate = async () => { try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); if (data && data.rates && data.rates.TWD) { exchangeRate.value = data.rates.TWD; } } catch (e) { console.error("Rate Fetch Error", e); } };
-        const showDiagnostic = () => { const isReset = confirm(`【V72.3 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
+        const showDiagnostic = () => { const isReset = confirm(`【V74.0 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
 
         const setCurrentUser = (u) => { if(isGuest.value) return; currentUser.value = u; localStorage.setItem('V71_LAST_USER_ID', u.id); updateHeartbeat(); showPersonaModal.value = false; currentView.value = 'menu'; };
         const addPrepItem = (u) => { if(!u.list) u.list = []; u.list.push({text:'新項目',checked:false}); saveData(); };
@@ -981,23 +983,6 @@ createApp({
         const openUserEditor = (u) => { editingUser.value={...u}; showUserEditModal.value=true; };
         const saveUserChanges = () => { if(isGuest.value) return; const idx=users.value.findIndex(u=>u.id===editingUser.value.id); if(idx!==-1){ users.value[idx]={...editingUser.value}; if(currentUser.value && currentUser.value.id === editingUser.value.id) currentUser.value = users.value[idx]; } saveData(); showUserEditModal.value=false; };
         const processAvatarUpload = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); editingUser.value.avatar = await compressImage(res); } };
-
-        const openEditItineraryModal = (item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {...item}; modalHasImg.value=false; isEditingItem.value = true; const targetArray = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; modalCallback.value = () => { targetArray[idx] = modalData.value; targetArray.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; modalDeleteCallback.value = () => { targetArray.splice(idx, 1); saveData(); }; showModal.value = true; };
-        const openAddItineraryModal = () => { modalTitle.value = '新增行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {hours:'',name:'',note:'',category:'Sightseeing'}; modalHasImg.value=false; isEditingItem.value = false; modalCallback.value = () => { const arr = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; arr.push(modalData.value); arr.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; showModal.value = true; };
-        
-        const openEditModal = (type, item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯'; modalData.value = {...item}; modalHasImg.value=true; isEditingItem.value = true; if(type === 'shopping') { modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); }; } else if (type === 'spot') { modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); }; } else if (type === 'food') { modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); }; } else if (type === 'coupon') { modalTitle.value = '編輯優惠券'; modalHasImg.value=false; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalCallback.value = () => { coupons.value[idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { coupons.value.splice(idx, 1); saveData(); }; } showModal.value=true; };
-        const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value = () => { shopping.value[shopCat.value].push(modalData.value); saveData(); }; showModal.value=true; };
-        const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',bestTime:'',queueTip:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
-        const openAddFoodModal = () => { modalTitle.value='新增美食'; modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需要訂位?', type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記', type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',reserve:false,reserveLink:'',note:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{ if(!modalData.value.note) autoFillFoodInfo(); spots.value.food[currentLoc.value].push(modalData.value); saveData(); }; showModal.value=true; };
-        const openAddCouponModal = () => { modalTitle.value='新增優惠券'; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalData.value={name:'',discount:'',link:'',note:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value = () => { coupons.value.push(modalData.value); saveData(); }; showModal.value=true; };
-        const openEditHotelModal = (h, idx) => { if(isGuest.value) return; modalTitle.value = '編輯住宿'; modalFields.value = [{key:'name',label:'名稱'},{key:'link',label:'地圖關鍵字'}]; modalData.value = {...h}; modalHasImg.value = true; isEditingItem.value = false; modalCallback.value = () => { hotels.value[idx] = modalData.value; saveData(); }; showModal.value = true; };
-        const openAddTicketModal = () => { modalTitle.value='新增門票'; modalFields.value=[{key:'name',label:'景點名稱'},{key:'url',label:'購票連結'}]; modalData.value={name:'',url:'https://', custom:true}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{suggestedTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
-        const openAddTransTicketModal = () => { modalTitle.value='新增交通票券'; modalFields.value=[{key:'name',label:'票券名稱'},{key:'url',label:'資訊連結'},{key:'note',label:'注意事項', type:'textarea'}]; modalData.value={name:'',url:'https://', note:'', icon:'fa-solid fa-ticket', custom:true, type:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{transportTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
-        const openAddCarModal = () => { modalTitle.value = '新增租車預約'; modalFields.value = [{key:'company',label:'租車公司'},{key:'pickup',label:'取車地點'},{key:'url',label:'預約連結'},{key:'note',label:'備註'}]; modalData.value = {company:'', pickup:'', url:'', note:'', status:'todo', reservationNumber:'', insurance:''}; modalHasImg.value = false; isEditingItem.value = false; modalCallback.value = () => { rentalCars.value.push(modalData.value); saveData(); }; showModal.value = true; };
-        const openAddPhraseModal = () => { modalTitle.value='新增翻譯'; modalFields.value=[{key:'zh',label:'中文'},{key:'jp',label:'日文'}]; modalData.value={zh:'',jp:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{japanesePhrases.value.push(modalData.value); saveData();}; showModal.value=true; };
-        const handleModalSave = () => { if(modalCallback.value) modalCallback.value(); showModal.value=false; };
-        const handleModalDelete = () => { if(confirm('確定刪除？') && modalDeleteCallback.value) { modalDeleteCallback.value(); showModal.value=false; } };
-        const processModalImg = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); modalData.value.img = await compressImage(res); } };
         const openExpenseModal = (mode) => { expenseMode.value = mode; modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : users.value.map(u=>u.id)}; showExpenseModal.value=true; };
         const toggleShare = (id) => { const i=modalData.value.forWhom.indexOf(id); i>-1?modalData.value.forWhom.splice(i,1):modalData.value.forWhom.push(id); };
         const saveExpense = () => { expenses.value.push({...modalData.value,id:Date.now(),date:new Date().toLocaleDateString()}); saveData(); showExpenseModal.value=false; };
@@ -1027,16 +1012,28 @@ createApp({
                         if(d.exists()){
                             const dt = d.data();
                             if (dt.users) users.value = mergeUsers(users.value, dt.users);
-                            if (dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
-                            else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary; 
-                            if (dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
-                            else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan; 
+                            
+                            // ★★★ V74.0 關鍵修復：雲端優先邏輯 ★★★
+                            // 如果雲端有資料(itinerary_json)，就用雲端的 (這樣您手打的資料就會回來)
+                            if (dt.itinerary_json && JSON.parse(dt.itinerary_json).length > 0) {
+                                itinerary.value = JSON.parse(dt.itinerary_json);
+                            } else {
+                                // 只有當雲端完全空白時，才使用預設值
+                                itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
+                            }
+
+                            if (dt.drivePlan_json && JSON.parse(dt.drivePlan_json).length > 0) {
+                                drivePlan.value = JSON.parse(dt.drivePlan_json);
+                            } else {
+                                drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
+                            }
+
                             if (dt.expenses) expenses.value = dt.expenses;
                             
-                            // ★★★ V72.1 全面修復邏輯 (關鍵區塊) ★★★
+                            // ★★★ 自動補圖邏輯 (保留) ★★★
                             let needsFix = false;
 
-                            // 1. 修復 Shopping (跟上次一樣)
+                            // 1. 修復 Shopping
                             if (dt.shopping) {
                                 const remoteShop = dt.shopping;
                                 const localShop = defaultData.shopping;
@@ -1044,6 +1041,7 @@ createApp({
                                     if (!remoteShop[cat]) { remoteShop[cat] = localShop[cat]; needsFix = true; continue; }
                                     localShop[cat].forEach(localItem => {
                                         const remoteItem = remoteShop[cat].find(r => r.name === localItem.name);
+                                        // 補圖：如果雲端沒圖，但程式碼有，就補上
                                         if (remoteItem && !remoteItem.img && localItem.img) {
                                             remoteItem.img = localItem.img;
                                             needsFix = true;
@@ -1055,17 +1053,17 @@ createApp({
                                 shopping.value = defaultData.shopping;
                             }
 
-                            // 2. 修復 Spots (景點/美食)
+                            // 2. 修復 Spots
                             if (dt.spots) {
                                 const remoteSpots = dt.spots;
                                 const localSpots = defaultData.spots;
-                                for (const type in localSpots) { // photo, food
+                                for (const type in localSpots) { 
                                     if (!remoteSpots[type]) { remoteSpots[type] = localSpots[type]; needsFix = true; continue; }
-                                    for (const loc in localSpots[type]) { // Tokyo, Kamakura, Fuji
+                                    for (const loc in localSpots[type]) { 
                                         if (!remoteSpots[type][loc]) { remoteSpots[type][loc] = localSpots[type][loc]; needsFix = true; continue; }
                                         localSpots[type][loc].forEach(localItem => {
                                             const remoteItem = remoteSpots[type][loc].find(r => r.name === localItem.name);
-                                            // 關鍵檢查：如果雲端資料沒圖片，但本地程式碼有，就補上去
+                                            // 補圖
                                             if (remoteItem && !remoteItem.img && localItem.img) {
                                                 remoteItem.img = localItem.img;
                                                 needsFix = true;
@@ -1088,12 +1086,13 @@ createApp({
                             if (dt.heartbeats) { const map = {}; for(let uid in dt.heartbeats) { if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime(); } activeUsers.value = map; }
                             ensureEssentialData();
 
-                            // 如果有發現缺圖片，就自動存檔修復
                             if(needsFix && !isGuest.value) {
-                                console.log("V72.1 Auto-healing images (Spots + Shopping)...");
+                                console.log("V74.0 Auto-healing images...");
                                 saveData(); 
                             }
                         } else {
+                             // 如果雲端完全沒資料，這才使用預設值
+                             // 這是為了應對「全新建立的 App」
                              itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
                              drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
                              shopping.value = JSON.parse(JSON.stringify(defaultData.shopping));
@@ -1129,6 +1128,6 @@ createApp({
         };
     }
 }).mount('#app');
-</script>                                
+</script>                                                                         
  </body>
 </html>
