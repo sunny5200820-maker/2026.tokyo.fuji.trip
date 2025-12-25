@@ -756,8 +756,11 @@ const defaultData = {
 };
 
 // 3. 核心邏輯 (App Logic)
+// --- 應用程式邏輯區 (V72.1 全面修復版) ---
+    
 createApp({
     setup() {
+        // 狀態變數定義
         const currentView = ref('welcome');
         const isWelcomeClosed = ref(false); 
         const currentUser = ref(null);
@@ -770,13 +773,15 @@ createApp({
         const isLoggedIn = ref(false);
         const syncStatus = ref('idle'); 
         
-        // 關鍵修正：確保資料初始值不為空
+        // 資料變數
         const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        const itinerary = ref(JSON.parse(JSON.stringify(defaultData.itinerary)));
-        const drivePlan = ref(JSON.parse(JSON.stringify(defaultData.drivePlan)));
+        const itinerary = ref([]);
+        const drivePlan = ref([]);
         const expenses = ref([]);
+        // 預載入本地資料，確保第一眼有圖
         const spots = ref(JSON.parse(JSON.stringify(defaultData.spots)));
         const shopping = ref(JSON.parse(JSON.stringify(defaultData.shopping)));
+        
         const japanesePhrases = ref(JSON.parse(JSON.stringify(defaultData.phrases)));
         const suggestedTickets = ref(JSON.parse(JSON.stringify(defaultData.suggestedTickets))); 
         const transportTickets = ref(JSON.parse(JSON.stringify(defaultData.transportTickets)));
@@ -785,9 +790,11 @@ createApp({
         const coupons = ref(JSON.parse(JSON.stringify(defaultData.coupons)));
         const activeUsers = ref({}); 
         
+        // UI 輔助變數
         const previewImg = ref(null);
         const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
         const closeLightbox = () => { previewImg.value = null; };
+
         const selectedDayIndex = ref(0);
         const itineraryMode = ref('normal');
         const exchangeRate = ref(0.215);
@@ -795,14 +802,17 @@ createApp({
         const hotelTab = ref('stay');
         const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
+        
         const showKonbiniModal = ref(false);
         const emergencyTab = ref('sos'); 
+
         const weatherLoading = ref(false);
         const weatherData = ref([
             {name:'Tokyo', displayName:'東京', temp:'--', bg:'bg-blue-400', icon:'fa-solid fa-cloud-sun'},
             {name:'Kamakura', displayName:'鎌倉', temp:'--', bg:'bg-indigo-400', icon:'fa-solid fa-water'},
             {name:'Fuji', displayName:'富士山', temp:'--', bg:'bg-purple-400', icon:'fa-solid fa-mountain'}
         ]);
+
         const showCouponModal = ref(false);
         const showExpenseModal = ref(false);
         const modalData = ref({});
@@ -833,22 +843,9 @@ createApp({
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
-        
-        // ★★★ 關鍵修正：使用 Google Maps 官方標準網址 ★★★
-        const getMapLink = (k,n) => { 
-            const q = k || n; 
-            if(!q) return ''; 
-            if(q.startsWith('http')) return q; 
-            // 修正為 https://www.google.com/maps/search/?api=1&query=... 這是最穩定的格式
-            return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); 
-        };
-        const getDirLink = (dest) => { 
-            const list = getCurrentItinerary(); 
-            let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
-            return 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(dest) + '&travelmode=transit'; 
-        };
+        const getMapLink = (k,n) => { const q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return 'http://googleusercontent.com/maps.google.com/?q=' + encodeURIComponent(q); };
+        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return 'http://googleusercontent.com/maps.google.com/?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; };
         const getSearchLink = (n) => 'https://www.google.com/search?q=' + encodeURIComponent(n);
-        
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','emergency':'急難救助'}[view]||'關東之旅');
         const isUserOnline = (id) => { const last = activeUsers.value[id]; return last && (Date.now() - last) < 65000; };
@@ -862,41 +859,7 @@ createApp({
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((sum, e) => sum + getAmountInTWD(e), 0));
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
-        
-        const settlements = computed(() => {
-            const b = {}; 
-            users.value.forEach(u => b[u.id] = 0);
-            groupExpenses.value.forEach(e => {
-                if (b[e.whoPaid] === undefined) return; 
-                const amountTWD = e.currency === 'JPY' ? (e.amount * exchangeRate.value) : parseFloat(e.amount);
-                const validTargets = e.forWhom.filter(uid => b[uid] !== undefined);
-                if (validTargets.length === 0) return;
-                b[e.whoPaid] += amountTWD;
-                const splitAmount = amountTWD / validTargets.length;
-                validTargets.forEach(uid => { b[uid] -= splitAmount; });
-            });
-            const r = [];
-            const debtors = []; const creditors = [];
-            for (const uid in b) {
-                const val = b[uid];
-                if (val < -1) debtors.push({ id: parseInt(uid), v: val });
-                if (val > 1) creditors.push({ id: parseInt(uid), v: val });
-            }
-            debtors.sort((a, b) => a.v - b.v);
-            creditors.sort((a, b) => b.v - a.v);
-            let i = 0; let j = 0;
-            while (i < debtors.length && j < creditors.length) {
-                const debtor = debtors[i];
-                const creditor = creditors[j];
-                let amount = Math.min(Math.abs(debtor.v), creditor.v);
-                r.push({ from: parseInt(debtor.id), to: parseInt(creditor.id), amount: Math.round(amount) });
-                debtor.v += amount; creditor.v -= amount;
-                if (Math.abs(debtor.v) < 1) i++;
-                if (Math.abs(creditor.v) < 1) j++;
-            }
-            return r;
-        });
-
+        const settlements = computed(() => { const b = {}; users.value.forEach(u => b[u.id] = 0); groupExpenses.value.forEach(e => { if (b[e.whoPaid] === undefined) return; const amountTWD = e.currency === 'JPY' ? (e.amount * exchangeRate.value) : parseFloat(e.amount); const validTargets = e.forWhom.filter(uid => b[uid] !== undefined); if (validTargets.length === 0) return; b[e.whoPaid] += amountTWD; const splitAmount = amountTWD / validTargets.length; validTargets.forEach(uid => { b[uid] -= splitAmount; }); }); const r = []; const debtors = []; const creditors = []; for (const uid in b) { const val = b[uid]; if (val < -1) debtors.push({ id: parseInt(uid), v: val }); if (val > 1) creditors.push({ id: parseInt(uid), v: val }); } debtors.sort((a, b) => a.v - b.v); creditors.sort((a, b) => b.v - a.v); let i = 0; let j = 0; while (i < debtors.length && j < creditors.length) { const debtor = debtors[i]; const creditor = creditors[j]; let amount = Math.min(Math.abs(debtor.v), creditor.v); r.push({ from: parseInt(debtor.id), to: parseInt(creditor.id), amount: Math.round(amount) }); debtor.v += amount; creditor.v -= amount; if (Math.abs(debtor.v) < 1) i++; if (Math.abs(creditor.v) < 1) j++; } return r; });
         const getMapCover = (loc) => { const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' }; if(!map[loc]) return 'https://placehold.co/600x200/orange/white?text=Food+Map'; return getImg(map[loc]); };
         const getRaidClass = (item) => { if(item.reserve) return 'raid-red'; if(item.desc.includes('排隊')) return 'raid-yellow'; return 'raid-green'; };
         const getRaidLabel = (item) => { if(item.reserve) return '特級咒物 (需預約)'; if(item.desc.includes('排隊')) return '討伐隊級 (排隊)'; return '雜草級 (輕鬆吃)'; };
@@ -912,10 +875,11 @@ createApp({
         
         const repairSpotData = (remoteSpots) => { 
             if (!remoteSpots) return JSON.parse(JSON.stringify(defaultData.spots));
+            // 保險起見，合併本地資料結構
             const localSpots = defaultData.spots;
-            for (const type in localSpots) { 
+            for (const type in localSpots) { // food, photo
                 if(!remoteSpots[type]) remoteSpots[type] = {};
-                for (const loc in localSpots[type]) { 
+                for (const loc in localSpots[type]) { // Tokyo, Kamakura, Fuji
                     if(!remoteSpots[type][loc]) remoteSpots[type][loc] = [];
                 }
             }
@@ -925,39 +889,14 @@ createApp({
         const deepSanitize = (obj) => { if (obj === undefined) return null; if (obj === null || typeof obj !== 'object') return obj; if (Array.isArray(obj)) return obj.map(deepSanitize); const newObj = {}; for (const key in obj) { newObj[key] = deepSanitize(obj[key]); } return newObj; };
 
         let saveTimeout = null;
-        const saveData = async () => { 
-            if(isGuest.value) return; 
-            
-            if (!itinerary.value || itinerary.value.length === 0) {
-                console.warn("Safety Lock: Itinerary is empty, save aborted.");
-                return;
-            }
-
-            syncStatus.value = 'syncing'; 
-            clearTimeout(saveTimeout); 
-            saveTimeout = setTimeout(async () => { 
-                const rawData = { users: users.value, itinerary_json: JSON.stringify(itinerary.value), drivePlan_json: JSON.stringify(drivePlan.value), expenses: expenses.value, spots: spots.value, shopping: shopping.value, phrases: japanesePhrases.value, tickets: suggestedTickets.value, transportTickets: transportTickets.value, rentalCars: rentalCars.value, hotels: hotels.value, coupons: coupons.value }; 
-                const safeData = deepSanitize(rawData); 
-                try { 
-                    if(db && isLoggedIn.value) { 
-                        await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); 
-                        setTimeout(() => syncStatus.value = 'idle', 500); 
-                    } else { 
-                        syncStatus.value = 'error'; 
-                    } 
-                } catch(e) { 
-                    console.error("Firebase Write Error:", e); 
-                    syncStatus.value = 'error'; 
-                } 
-            }, 800); 
-        };
+        const saveData = async () => { if(isGuest.value) return; syncStatus.value = 'syncing'; clearTimeout(saveTimeout); saveTimeout = setTimeout(async () => { const rawData = { users: users.value, itinerary_json: JSON.stringify(itinerary.value), drivePlan_json: JSON.stringify(drivePlan.value), expenses: expenses.value, spots: spots.value, shopping: shopping.value, phrases: japanesePhrases.value, tickets: suggestedTickets.value, transportTickets: transportTickets.value, rentalCars: rentalCars.value, hotels: hotels.value, coupons: coupons.value }; const safeData = deepSanitize(rawData); try { if(db && isLoggedIn.value) { await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); setTimeout(() => syncStatus.value = 'idle', 500); } else { syncStatus.value = 'error'; } } catch(e) { console.error("Firebase Write Error:", e); syncStatus.value = 'error'; } }, 800); };
         
         const forceRestoreDefaults = async () => { if(confirm('警告：這將會強制覆蓋雲端上的所有資料(含行程與記帳)。確定要執行嗎？')) { const rawData = { users: JSON.parse(JSON.stringify(defaultUsers)), itinerary_json: JSON.stringify(defaultData.itinerary), drivePlan_json: JSON.stringify(defaultData.drivePlan), spots: defaultData.spots, shopping: defaultData.shopping, phrases: defaultData.phrases, transportTickets: defaultData.transportTickets, rentalCars: defaultData.rentalCars, hotels: defaultData.hotels, coupons: defaultData.coupons, tickets: defaultData.suggestedTickets }; const safeData = deepSanitize(rawData); try { await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); alert('還原成功！'); location.reload(); } catch(e) { alert('還原失敗：' + e.message); } } };
         
         const updateHeartbeat = async () => { if(!isLoggedIn.value || !currentUser.value || isGuest.value) return; try { await updateDoc(doc(db,"trips","kanto2026"), { [`heartbeats.${currentUser.value.id}`]: serverTimestamp() }); } catch(e) { console.log("Heartbeat skip"); } };
         const fetchRealWeather = async () => { weatherLoading.value = true; try { const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ]; for(let l of locs) { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`); const d = await res.json(); const target = weatherData.value.find(w => w.name === l.key); if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); } } } catch(e) { console.error("Weather Error", e); } weatherLoading.value = false; };
         const fetchExchangeRate = async () => { try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); if (data && data.rates && data.rates.TWD) { exchangeRate.value = data.rates.TWD; } } catch (e) { console.error("Rate Fetch Error", e); } };
-        const showDiagnostic = () => { const isReset = confirm(`【V78.0 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
+        const showDiagnostic = () => { const isReset = confirm(`【V72.1 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
 
         const setCurrentUser = (u) => { if(isGuest.value) return; currentUser.value = u; localStorage.setItem('V71_LAST_USER_ID', u.id); updateHeartbeat(); showPersonaModal.value = false; currentView.value = 'menu'; };
         const addPrepItem = (u) => { if(!u.list) u.list = []; u.list.push({text:'新項目',checked:false}); saveData(); };
@@ -968,6 +907,23 @@ createApp({
         const openUserEditor = (u) => { editingUser.value={...u}; showUserEditModal.value=true; };
         const saveUserChanges = () => { if(isGuest.value) return; const idx=users.value.findIndex(u=>u.id===editingUser.value.id); if(idx!==-1){ users.value[idx]={...editingUser.value}; if(currentUser.value && currentUser.value.id === editingUser.value.id) currentUser.value = users.value[idx]; } saveData(); showUserEditModal.value=false; };
         const processAvatarUpload = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); editingUser.value.avatar = await compressImage(res); } };
+
+        const openEditItineraryModal = (item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {...item}; modalHasImg.value=false; isEditingItem.value = true; const targetArray = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; modalCallback.value = () => { targetArray[idx] = modalData.value; targetArray.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; modalDeleteCallback.value = () => { targetArray.splice(idx, 1); saveData(); }; showModal.value = true; };
+        const openAddItineraryModal = () => { modalTitle.value = '新增行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {hours:'',name:'',note:'',category:'Sightseeing'}; modalHasImg.value=false; isEditingItem.value = false; modalCallback.value = () => { const arr = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; arr.push(modalData.value); arr.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; showModal.value = true; };
+        
+        const openEditModal = (type, item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯'; modalData.value = {...item}; modalHasImg.value=true; isEditingItem.value = true; if(type === 'shopping') { modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); }; } else if (type === 'spot') { modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); }; } else if (type === 'food') { modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); }; } else if (type === 'coupon') { modalTitle.value = '編輯優惠券'; modalHasImg.value=false; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalCallback.value = () => { coupons.value[idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { coupons.value.splice(idx, 1); saveData(); }; } showModal.value=true; };
+        const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value = () => { shopping.value[shopCat.value].push(modalData.value); saveData(); }; showModal.value=true; };
+        const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',bestTime:'',queueTip:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
+        const openAddFoodModal = () => { modalTitle.value='新增美食'; modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需要訂位?', type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記', type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',reserve:false,reserveLink:'',note:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{ if(!modalData.value.note) autoFillFoodInfo(); spots.value.food[currentLoc.value].push(modalData.value); saveData(); }; showModal.value=true; };
+        const openAddCouponModal = () => { modalTitle.value='新增優惠券'; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalData.value={name:'',discount:'',link:'',note:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value = () => { coupons.value.push(modalData.value); saveData(); }; showModal.value=true; };
+        const openEditHotelModal = (h, idx) => { if(isGuest.value) return; modalTitle.value = '編輯住宿'; modalFields.value = [{key:'name',label:'名稱'},{key:'link',label:'地圖關鍵字'}]; modalData.value = {...h}; modalHasImg.value = true; isEditingItem.value = false; modalCallback.value = () => { hotels.value[idx] = modalData.value; saveData(); }; showModal.value = true; };
+        const openAddTicketModal = () => { modalTitle.value='新增門票'; modalFields.value=[{key:'name',label:'景點名稱'},{key:'url',label:'購票連結'}]; modalData.value={name:'',url:'https://', custom:true}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{suggestedTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
+        const openAddTransTicketModal = () => { modalTitle.value='新增交通票券'; modalFields.value=[{key:'name',label:'票券名稱'},{key:'url',label:'資訊連結'},{key:'note',label:'注意事項', type:'textarea'}]; modalData.value={name:'',url:'https://', note:'', icon:'fa-solid fa-ticket', custom:true, type:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{transportTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
+        const openAddCarModal = () => { modalTitle.value = '新增租車預約'; modalFields.value = [{key:'company',label:'租車公司'},{key:'pickup',label:'取車地點'},{key:'url',label:'預約連結'},{key:'note',label:'備註'}]; modalData.value = {company:'', pickup:'', url:'', note:'', status:'todo', reservationNumber:'', insurance:''}; modalHasImg.value = false; isEditingItem.value = false; modalCallback.value = () => { rentalCars.value.push(modalData.value); saveData(); }; showModal.value = true; };
+        const openAddPhraseModal = () => { modalTitle.value='新增翻譯'; modalFields.value=[{key:'zh',label:'中文'},{key:'jp',label:'日文'}]; modalData.value={zh:'',jp:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{japanesePhrases.value.push(modalData.value); saveData();}; showModal.value=true; };
+        const handleModalSave = () => { if(modalCallback.value) modalCallback.value(); showModal.value=false; };
+        const handleModalDelete = () => { if(confirm('確定刪除？') && modalDeleteCallback.value) { modalDeleteCallback.value(); showModal.value=false; } };
+        const processModalImg = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); modalData.value.img = await compressImage(res); } };
         const openExpenseModal = (mode) => { expenseMode.value = mode; modalData.value={name:'', amount:'', currency:'JPY', method:'cash', whoPaid: currentUser.value.id, forWhom: mode==='private' ? [currentUser.value.id] : users.value.map(u=>u.id)}; showExpenseModal.value=true; };
         const toggleShare = (id) => { const i=modalData.value.forWhom.indexOf(id); i>-1?modalData.value.forWhom.splice(i,1):modalData.value.forWhom.push(id); };
         const saveExpense = () => { expenses.value.push({...modalData.value,id:Date.now(),date:new Date().toLocaleDateString()}); saveData(); showExpenseModal.value=false; };
@@ -997,25 +953,16 @@ createApp({
                         if(d.exists()){
                             const dt = d.data();
                             if (dt.users) users.value = mergeUsers(users.value, dt.users);
-                            
-                            // ★★★ 雲端優先邏輯 ★★★
-                            if (dt.itinerary_json && JSON.parse(dt.itinerary_json).length > 0) {
-                                itinerary.value = JSON.parse(dt.itinerary_json);
-                            } else {
-                                itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
-                            }
-
-                            if (dt.drivePlan_json && JSON.parse(dt.drivePlan_json).length > 0) {
-                                drivePlan.value = JSON.parse(dt.drivePlan_json);
-                            } else {
-                                drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
-                            }
-
+                            if (dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
+                            else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary; 
+                            if (dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
+                            else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan; 
                             if (dt.expenses) expenses.value = dt.expenses;
                             
-                            // ★★★ 自動補圖邏輯 ★★★
+                            // ★★★ V72.1 全面修復邏輯 (關鍵區塊) ★★★
                             let needsFix = false;
 
+                            // 1. 修復 Shopping (跟上次一樣)
                             if (dt.shopping) {
                                 const remoteShop = dt.shopping;
                                 const localShop = defaultData.shopping;
@@ -1034,15 +981,17 @@ createApp({
                                 shopping.value = defaultData.shopping;
                             }
 
+                            // 2. 修復 Spots (景點/美食) - 這是新加的！
                             if (dt.spots) {
                                 const remoteSpots = dt.spots;
                                 const localSpots = defaultData.spots;
-                                for (const type in localSpots) { 
+                                for (const type in localSpots) { // photo, food
                                     if (!remoteSpots[type]) { remoteSpots[type] = localSpots[type]; needsFix = true; continue; }
-                                    for (const loc in localSpots[type]) { 
+                                    for (const loc in localSpots[type]) { // Tokyo, Kamakura, Fuji
                                         if (!remoteSpots[type][loc]) { remoteSpots[type][loc] = localSpots[type][loc]; needsFix = true; continue; }
                                         localSpots[type][loc].forEach(localItem => {
                                             const remoteItem = remoteSpots[type][loc].find(r => r.name === localItem.name);
+                                            // 關鍵檢查：如果雲端資料沒圖片，但本地程式碼有，就補上去
                                             if (remoteItem && !remoteItem.img && localItem.img) {
                                                 remoteItem.img = localItem.img;
                                                 needsFix = true;
@@ -1065,8 +1014,9 @@ createApp({
                             if (dt.heartbeats) { const map = {}; for(let uid in dt.heartbeats) { if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime(); } activeUsers.value = map; }
                             ensureEssentialData();
 
+                            // 如果有發現缺圖片，就自動存檔修復
                             if(needsFix && !isGuest.value) {
-                                console.log("V78.0 Auto-healing images...");
+                                console.log("V72.1 Auto-healing images (Spots + Shopping)...");
                                 saveData(); 
                             }
                         } else {
@@ -1105,6 +1055,6 @@ createApp({
         };
     }
 }).mount('#app');
-</script>                                                                                                                                                                                                                                                    
+</script>                                                                                                                                                                                                                                        
 </body>
 </html>
