@@ -763,12 +763,11 @@ const defaultData = {
         {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
 };
-// --- 應用程式邏輯區 ---
-// --- 應用程式邏輯區 (V72.1 全面修復版) ---
+// --- 應用程式邏輯區 (V72.2 地圖連結修正版) ---
 
 createApp({
     setup() {
-        // 狀態變數定義
+        // 狀態變數
         const currentView = ref('welcome');
         const isWelcomeClosed = ref(false); 
         const currentUser = ref(null);
@@ -786,10 +785,8 @@ createApp({
         const itinerary = ref([]);
         const drivePlan = ref([]);
         const expenses = ref([]);
-        // 預載入本地資料，確保第一眼有圖
         const spots = ref(JSON.parse(JSON.stringify(defaultData.spots)));
         const shopping = ref(JSON.parse(JSON.stringify(defaultData.shopping)));
-        
         const japanesePhrases = ref(JSON.parse(JSON.stringify(defaultData.phrases)));
         const suggestedTickets = ref(JSON.parse(JSON.stringify(defaultData.suggestedTickets))); 
         const transportTickets = ref(JSON.parse(JSON.stringify(defaultData.transportTickets)));
@@ -798,11 +795,10 @@ createApp({
         const coupons = ref(JSON.parse(JSON.stringify(defaultData.coupons)));
         const activeUsers = ref({}); 
         
-        // UI 輔助變數
+        // UI 變數
         const previewImg = ref(null);
         const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
         const closeLightbox = () => { previewImg.value = null; };
-
         const selectedDayIndex = ref(0);
         const itineraryMode = ref('normal');
         const exchangeRate = ref(0.215);
@@ -810,17 +806,14 @@ createApp({
         const hotelTab = ref('stay');
         const shopCat = ref('cosme');
         const currentLoc = ref('Tokyo');
-        
         const showKonbiniModal = ref(false);
         const emergencyTab = ref('sos'); 
-
         const weatherLoading = ref(false);
         const weatherData = ref([
             {name:'Tokyo', displayName:'東京', temp:'--', bg:'bg-blue-400', icon:'fa-solid fa-cloud-sun'},
             {name:'Kamakura', displayName:'鎌倉', temp:'--', bg:'bg-indigo-400', icon:'fa-solid fa-water'},
             {name:'Fuji', displayName:'富士山', temp:'--', bg:'bg-purple-400', icon:'fa-solid fa-mountain'}
         ]);
-
         const showCouponModal = ref(false);
         const showExpenseModal = ref(false);
         const modalData = ref({});
@@ -851,9 +844,23 @@ createApp({
 
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
-        const getMapLink = (k,n) => { const q = k || n; if(!q) return ''; if(q.startsWith('http')) return q; return 'http://googleusercontent.com/maps.google.com/?q=' + encodeURIComponent(q); };
-        const getDirLink = (dest) => { const list = getCurrentItinerary(); let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; return 'http://googleusercontent.com/maps.google.com/?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; };
+        
+        // ★★★ V72.2 修正重點：使用標準 Google Maps 網址 ★★★
+        const getMapLink = (k,n) => { 
+            const q = k || n; 
+            if(!q) return ''; 
+            if(q.startsWith('http')) return q; 
+            // 修正為標準網址，解決 404 問題
+            return 'https://www.google.com/maps?q=' + encodeURIComponent(q); 
+        };
+        const getDirLink = (dest) => { 
+            const list = getCurrentItinerary(); 
+            let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
+            // 修正為標準網址
+            return 'https://www.google.com/maps?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; 
+        };
         const getSearchLink = (n) => 'https://www.google.com/search?q=' + encodeURIComponent(n);
+        
         const handleImgError = (e) => e.target.src='https://placehold.co/400x300/pink/white?text=IMAGE';
         const getPageTitle = (view) => ({'itinerary':'行程表','money':'小財庫','hotel':'住宿交通','prep':'行前準備','food':'美食地圖','photo':'打卡景點','shopping':'購物清單','weather':'天氣預報','emergency':'急難救助'}[view]||'關東之旅');
         const isUserOnline = (id) => { const last = activeUsers.value[id]; return last && (Date.now() - last) < 65000; };
@@ -867,7 +874,41 @@ createApp({
         const myPrivateExpenses = computed(() => currentUser.value ? expenses.value.filter(e => e.whoPaid===currentUser.value.id && e.forWhom.length===1 && e.forWhom[0]===currentUser.value.id) : []);
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((sum, e) => sum + getAmountInTWD(e), 0));
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
-        const settlements = computed(() => { const b = {}; users.value.forEach(u => b[u.id] = 0); groupExpenses.value.forEach(e => { if (b[e.whoPaid] === undefined) return; const amountTWD = e.currency === 'JPY' ? (e.amount * exchangeRate.value) : parseFloat(e.amount); const validTargets = e.forWhom.filter(uid => b[uid] !== undefined); if (validTargets.length === 0) return; b[e.whoPaid] += amountTWD; const splitAmount = amountTWD / validTargets.length; validTargets.forEach(uid => { b[uid] -= splitAmount; }); }); const r = []; const debtors = []; const creditors = []; for (const uid in b) { const val = b[uid]; if (val < -1) debtors.push({ id: parseInt(uid), v: val }); if (val > 1) creditors.push({ id: parseInt(uid), v: val }); } debtors.sort((a, b) => a.v - b.v); creditors.sort((a, b) => b.v - a.v); let i = 0; let j = 0; while (i < debtors.length && j < creditors.length) { const debtor = debtors[i]; const creditor = creditors[j]; let amount = Math.min(Math.abs(debtor.v), creditor.v); r.push({ from: parseInt(debtor.id), to: parseInt(creditor.id), amount: Math.round(amount) }); debtor.v += amount; creditor.v -= amount; if (Math.abs(debtor.v) < 1) i++; if (Math.abs(creditor.v) < 1) j++; } return r; });
+        
+        const settlements = computed(() => {
+            const b = {}; 
+            users.value.forEach(u => b[u.id] = 0);
+            groupExpenses.value.forEach(e => {
+                if (b[e.whoPaid] === undefined) return; 
+                const amountTWD = e.currency === 'JPY' ? (e.amount * exchangeRate.value) : parseFloat(e.amount);
+                const validTargets = e.forWhom.filter(uid => b[uid] !== undefined);
+                if (validTargets.length === 0) return;
+                b[e.whoPaid] += amountTWD;
+                const splitAmount = amountTWD / validTargets.length;
+                validTargets.forEach(uid => { b[uid] -= splitAmount; });
+            });
+            const r = [];
+            const debtors = []; const creditors = [];
+            for (const uid in b) {
+                const val = b[uid];
+                if (val < -1) debtors.push({ id: parseInt(uid), v: val });
+                if (val > 1) creditors.push({ id: parseInt(uid), v: val });
+            }
+            debtors.sort((a, b) => a.v - b.v);
+            creditors.sort((a, b) => b.v - a.v);
+            let i = 0; let j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                const debtor = debtors[i];
+                const creditor = creditors[j];
+                let amount = Math.min(Math.abs(debtor.v), creditor.v);
+                r.push({ from: parseInt(debtor.id), to: parseInt(creditor.id), amount: Math.round(amount) });
+                debtor.v += amount; creditor.v -= amount;
+                if (Math.abs(debtor.v) < 1) i++;
+                if (Math.abs(creditor.v) < 1) j++;
+            }
+            return r;
+        });
+
         const getMapCover = (loc) => { const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' }; if(!map[loc]) return 'https://placehold.co/600x200/orange/white?text=Food+Map'; return getImg(map[loc]); };
         const getRaidClass = (item) => { if(item.reserve) return 'raid-red'; if(item.desc.includes('排隊')) return 'raid-yellow'; return 'raid-green'; };
         const getRaidLabel = (item) => { if(item.reserve) return '特級咒物 (需預約)'; if(item.desc.includes('排隊')) return '討伐隊級 (排隊)'; return '雜草級 (輕鬆吃)'; };
@@ -883,11 +924,10 @@ createApp({
         
         const repairSpotData = (remoteSpots) => { 
             if (!remoteSpots) return JSON.parse(JSON.stringify(defaultData.spots));
-            // 保險起見，合併本地資料結構
             const localSpots = defaultData.spots;
-            for (const type in localSpots) { // food, photo
+            for (const type in localSpots) { 
                 if(!remoteSpots[type]) remoteSpots[type] = {};
-                for (const loc in localSpots[type]) { // Tokyo, Kamakura, Fuji
+                for (const loc in localSpots[type]) { 
                     if(!remoteSpots[type][loc]) remoteSpots[type][loc] = [];
                 }
             }
@@ -904,7 +944,7 @@ createApp({
         const updateHeartbeat = async () => { if(!isLoggedIn.value || !currentUser.value || isGuest.value) return; try { await updateDoc(doc(db,"trips","kanto2026"), { [`heartbeats.${currentUser.value.id}`]: serverTimestamp() }); } catch(e) { console.log("Heartbeat skip"); } };
         const fetchRealWeather = async () => { weatherLoading.value = true; try { const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ]; for(let l of locs) { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`); const d = await res.json(); const target = weatherData.value.find(w => w.name === l.key); if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); } } } catch(e) { console.error("Weather Error", e); } weatherLoading.value = false; };
         const fetchExchangeRate = async () => { try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); if (data && data.rates && data.rates.TWD) { exchangeRate.value = data.rates.TWD; } } catch (e) { console.error("Rate Fetch Error", e); } };
-        const showDiagnostic = () => { const isReset = confirm(`【V72.1 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
+        const showDiagnostic = () => { const isReset = confirm(`【V72.2 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
 
         const setCurrentUser = (u) => { if(isGuest.value) return; currentUser.value = u; localStorage.setItem('V71_LAST_USER_ID', u.id); updateHeartbeat(); showPersonaModal.value = false; currentView.value = 'menu'; };
         const addPrepItem = (u) => { if(!u.list) u.list = []; u.list.push({text:'新項目',checked:false}); saveData(); };
@@ -947,11 +987,32 @@ createApp({
         const openGoogleTranslate = (text) => { window.open(`https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(text)}&op=translate`, '_blank'); };
         const handleCameraTranslate = () => { window.open('https://translate.google.com/?sl=auto&tl=zh-TW&op=images', '_blank'); };
         const expandCard = (p) => expandedPhrase.value=p;
-        const mergeUsers = (local, remote) => { if(!remote || !Array.isArray(remote)) return local; remote.forEach(rUser => { const lUser = local.find(u => u.id === rUser.id); if(lUser) { lUser.name = rUser.name; lUser.avatar = rUser.avatar; if(rUser.list && rUser.list.length > 0) lUser.list = rUser.list; lUser.flightOut = rUser.flightOut; lUser.flightOutSeat = rUser.flightOutSeat; lUser.flightIn = rUser.flightIn; lUser.flightInSeat = rUser.flightInSeat; } }); return local; };
-        const ensureEssentialData = () => { const hasSky = suggestedTickets.value.find(t => t.name === 'SHIBUYA SKY'); if(!hasSky) { suggestedTickets.value.push({name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}); } };
+
+        const mergeUsers = (local, remote) => {
+            if(!remote || !Array.isArray(remote)) return local;
+            remote.forEach(rUser => {
+                const lUser = local.find(u => u.id === rUser.id);
+                if(lUser) {
+                    lUser.name = rUser.name; 
+                    lUser.avatar = rUser.avatar; 
+                    if(rUser.list && rUser.list.length > 0) lUser.list = rUser.list; 
+                    lUser.flightOut = rUser.flightOut; lUser.flightOutSeat = rUser.flightOutSeat;
+                    lUser.flightIn = rUser.flightIn; lUser.flightInSeat = rUser.flightInSeat;
+                }
+            });
+            return local;
+        };
+
+        const ensureEssentialData = () => {
+            const hasSky = suggestedTickets.value.find(t => t.name === 'SHIBUYA SKY');
+            if(!hasSky) {
+                suggestedTickets.value.push({name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false});
+            }
+        };
 
         onMounted(() => {
             fetchRealWeather();
+            // 自動抓匯率
             fetchExchangeRate();
             
             if(auth) onAuthStateChanged(auth, u=>{ 
@@ -989,7 +1050,7 @@ createApp({
                                 shopping.value = defaultData.shopping;
                             }
 
-                            // 2. 修復 Spots (景點/美食) - 這是新加的！
+                            // 2. 修復 Spots (景點/美食)
                             if (dt.spots) {
                                 const remoteSpots = dt.spots;
                                 const localSpots = defaultData.spots;
@@ -1063,6 +1124,6 @@ createApp({
         };
     }
 }).mount('#app');
-</script>                                      
+</script>                                                                    
 </body>
 </html>
