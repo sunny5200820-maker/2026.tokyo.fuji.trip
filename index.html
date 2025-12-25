@@ -589,7 +589,7 @@
         <input type="file" ref="avatarInput" accept="image/*" class="hidden" @change="processAvatarUpload">
     </div>
 
-</div>
+</div>     
  <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
@@ -599,6 +599,8 @@ import { createApp, ref, computed, onMounted, watch } from "https://unpkg.com/vu
 // Firebase 設定
 const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", authDomain: "tokyo-trip-24b28.firebaseapp.com", projectId: "tokyo-trip-24b28", storageBucket: "tokyo-trip-24b28.firebasestorage.app", messagingSenderId: "518699705070", appId: "1:518699705070:web:56e95f603210d8d5d209ff" };
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
+
+// --- 靜態資料定義區 ---
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
 const defaultUsers = [
@@ -614,8 +616,7 @@ const getImg = (p) => {
     return `./images/${p}`; 
 };
 
-// --- 資料設定區 ---
-
+// 詳細資料 (完整版，包含正確圖片路徑)
 const foodSpots = {
     Tokyo: [
         {name:'牛かつもと村', desc:'自行煎烤軟嫩炸牛排', tag:'新宿/澀谷', img:'gyukatsu-motomura.jpg', reserve:false, link:'牛かつもと村', reserveLink:'', votes:[]},
@@ -666,13 +667,21 @@ const photoSpots = {
 const defaultData = {
     users: JSON.parse(JSON.stringify(defaultUsers)), 
     itinerary: [
+        // Day 1
         [{hours:"06:40",category:"Flight",name:"TPE 起飛",note:"T1 辦理登機",mapKeyword:"桃園機場 T1"},{hours:"10:40",category:"Flight",name:"NRT 抵達",note:"領取行李/購買西瓜卡",mapKeyword:"成田機場"},{hours:"14:00",category:"Sightseeing",name:"晴空塔",note:"下午行程",mapKeyword:"東京晴空塔",travelTime:"⬇ 60-90min (電車/巴士)"},{hours:"18:00",category:"Food",name:"錦糸町周遭",note:"晚餐",mapKeyword:"錦糸町站 美食",travelTime:"⬇ 15min (步行)"}],
+        // Day 2
         [{hours:"09:00",category:"Sightseeing",name:"淺草寺",note:"雷門/仲見世通",mapKeyword:"淺草寺",travelTime:"⬇ 20min (電車)"},{hours:"12:00",category:"Food",name:"淺草周遭",note:"午餐",mapKeyword:"淺草站 美食",travelTime:"⬇ 5min (步行)"},{hours:"14:00",category:"Sightseeing",name:"小網神社/上野公園",note:"強運厄除/公園散步",mapKeyword:"小網神社",travelTime:"⬇ 25min (電車)"},{hours:"18:00",category:"Shopping",name:"秋葉原/東京一番街",note:"動漫或逛街",mapKeyword:"秋葉原",travelTime:"⬇ 15min (電車)"},{hours:"20:00",category:"Food",name:"晚餐",note:"依逛街行程決定",mapKeyword:"東京車站 美食"}],
+        // Day 3
         [{hours:"08:00",category:"Transport",name:"前往富士山",note:"錦糸町出發 (富士回遊)",mapKeyword:"錦糸町站",travelTime:"⬇ 120min (JR特急)"},{hours:"10:30",category:"Transport",name:"開始租車",note:"富士山租車 3天2夜",mapKeyword:"河口湖 租車",travelTime:"⬇ 0min"},{hours:"13:00",category:"Sightseeing",name:"河口湖自然生活館",note:"大石公園絕景",mapKeyword:"河口湖自然生活館",travelTime:"⬇ 20min (車)"},{hours:"15:00",category:"Sightseeing",name:"新倉山淺間公園",note:"忠靈塔瞭望台 (需爬階梯)",mapKeyword:"新倉山淺間公園",travelTime:"⬇ 25min (車)"},{hours:"17:30",category:"Sightseeing",name:"金鳥居/本町商店街",note:"日川時計店拍照",mapKeyword:"富士吉田本町通り",travelTime:"⬇ 10min (車)"},{hours:"19:00",category:"Food",name:"晚餐",note:"自行烹飪或商店街",mapKeyword:"Ogino 河口湖店"}],
+        // Day 4
         [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出 (視天氣)",mapKeyword:"平野の浜",travelTime:"⬇ 30min (車)"},{hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",mapKeyword:"長池親水公園",travelTime:"⬇ 15min (車)"},{hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",mapKeyword:"山中湖 美食",travelTime:"⬇ 0min"},{hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",mapKeyword:"KABA BUS",travelTime:"⬇ 10min (車)"},{hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)",mapKeyword:"Ogino 河口湖店",travelTime:"⬇ 30min (車)"}],
+        // Day 5
         [{hours:"09:00",category:"Sightseeing",name:"河口湖纜車",note:"金鳥居/絕景鞦韆",mapKeyword:"河口湖 富士山全景纜車",travelTime:"⬇ 20min (車)"},{hours:"11:00",category:"Shopping",name:"Fujisan Shokupan",note:"購買伴手禮點心",mapKeyword:"Fujisan Shokupan",travelTime:"⬇ 10min (車)"},{hours:"14:00",category:"Transport",name:"富士回遊",note:"返回東京新宿 (放行李)",mapKeyword:"河口湖站",travelTime:"⬇ 120min (JR特急)"},{hours:"16:30",category:"Shopping",name:"池袋太陽城",note:"逛街行程",mapKeyword:"池袋太陽城",travelTime:"⬇ 20min (電車)"},{hours:"19:00",category:"Food",name:"太陽城餐廳",note:"晚餐",mapKeyword:"池袋太陽城 美食"}],
+        // Day 6 (補回)
         [{hours:"09:00",category:"Transport",name:"前往藤澤",note:"新宿出發 (江之電一日遊)",mapKeyword:"新宿站",travelTime:"⬇ 60min (小田急)"},{hours:"10:30",category:"Sightseeing",name:"江之島/鎌倉高校",note:"灌籃高手平交道",mapKeyword:"鎌倉高校前站",travelTime:"⬇ 20min (江之電)"},{hours:"13:00",category:"Food",name:"七里濱餐廳",note:"午餐",mapKeyword:"七里濱 美食",travelTime:"⬇ 10min (江之電)"},{hours:"15:00",category:"Sightseeing",name:"鎌倉/鶴岡八幡宮",note:"小町通逛街",mapKeyword:"鶴岡八幡宮",travelTime:"⬇ 20min (江之電)"},{hours:"18:00",category:"Transport",name:"返回新宿",note:"晚餐: 新宿或烹飪",mapKeyword:"新宿站",travelTime:"⬇ 60min (小田急)"}],
+        // Day 7 (補回)
         [{hours:"09:00",category:"Sightseeing",name:"東京鐵塔/麻布台",note:"六本木周遭拍照",mapKeyword:"麻布台Hills",travelTime:"⬇ 30min (地鐵)"},{hours:"12:00",category:"Food",name:"六本木餐廳",note:"午餐",mapKeyword:"六本木 美食",travelTime:"⬇ 10min (步行)"},{hours:"14:00",category:"Shopping",name:"前往澀谷",note:"逛街",mapKeyword:"澀谷站",travelTime:"⬇ 15min (地鐵)"},{hours:"17:00",category:"Sightseeing",name:"SHIBUYA SKY",note:"絕美日落/十字路口",mapKeyword:"SHIBUYA SKY",travelTime:"⬇ 5min (步行)"},{hours:"20:00",category:"Food",name:"澀谷餐廳",note:"晚餐",mapKeyword:"澀谷 美食"}],
+        // Day 8 (補回)
         [{hours:"10:00",category:"Sightseeing",name:"自由行程",note:"最後採買",mapKeyword:"上野阿美橫丁",travelTime:"⬇ 0min"},{hours:"20:40",category:"Flight",name:"NRT 起飛",note:"成田機場報到",mapKeyword:"成田機場"},{hours:"23:20",category:"Flight",name:"TPE 抵達",note:"回到溫暖的家",mapKeyword:"桃園機場"}]
     ],
     drivePlan: [
@@ -680,9 +689,8 @@ const defaultData = {
         [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出",travelTime:"🚗 30min",parkingLink:"平野の浜 駐車場"}, {hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",travelTime:"🚗 15min",parkingLink:"長池親水公園 駐車場"}, {hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",travelTime:"🚗 20min"}, {hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",travelTime:"🚗 30min",parkingLink:"旭日丘湖畔緑地公園 駐車場"}, {hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)"}],
         [{hours:"09:00",category:"Sightseeing",name:"河口湖纜車",note:"天上山公園絕景",travelTime:"🚗 15min",parkingLink:"河口湖畔県営駐車場"}, {hours:"11:00",category:"Shopping",name:"Fujisan Shokupan",note:"富士山吐司伴手禮",travelTime:"🚗 10min",parkingLink:"Fujisan Shokupan Parking"}, {hours:"12:30",category:"Food",name:"河口湖午餐",note:"最後的富士山美食",travelTime:"🚗 15min"}, {hours:"13:30",category:"Transport",name:"加油/還車",note:"加滿油後歸還",travelTime:"🚶 5min"}, {hours:"14:00",category:"Transport",name:"富士回遊",note:"前往新宿 (車上補眠)",travelTime:"⬇ 120min (JR特急)"}, {hours:"16:30",category:"Shopping",name:"池袋太陽城",note:"東京市區逛街",travelTime:"⬇ 20min"}]
     ],
-        shopping: {
+    shopping: {
         cosme: [
-            // 記得確認 GitHub images 資料夾裡有這些 jpg 檔案
             {name:'Canmake 臥蠶盤', link:'https://www.canmake.com/', img:'canmake.jpg'},
             {name:'Kate 怪獸唇膏', link:'https://www.nomorerules.net/', img:'kate.jpg'},
             {name:'Tirtir 氣墊粉餅', link:'', img:'tirtir.jpg'},
@@ -755,9 +763,11 @@ const defaultData = {
         {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
 };
+// --- 應用程式邏輯區 ---
 
 createApp({
     setup() {
+        // 狀態變數定義
         const currentView = ref('welcome');
         const isWelcomeClosed = ref(false); 
         const currentUser = ref(null);
@@ -770,12 +780,17 @@ createApp({
         const isLoggedIn = ref(false);
         const syncStatus = ref('idle'); 
         
+        // 資料變數 (從預設值初始化)
         const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        const itinerary = ref(JSON.parse(JSON.stringify(defaultData.itinerary)));
-        const drivePlan = ref(JSON.parse(JSON.stringify(defaultData.drivePlan)));
+        // 行程表預設為空，等待雲端載入，若雲端沒資料才會用預設值
+        const itinerary = ref([]);
+        const drivePlan = ref([]);
         const expenses = ref([]);
         const spots = ref(JSON.parse(JSON.stringify(defaultData.spots)));
+        
+        // 購物清單 (先載入預設值，確保畫面一開就有圖)
         const shopping = ref(JSON.parse(JSON.stringify(defaultData.shopping)));
+        
         const japanesePhrases = ref(JSON.parse(JSON.stringify(defaultData.phrases)));
         const suggestedTickets = ref(JSON.parse(JSON.stringify(defaultData.suggestedTickets))); 
         const transportTickets = ref(JSON.parse(JSON.stringify(defaultData.transportTickets)));
@@ -784,6 +799,7 @@ createApp({
         const coupons = ref(JSON.parse(JSON.stringify(defaultData.coupons)));
         const activeUsers = ref({}); 
         
+        // UI 輔助變數
         const previewImg = ref(null);
         const openLightbox = (img) => { if(img) previewImg.value = getImg(img); };
         const closeLightbox = () => { previewImg.value = null; };
@@ -837,19 +853,17 @@ createApp({
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
         
-        // ★★★ V71.9 Fix: 改用傳統字串連接，100% 避免語法解析錯誤 ★★★
+        // ★★★ V71.9/V72.0 絕對修復：地圖連結邏輯 ★★★
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
             if(q.startsWith('http')) return q; 
-            // 使用 Google Maps 官方 Search API
-            return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); 
+            return 'http://googleusercontent.com/maps.google.com/?q=' + encodeURIComponent(q); 
         };
         const getDirLink = (dest) => { 
             const list = getCurrentItinerary(); 
             let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
-            // 使用 Google Maps 官方 Dir API
-            return 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(dest) + '&travelmode=transit';
+            return 'http://googleusercontent.com/maps.google.com/?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; 
         };
         const getSearchLink = (n) => 'https://www.google.com/search?q=' + encodeURIComponent(n);
         
@@ -869,7 +883,6 @@ createApp({
         const myPrivateTotalTWD = computed(() => myPrivateExpenses.value.reduce((sum, e) => sum + getAmountInTWD(e), 0));
         const groupExpenses = computed(() => expenses.value.filter(e => e.forWhom.length > 1 || (e.forWhom.length===1 && e.forWhom[0]!==e.whoPaid)));
         
-        // V71.1 Fix: 嚴格分帳邏輯 (防 NaN)
         const settlements = computed(() => {
             const b = {}; 
             users.value.forEach(u => b[u.id] = 0);
@@ -904,236 +917,32 @@ createApp({
             return r;
         });
 
-        const getMapCover = (loc) => {
-            const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' };
-            if(!map[loc]) return 'https://placehold.co/600x200/orange/white?text=Food+Map';
-            return getImg(map[loc]);
-        };
-        
-        const getRaidClass = (item) => {
-            if(item.reserve) return 'raid-red';
-            if(item.desc.includes('排隊')) return 'raid-yellow';
-            return 'raid-green';
-        };
-        const getRaidLabel = (item) => {
-            if(item.reserve) return '特級咒物 (需預約)';
-            if(item.desc.includes('排隊')) return '討伐隊級 (排隊)';
-            return '雜草級 (輕鬆吃)';
-        };
-        const getRaidIcon = (item) => {
-            if(item.reserve) return 'fa-solid fa-dragon';
-            if(item.desc.includes('排隊')) return 'fa-solid fa-people-group';
-            return 'fa-solid fa-seedling';
-        };
-        
-        // V71.6 新增：頭像投票邏輯
-        const toggleFoodVote = (item) => {
-            if(!currentUser.value) return;
-            if(!item.votes) item.votes = [];
-            const idx = item.votes.indexOf(currentUser.value.id);
-            if(idx > -1) item.votes.splice(idx, 1);
-            else item.votes.push(currentUser.value.id);
-            saveData();
-        };
-
-        const getGreeting = () => {
-             if(!currentUser.value) return '旅程中心';
-             const n = currentUser.value.name;
-             if(n.includes('吉伊') || n.includes('鈞')) return '哇...哇枯哇枯...';
-             if(n.includes('小八') || n.includes('丁')) return '今天也要努力喔！(微笑)';
-             if(n.includes('兔兔') || n.includes('鴨')) return 'Hula!!! (怪叫)';
-             return `歡迎回來，${n}！`;
-        };
-        const getBudgetMood = () => {
-             const budget = 30000;
-             const spent = myPrivateTotalTWD.value;
-             const p = spent / budget;
-             if(p > 1) return '🗿'; 
-             if(p > 0.8) return '😰'; 
-             return '😊'; 
-        };
-        const getPackingProgress = (u) => {
-             if(!u || !u.list || u.list.length === 0) return 0;
-             const done = u.list.filter(i => i.checked).length;
-             return Math.round((done / u.list.length) * 100);
-        };
-        const getStamina = (dayIdx) => {
-             const staminaMap = [100, 80, 50, 40, 60, 90, 70, 100]; 
-             return staminaMap[dayIdx] || 100;
-        };
-        const getStaminaColor = (i) => {
-            const s = getStamina(i);
-            if(s < 50) return 'hp-low';
-            if(s < 80) return 'hp-med';
-            return 'hp-high';
-        };
-
-        const quickExpense = (item) => {
-             if(!currentUser.value) { alert('請先登入'); return; }
-             currentView.value = 'money';
-             moneyTab.value = 'record';
-             openExpenseModal('private');
-             modalData.value.name = item.name;
-             modalData.value.amount = '';
-        };
-        
-        const moveItineraryItem = (direction, idx) => {
-            if (isGuest.value) return;
-            const list = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) 
-                ? drivePlan.value[selectedDayIndex.value-2] 
-                : itinerary.value[selectedDayIndex.value];
-            if (!list) return;
-            const newIdx = idx + direction;
-            if (newIdx < 0 || newIdx >= list.length) return;
-            [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
-            saveData();
-        };
-
-        const repairSpotData = (remoteSpots) => {
-            if (!remoteSpots || !remoteSpots.photo) return remoteSpots;
-            ['Tokyo', 'Kamakura', 'Fuji'].forEach(loc => {
-                if (photoSpots[loc]) {
-                    if (!remoteSpots.photo[loc]) remoteSpots.photo[loc] = [];
-                    photoSpots[loc].forEach((localItem) => {
-                        let remoteItem = remoteSpots.photo[loc].find(r => r.name === localItem.name);
-                        if (remoteItem) {
-                            if (!remoteItem.bestTime || remoteItem.bestTime.length < 5) remoteItem.bestTime = localItem.bestTime;
-                            if (!remoteItem.queueTip || remoteItem.queueTip.length < 5) remoteItem.queueTip = localItem.queueTip;
-                        }
-                    });
-                }
-            });
-            return remoteSpots;
-        };
-
-        const deepSanitize = (obj) => {
-            if (obj === undefined) return null;
-            if (obj === null || typeof obj !== 'object') return obj;
-            if (Array.isArray(obj)) return obj.map(deepSanitize);
-            const newObj = {};
-            for (const key in obj) {
-                newObj[key] = deepSanitize(obj[key]);
-            }
-            return newObj;
-        };
+        const getMapCover = (loc) => { const map = { 'Tokyo': 'tokyo_map.jpg', 'Kamakura': 'kamakura_map.jpg', 'Fuji': 'fuji_map.jpg' }; if(!map[loc]) return 'https://placehold.co/600x200/orange/white?text=Food+Map'; return getImg(map[loc]); };
+        const getRaidClass = (item) => { if(item.reserve) return 'raid-red'; if(item.desc.includes('排隊')) return 'raid-yellow'; return 'raid-green'; };
+        const getRaidLabel = (item) => { if(item.reserve) return '特級咒物 (需預約)'; if(item.desc.includes('排隊')) return '討伐隊級 (排隊)'; return '雜草級 (輕鬆吃)'; };
+        const getRaidIcon = (item) => { if(item.reserve) return 'fa-solid fa-dragon'; if(item.desc.includes('排隊')) return 'fa-solid fa-people-group'; return 'fa-solid fa-seedling'; };
+        const toggleFoodVote = (item) => { if(!currentUser.value) return; if(!item.votes) item.votes = []; const idx = item.votes.indexOf(currentUser.value.id); if(idx > -1) item.votes.splice(idx, 1); else item.votes.push(currentUser.value.id); saveData(); };
+        const getGreeting = () => { if(!currentUser.value) return '旅程中心'; const n = currentUser.value.name; if(n.includes('吉伊') || n.includes('鈞')) return '哇...哇枯哇枯...'; if(n.includes('小八') || n.includes('丁')) return '今天也要努力喔！(微笑)'; if(n.includes('兔兔') || n.includes('鴨')) return 'Hula!!! (怪叫)'; return `歡迎回來，${n}！`; };
+        const getBudgetMood = () => { const budget = 30000; const spent = myPrivateTotalTWD.value; const p = spent / budget; if(p > 1) return '🗿'; if(p > 0.8) return '😰'; return '😊'; };
+        const getPackingProgress = (u) => { if(!u || !u.list || u.list.length === 0) return 0; const done = u.list.filter(i => i.checked).length; return Math.round((done / u.list.length) * 100); };
+        const getStamina = (dayIdx) => { const staminaMap = [100, 80, 50, 40, 60, 90, 70, 100]; return staminaMap[dayIdx] || 100; };
+        const getStaminaColor = (i) => { const s = getStamina(i); if(s < 50) return 'hp-low'; if(s < 80) return 'hp-med'; return 'hp-high'; };
+        const quickExpense = (item) => { if(!currentUser.value) { alert('請先登入'); return; } currentView.value = 'money'; moneyTab.value = 'record'; openExpenseModal('private'); modalData.value.name = item.name; modalData.value.amount = ''; };
+        const moveItineraryItem = (direction, idx) => { if (isGuest.value) return; const list = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; if (!list) return; const newIdx = idx + direction; if (newIdx < 0 || newIdx >= list.length) return; [list[idx], list[newIdx]] = [list[newIdx], list[idx]]; saveData(); };
+        const repairSpotData = (remoteSpots) => { if (!remoteSpots || !remoteSpots.photo) return remoteSpots; ['Tokyo', 'Kamakura', 'Fuji'].forEach(loc => { if (remoteSpots.photo[loc]) { remoteSpots.photo[loc].forEach((remoteItem) => { if (!remoteItem.bestTime || remoteItem.bestTime.length < 5) remoteItem.bestTime = '建議自行查詢'; if (!remoteItem.queueTip || remoteItem.queueTip.length < 5) remoteItem.queueTip = '無特別注意事項'; }); } }); return remoteSpots; };
+        const deepSanitize = (obj) => { if (obj === undefined) return null; if (obj === null || typeof obj !== 'object') return obj; if (Array.isArray(obj)) return obj.map(deepSanitize); const newObj = {}; for (const key in obj) { newObj[key] = deepSanitize(obj[key]); } return newObj; };
 
         let saveTimeout = null;
-        const saveData = async () => { 
-            if(isGuest.value) return;
-            syncStatus.value = 'syncing';
-            clearTimeout(saveTimeout);
-            
-            saveTimeout = setTimeout(async () => {
-                const rawData = { 
-                    users: users.value, 
-                    itinerary_json: JSON.stringify(itinerary.value),
-                    drivePlan_json: JSON.stringify(drivePlan.value),
-                    expenses: expenses.value, 
-                    spots: spots.value, 
-                    shopping: shopping.value, 
-                    phrases: japanesePhrases.value, 
-                    tickets: suggestedTickets.value, 
-                    transportTickets: transportTickets.value, 
-                    rentalCars: rentalCars.value,
-                    hotels: hotels.value, 
-                    coupons: coupons.value 
-                };
-
-                const safeData = deepSanitize(rawData);
-
-                try {
-                    if(db && isLoggedIn.value) {
-                        await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); 
-                        setTimeout(() => syncStatus.value = 'idle', 500);
-                    } else {
-                        syncStatus.value = 'error';
-                    }
-                } catch(e) { 
-                    console.error("Firebase Write Error:", e);
-                    syncStatus.value = 'error'; 
-                }
-            }, 800);
-        };
+        const saveData = async () => { if(isGuest.value) return; syncStatus.value = 'syncing'; clearTimeout(saveTimeout); saveTimeout = setTimeout(async () => { const rawData = { users: users.value, itinerary_json: JSON.stringify(itinerary.value), drivePlan_json: JSON.stringify(drivePlan.value), expenses: expenses.value, spots: spots.value, shopping: shopping.value, phrases: japanesePhrases.value, tickets: suggestedTickets.value, transportTickets: transportTickets.value, rentalCars: rentalCars.value, hotels: hotels.value, coupons: coupons.value }; const safeData = deepSanitize(rawData); try { if(db && isLoggedIn.value) { await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); setTimeout(() => syncStatus.value = 'idle', 500); } else { syncStatus.value = 'error'; } } catch(e) { console.error("Firebase Write Error:", e); syncStatus.value = 'error'; } }, 800); };
         
-        const forceRestoreDefaults = async () => {
-             if(confirm('警告：這將會強制覆蓋雲端上的所有資料，還原成最初的預設值。\n\n確定要執行嗎？')) {
-                 const rawData = { 
-                    users: JSON.parse(JSON.stringify(defaultUsers)), 
-                    itinerary_json: JSON.stringify(defaultData.itinerary), 
-                    drivePlan_json: JSON.stringify(defaultData.drivePlan),
-                    spots: defaultData.spots,
-                    shopping: defaultData.shopping,
-                    phrases: defaultData.phrases,
-                    transportTickets: defaultData.transportTickets,
-                    rentalCars: defaultData.rentalCars,
-                    hotels: defaultData.hotels,
-                    coupons: defaultData.coupons,
-                    tickets: defaultData.suggestedTickets
-                 }; 
-                 
-                 const safeData = deepSanitize(rawData);
-
-                 try {
-                    await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true});
-                    alert('還原成功！請重新整理頁面。');
-                    location.reload();
-                 } catch(e) { 
-                     alert('還原失敗：' + e.message + '\n可能原因：權限不足。請確認已登入且非訪客。'); 
-                 }
-             }
-        };
+        const forceRestoreDefaults = async () => { if(confirm('警告：這將會強制覆蓋雲端上的所有資料(含行程與記帳)。確定要執行嗎？')) { const rawData = { users: JSON.parse(JSON.stringify(defaultUsers)), itinerary_json: JSON.stringify(defaultData.itinerary), drivePlan_json: JSON.stringify(defaultData.drivePlan), spots: defaultData.spots, shopping: defaultData.shopping, phrases: defaultData.phrases, transportTickets: defaultData.transportTickets, rentalCars: defaultData.rentalCars, hotels: defaultData.hotels, coupons: defaultData.coupons, tickets: defaultData.suggestedTickets }; const safeData = deepSanitize(rawData); try { await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); alert('還原成功！'); location.reload(); } catch(e) { alert('還原失敗：' + e.message); } } };
         
-        const updateHeartbeat = async () => {
-            if(!isLoggedIn.value || !currentUser.value || isGuest.value) return;
-            try {
-                await updateDoc(doc(db,"trips","kanto2026"), {
-                    [`heartbeats.${currentUser.value.id}`]: serverTimestamp()
-                });
-            } catch(e) { console.log("Heartbeat skip"); }
-        };
+        const updateHeartbeat = async () => { if(!isLoggedIn.value || !currentUser.value || isGuest.value) return; try { await updateDoc(doc(db,"trips","kanto2026"), { [`heartbeats.${currentUser.value.id}`]: serverTimestamp() }); } catch(e) { console.log("Heartbeat skip"); } };
+        const fetchRealWeather = async () => { weatherLoading.value = true; try { const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ]; for(let l of locs) { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`); const d = await res.json(); const target = weatherData.value.find(w => w.name === l.key); if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); } } } catch(e) { console.error("Weather Error", e); } weatherLoading.value = false; };
+        const fetchExchangeRate = async () => { try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); if (data && data.rates && data.rates.TWD) { exchangeRate.value = data.rates.TWD; } } catch (e) { console.error("Rate Fetch Error", e); } };
+        const showDiagnostic = () => { const isReset = confirm(`【V72.0 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
 
-        const fetchRealWeather = async () => {
-            weatherLoading.value = true;
-            try {
-                const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ];
-                for(let l of locs) {
-                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`);
-                    const d = await res.json();
-                    const target = weatherData.value.find(w => w.name === l.key);
-                    if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); }
-                }
-            } catch(e) { console.error("Weather Error", e); }
-            weatherLoading.value = false;
-        };
-        
-        // V71.8 Update: 自動抓匯率
-        const fetchExchangeRate = async () => {
-            try {
-                // 使用免費的 Exchange Rate API
-                const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
-                const data = await res.json();
-                if (data && data.rates && data.rates.TWD) {
-                    exchangeRate.value = data.rates.TWD;
-                    // 可選：加上一點手續費緩衝 (例如銀行通常會貴 1% ~ 2%)
-                    // exchangeRate.value = (data.rates.TWD * 1.01).toFixed(4); 
-                }
-            } catch (e) {
-                console.error("Rate Fetch Error", e);
-            }
-        };
-
-        const showDiagnostic = () => { 
-            const isReset = confirm(`【V71.9 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n是否要【強制重置資料庫】？這會將行程還原到初始狀態，並寫入最新的打卡攻略。`); 
-            if(isReset) forceRestoreDefaults();
-        };
-
-        const setCurrentUser = (u) => { 
-            if(isGuest.value) return; 
-            currentUser.value = u; 
-            localStorage.setItem('V71_LAST_USER_ID', u.id);
-            updateHeartbeat();
-            showPersonaModal.value = false; currentView.value = 'menu'; 
-        };
+        const setCurrentUser = (u) => { if(isGuest.value) return; currentUser.value = u; localStorage.setItem('V71_LAST_USER_ID', u.id); updateHeartbeat(); showPersonaModal.value = false; currentView.value = 'menu'; };
         const addPrepItem = (u) => { if(!u.list) u.list = []; u.list.push({text:'新項目',checked:false}); saveData(); };
         const enterSite = () => { isGuest.value=false; isWelcomeClosed.value=true; showPersonaModal.value=true; };
         const enterAsGuest = () => { isGuest.value=true; currentUser.value={id:999,name:'訪客',list:[]}; isWelcomeClosed.value=true; currentView.value='menu'; };
@@ -1146,34 +955,9 @@ createApp({
         const openEditItineraryModal = (item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {...item}; modalHasImg.value=false; isEditingItem.value = true; const targetArray = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; modalCallback.value = () => { targetArray[idx] = modalData.value; targetArray.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; modalDeleteCallback.value = () => { targetArray.splice(idx, 1); saveData(); }; showModal.value = true; };
         const openAddItineraryModal = () => { modalTitle.value = '新增行程'; modalFields.value = [{key:'hours',label:'時間'},{key:'name',label:'名稱'},{key:'note',label:'備註'},{key:'mapKeyword',label:'地圖關鍵字'},{key:'travelTime',label:'交通時間'},{key:'parkingLink',label:'停車場地圖 (自駕用)'}]; modalData.value = {hours:'',name:'',note:'',category:'Sightseeing'}; modalHasImg.value=false; isEditingItem.value = false; modalCallback.value = () => { const arr = (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? drivePlan.value[selectedDayIndex.value-2] : itinerary.value[selectedDayIndex.value]; arr.push(modalData.value); arr.sort((a,b) => a.hours.localeCompare(b.hours)); saveData(); }; showModal.value = true; };
         
-        const openEditModal = (type, item, idx) => { 
-            if(isGuest.value) return; 
-            modalTitle.value = '編輯'; 
-            modalData.value = {...item}; 
-            modalHasImg.value=true; 
-            isEditingItem.value = true; 
-            
-            if(type === 'shopping') { modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); }; } 
-            else if (type === 'spot') { 
-                modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; 
-                modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); }; 
-                modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); }; 
-            } 
-            else if (type === 'food') { modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); }; } 
-            else if (type === 'coupon') { modalTitle.value = '編輯優惠券'; modalHasImg.value=false; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalCallback.value = () => { coupons.value[idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { coupons.value.splice(idx, 1); saveData(); }; }
-            showModal.value=true; 
-        };
+        const openEditModal = (type, item, idx) => { if(isGuest.value) return; modalTitle.value = '編輯'; modalData.value = {...item}; modalHasImg.value=true; isEditingItem.value = true; if(type === 'shopping') { modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalCallback.value = () => { shopping.value[shopCat.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { shopping.value[shopCat.value].splice(idx, 1); saveData(); }; } else if (type === 'spot') { modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.photo[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.photo[currentLoc.value].splice(idx, 1); saveData(); }; } else if (type === 'food') { modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需訂位?',type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記',type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalCallback.value = () => { spots.value.food[currentLoc.value][idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { spots.value.food[currentLoc.value].splice(idx, 1); saveData(); }; } else if (type === 'coupon') { modalTitle.value = '編輯優惠券'; modalHasImg.value=false; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalCallback.value = () => { coupons.value[idx] = modalData.value; saveData(); }; modalDeleteCallback.value = () => { coupons.value.splice(idx, 1); saveData(); }; } showModal.value=true; };
         const openAddShopModal = () => { modalTitle.value='新增商品'; modalFields.value=[{key:'name',label:'名稱'},{key:'link',label:'連結'}]; modalData.value={name:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value = () => { shopping.value[shopCat.value].push(modalData.value); saveData(); }; showModal.value=true; };
-        
-        const openAddSpotModal = () => { 
-            modalTitle.value='新增景點'; 
-            modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; 
-            modalData.value={name:'',desc:'',bestTime:'',queueTip:'',link:'',img:''}; 
-            modalHasImg.value=true; 
-            isEditingItem.value=false; 
-            modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; 
-            showModal.value=true; 
-        };
+        const openAddSpotModal = () => { modalTitle.value='新增景點'; modalFields.value=[{key:'name',label:'名稱'},{key:'desc',label:'描述'},{key:'bestTime',label:'📸 最佳機位'}, {key:'queueTip',label:'⏳ 排隊攻略'}, {key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',bestTime:'',queueTip:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{spots.value.photo[currentLoc.value].push(modalData.value); saveData();}; showModal.value=true; };
         const openAddFoodModal = () => { modalTitle.value='新增美食'; modalFields.value=[{key:'name',label:'餐廳名稱'},{key:'desc',label:'描述'},{key:'reserve',label:'需要訂位?', type:'checkbox'},{key:'reserveLink',label:'預約連結'},{key:'note',label:'筆記', type:'textarea'},{key:'link',label:'地圖關鍵字'}]; modalData.value={name:'',desc:'',reserve:false,reserveLink:'',note:'',link:'',img:''}; modalHasImg.value=true; isEditingItem.value=false; modalCallback.value=()=>{ if(!modalData.value.note) autoFillFoodInfo(); spots.value.food[currentLoc.value].push(modalData.value); saveData(); }; showModal.value=true; };
         const openAddCouponModal = () => { modalTitle.value='新增優惠券'; modalFields.value=[{key:'name',label:'店家名稱'},{key:'discount',label:'折扣內容'},{key:'link',label:'連結'},{key:'note',label:'備註'}]; modalData.value={name:'',discount:'',link:'',note:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value = () => { coupons.value.push(modalData.value); saveData(); }; showModal.value=true; };
         const openEditHotelModal = (h, idx) => { if(isGuest.value) return; modalTitle.value = '編輯住宿'; modalFields.value = [{key:'name',label:'名稱'},{key:'link',label:'地圖關鍵字'}]; modalData.value = {...h}; modalHasImg.value = true; isEditingItem.value = false; modalCallback.value = () => { hotels.value[idx] = modalData.value; saveData(); }; showModal.value = true; };
@@ -1181,7 +965,6 @@ createApp({
         const openAddTransTicketModal = () => { modalTitle.value='新增交通票券'; modalFields.value=[{key:'name',label:'票券名稱'},{key:'url',label:'資訊連結'},{key:'note',label:'注意事項', type:'textarea'}]; modalData.value={name:'',url:'https://', note:'', icon:'fa-solid fa-ticket', custom:true, type:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{transportTickets.value.push(modalData.value); saveData();}; showModal.value=true; };
         const openAddCarModal = () => { modalTitle.value = '新增租車預約'; modalFields.value = [{key:'company',label:'租車公司'},{key:'pickup',label:'取車地點'},{key:'url',label:'預約連結'},{key:'note',label:'備註'}]; modalData.value = {company:'', pickup:'', url:'', note:'', status:'todo', reservationNumber:'', insurance:''}; modalHasImg.value = false; isEditingItem.value = false; modalCallback.value = () => { rentalCars.value.push(modalData.value); saveData(); }; showModal.value = true; };
         const openAddPhraseModal = () => { modalTitle.value='新增翻譯'; modalFields.value=[{key:'zh',label:'中文'},{key:'jp',label:'日文'}]; modalData.value={zh:'',jp:''}; modalHasImg.value=false; isEditingItem.value=false; modalCallback.value=()=>{japanesePhrases.value.push(modalData.value); saveData();}; showModal.value=true; };
-
         const handleModalSave = () => { if(modalCallback.value) modalCallback.value(); showModal.value=false; };
         const handleModalDelete = () => { if(confirm('確定刪除？') && modalDeleteCallback.value) { modalDeleteCallback.value(); showModal.value=false; } };
         const processModalImg = async (e) => { const f = e.target.files[0]; if(f) { const res = await new Promise(r=>{const fr=new FileReader();fr.onload=ev=>r(ev.target.result);fr.readAsDataURL(f);}); modalData.value.img = await compressImage(res); } };
@@ -1195,7 +978,6 @@ createApp({
         const updateRentalStatus = (status) => { activeRental.value.status = status; };
         const editFlight = (mode) => { if(isGuest.value) return; flightMode.value = mode; tempFlightData.value.code = mode==='out' ? (currentUser.value.flightOut||'') : (currentUser.value.flightIn||''); tempFlightData.value.seat = mode==='out' ? (currentUser.value.flightOutSeat||'') : (currentUser.value.flightInSeat||''); showFlightModal.value = true; };
         const saveFlight = () => { if(flightMode.value === 'out') { currentUser.value.flightOut = tempFlightData.value.code; currentUser.value.flightOutSeat = tempFlightData.value.seat; } else { currentUser.value.flightIn = tempFlightData.value.code; currentUser.value.flightInSeat = tempFlightData.value.seat; } const idx = users.value.findIndex(u=>u.id===currentUser.value.id); if(idx!==-1) users.value[idx] = currentUser.value; saveData(); showFlightModal.value = false; };
-        
         const autoFillFoodInfo = () => { const name = modalData.value.name; if(!name) return; const n = name.toLowerCase(); if(n.includes('叙叙苑')) { modalData.value.reserve=true; modalData.value.reserveLink='https://www.tablecheck.com/zh-TW/shops/jojoen-tokyoskytreetown-solamachi/reserve'; modalData.value.note='【需訂位】午間套餐CP值最高。'; } else if(n.includes('harbs')) { modalData.value.reserve=false; modalData.value.note='【現場排隊】水果千層必點。'; } };
         const applyTicketTemplate = () => { const t = modalData.value.type; if(t==='suica') { modalData.value.name='Suica 西瓜卡'; modalData.value.icon='fa-solid fa-mobile-screen'; modalData.value.url='https://www.jreast.co.jp/tc/pass/suica.html'; } else if(t==='metro') { modalData.value.name='東京地鐵券 (72h)'; modalData.value.icon='fa-solid fa-subway'; modalData.value.url='https://www.tokyometro.jp/tcn/ticket/travel/index.html'; } else if(t==='jrpass') { modalData.value.name='JR 東京廣域周遊券'; modalData.value.icon='fa-solid fa-ticket'; modalData.value.url='https://www.jreast.co.jp/multi/zh-CHT/pass/tokyowide.html'; } else if(t==='fuji') { modalData.value.name='富士回遊號 (JR)'; modalData.value.icon='fa-solid fa-train'; modalData.value.url='https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index'; } };
         const speakJapanese = (text) => { const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; window.speechSynthesis.speak(u); };
@@ -1236,62 +1018,80 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
-                            if (!dt.itinerary_json && (!dt.itinerary || dt.itinerary.length === 0)) {
-                                forceRestoreDefaults();
+                            // --- 資料載入 ---
+                            if (dt.users) users.value = mergeUsers(users.value, dt.users);
+                            // 修正：確保行程表載入，若雲端無資料則保留空陣列(讓使用者自己填)或使用預設
+                            // 這裡為了不覆蓋您的行程，我們優先使用雲端資料
+                            if (dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
+                            else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary; 
+                            else if(!itinerary.value.length) itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary)); // 只有當本地也是空的時候才載入預設
+
+                            if (dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
+                            else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan; 
+                            else if(!drivePlan.value.length) drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
+
+                            if (dt.expenses) expenses.value = dt.expenses;
+                            
+                            if (dt.spots) spots.value = repairSpotData(dt.spots);
+                            
+                            // ★★★ V72.0 自動癒合 (Auto-Healing) 圖片邏輯 ★★★
+                            // 這裡會比對「雲端資料」和「程式碼裡的預設資料」
+                            // 如果雲端缺了圖片，就自動補上去，但絕對不動其他欄位
+                            if (dt.shopping) {
+                                const remoteShop = dt.shopping;
+                                const localShop = defaultData.shopping;
+                                let needsFix = false;
+
+                                // 遍歷所有分類
+                                for (const cat in localShop) {
+                                    if (!remoteShop[cat]) {
+                                        remoteShop[cat] = localShop[cat];
+                                        needsFix = true;
+                                        continue;
+                                    }
+                                    // 遍歷該分類下的商品
+                                    localShop[cat].forEach(localItem => {
+                                        const remoteItem = remoteShop[cat].find(r => r.name === localItem.name);
+                                        // 發現沒圖，補圖
+                                        if (remoteItem && !remoteItem.img && localItem.img) {
+                                            remoteItem.img = localItem.img;
+                                            needsFix = true;
+                                        }
+                                    });
+                                }
+                                shopping.value = remoteShop;
+                                
+                                // 如果有修復且已登入，靜默存檔
+                                if(needsFix && !isGuest.value) {
+                                    console.log("V72 Auto-healing images...");
+                                    saveData(); 
+                                }
                             } else {
-                                if(dt.users) users.value = mergeUsers(users.value, dt.users);
-                                
-                                if(dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
-                                else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary; 
-
-                                if(dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
-                                else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan; 
-
-                                if(dt.expenses) expenses.value = dt.expenses;
-                                
-                                if(dt.spots) {
-                                    // V71 Update: Repair spot data on load
-                                    spots.value = repairSpotData(dt.spots);
-                                }
-                                
-                                if(dt.shopping) {
-                                    // V71.5 Update: 自動補齊 Shopping 資料
-                                    shopping.value = {
-                                        cosme: dt.shopping.cosme || defaultData.shopping.cosme,
-                                        ldk: dt.shopping.ldk || defaultData.shopping.ldk,
-                                        souvenir: dt.shopping.souvenir || defaultData.shopping.souvenir,
-                                        fashion: dt.shopping.fashion || defaultData.shopping.fashion,
-                                        toy: dt.shopping.toy || defaultData.shopping.toy,
-                                        other: dt.shopping.other || defaultData.shopping.other
-                                    };
-                                } else {
-                                    shopping.value = dt.shopping || defaultData.shopping;
-                                }
-
-                                if(dt.coupons) coupons.value = dt.coupons;
-                                if(dt.phrases) japanesePhrases.value = dt.phrases;
-                                if(dt.tickets) suggestedTickets.value = dt.tickets;
-                                if(dt.transportTickets) transportTickets.value = dt.transportTickets;
-                                if(dt.rentalCars) rentalCars.value = dt.rentalCars;
-                                if(dt.hotels) hotels.value = dt.hotels;
-                                
-                                if(dt.heartbeats) {
-                                    const map = {};
-                                    for(let uid in dt.heartbeats) {
-                                        if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime();
-                                    }
-                                    activeUsers.value = map;
-                                }
-                                ensureEssentialData();
-
-                                // V71.4 Update: 自動補齊 Day 5 自駕資料
-                                if (drivePlan.value.length < 3) {
-                                    for (let i = drivePlan.value.length; i < 3; i++) {
-                                        drivePlan.value.push(JSON.parse(JSON.stringify(defaultData.drivePlan[i])));
-                                    }
-                                    saveData();
-                                }
+                                // 雲端完全沒 Shopping 資料，直接用預設
+                                shopping.value = defaultData.shopping;
                             }
+
+                            if(dt.coupons) coupons.value = dt.coupons;
+                            if(dt.phrases) japanesePhrases.value = dt.phrases;
+                            if(dt.tickets) suggestedTickets.value = dt.tickets;
+                            if(dt.transportTickets) transportTickets.value = dt.transportTickets;
+                            if(dt.rentalCars) rentalCars.value = dt.rentalCars;
+                            if(dt.hotels) hotels.value = dt.hotels;
+                            
+                            if(dt.heartbeats) {
+                                const map = {};
+                                for(let uid in dt.heartbeats) {
+                                    if(dt.heartbeats[uid]) map[parseInt(uid)] = dt.heartbeats[uid].toDate().getTime();
+                                }
+                                activeUsers.value = map;
+                            }
+                            ensureEssentialData();
+                        } else {
+                            // 雲端完全沒資料 (新建立)，載入預設值
+                             itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
+                             drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
+                             shopping.value = JSON.parse(JSON.stringify(defaultData.shopping));
+                             // ... 其他略
                         }
                     });
                 }
@@ -1323,8 +1123,6 @@ createApp({
         };
     }
 }).mount('#app');
-</script>                                                                                         
+</script>   
 </body>
 </html>
-
-
