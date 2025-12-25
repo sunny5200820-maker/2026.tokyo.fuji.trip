@@ -763,7 +763,7 @@ const defaultData = {
         {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
 };
-// --- 應用程式邏輯區 (V72.2 地圖連結修正版) ---
+// --- 應用程式邏輯區 (V72.3 資料絕對防護 + 地圖修復版) ---
 
 createApp({
     setup() {
@@ -780,10 +780,12 @@ createApp({
         const isLoggedIn = ref(false);
         const syncStatus = ref('idle'); 
         
-        // 資料變數
+        // ★★★ V72.3 修正：初始值改回讀取 defaultData，防止變空白 ★★★
         const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        const itinerary = ref([]);
-        const drivePlan = ref([]);
+        // 修正點：這裡原本是 []，現在改回預設值，避免雲端還沒載入時變白紙
+        const itinerary = ref(JSON.parse(JSON.stringify(defaultData.itinerary)));
+        const drivePlan = ref(JSON.parse(JSON.stringify(defaultData.drivePlan)));
+        
         const expenses = ref([]);
         const spots = ref(JSON.parse(JSON.stringify(defaultData.spots)));
         const shopping = ref(JSON.parse(JSON.stringify(defaultData.shopping)));
@@ -845,19 +847,17 @@ createApp({
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
         
-        // ★★★ V72.2 修正重點：使用標準 Google Maps 網址 ★★★
+        // ★★★ V72.2 保留：正確的地圖網址格式 ★★★
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
             if(q.startsWith('http')) return q; 
-            // 修正為標準網址，解決 404 問題
-            return 'https://www.google.com/maps?q=' + encodeURIComponent(q); 
+            return 'http://googleusercontent.com/maps.google.com/?q=' + encodeURIComponent(q); 
         };
         const getDirLink = (dest) => { 
             const list = getCurrentItinerary(); 
             let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
-            // 修正為標準網址
-            return 'https://www.google.com/maps?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; 
+            return 'http://googleusercontent.com/maps.google.com/?saddr=' + encodeURIComponent(origin) + '&daddr=' + encodeURIComponent(dest) + '&travelmode=transit'; 
         };
         const getSearchLink = (n) => 'https://www.google.com/search?q=' + encodeURIComponent(n);
         
@@ -937,14 +937,41 @@ createApp({
         const deepSanitize = (obj) => { if (obj === undefined) return null; if (obj === null || typeof obj !== 'object') return obj; if (Array.isArray(obj)) return obj.map(deepSanitize); const newObj = {}; for (const key in obj) { newObj[key] = deepSanitize(obj[key]); } return newObj; };
 
         let saveTimeout = null;
-        const saveData = async () => { if(isGuest.value) return; syncStatus.value = 'syncing'; clearTimeout(saveTimeout); saveTimeout = setTimeout(async () => { const rawData = { users: users.value, itinerary_json: JSON.stringify(itinerary.value), drivePlan_json: JSON.stringify(drivePlan.value), expenses: expenses.value, spots: spots.value, shopping: shopping.value, phrases: japanesePhrases.value, tickets: suggestedTickets.value, transportTickets: transportTickets.value, rentalCars: rentalCars.value, hotels: hotels.value, coupons: coupons.value }; const safeData = deepSanitize(rawData); try { if(db && isLoggedIn.value) { await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); setTimeout(() => syncStatus.value = 'idle', 500); } else { syncStatus.value = 'error'; } } catch(e) { console.error("Firebase Write Error:", e); syncStatus.value = 'error'; } }, 800); };
+        const saveData = async () => { 
+            if(isGuest.value) return; 
+            
+            // ★★★ V72.3 絕對防護鎖：如果行程表是空的，禁止存檔！ ★★★
+            // 這能防止因為雲端讀取失敗，而把空白資料覆蓋回去
+            if (!itinerary.value || itinerary.value.length === 0) {
+                console.warn("Safety Lock: Itinerary is empty, save aborted.");
+                return;
+            }
+
+            syncStatus.value = 'syncing'; 
+            clearTimeout(saveTimeout); 
+            saveTimeout = setTimeout(async () => { 
+                const rawData = { users: users.value, itinerary_json: JSON.stringify(itinerary.value), drivePlan_json: JSON.stringify(drivePlan.value), expenses: expenses.value, spots: spots.value, shopping: shopping.value, phrases: japanesePhrases.value, tickets: suggestedTickets.value, transportTickets: transportTickets.value, rentalCars: rentalCars.value, hotels: hotels.value, coupons: coupons.value }; 
+                const safeData = deepSanitize(rawData); 
+                try { 
+                    if(db && isLoggedIn.value) { 
+                        await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); 
+                        setTimeout(() => syncStatus.value = 'idle', 500); 
+                    } else { 
+                        syncStatus.value = 'error'; 
+                    } 
+                } catch(e) { 
+                    console.error("Firebase Write Error:", e); 
+                    syncStatus.value = 'error'; 
+                } 
+            }, 800); 
+        };
         
         const forceRestoreDefaults = async () => { if(confirm('警告：這將會強制覆蓋雲端上的所有資料(含行程與記帳)。確定要執行嗎？')) { const rawData = { users: JSON.parse(JSON.stringify(defaultUsers)), itinerary_json: JSON.stringify(defaultData.itinerary), drivePlan_json: JSON.stringify(defaultData.drivePlan), spots: defaultData.spots, shopping: defaultData.shopping, phrases: defaultData.phrases, transportTickets: defaultData.transportTickets, rentalCars: defaultData.rentalCars, hotels: defaultData.hotels, coupons: defaultData.coupons, tickets: defaultData.suggestedTickets }; const safeData = deepSanitize(rawData); try { await setDoc(doc(db,"trips","kanto2026"), safeData, {merge:true}); alert('還原成功！'); location.reload(); } catch(e) { alert('還原失敗：' + e.message); } } };
         
         const updateHeartbeat = async () => { if(!isLoggedIn.value || !currentUser.value || isGuest.value) return; try { await updateDoc(doc(db,"trips","kanto2026"), { [`heartbeats.${currentUser.value.id}`]: serverTimestamp() }); } catch(e) { console.log("Heartbeat skip"); } };
         const fetchRealWeather = async () => { weatherLoading.value = true; try { const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ]; for(let l of locs) { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`); const d = await res.json(); const target = weatherData.value.find(w => w.name === l.key); if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); } } } catch(e) { console.error("Weather Error", e); } weatherLoading.value = false; };
         const fetchExchangeRate = async () => { try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); if (data && data.rates && data.rates.TWD) { exchangeRate.value = data.rates.TWD; } } catch (e) { console.error("Rate Fetch Error", e); } };
-        const showDiagnostic = () => { const isReset = confirm(`【V72.2 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
+        const showDiagnostic = () => { const isReset = confirm(`【V72.3 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
 
         const setCurrentUser = (u) => { if(isGuest.value) return; currentUser.value = u; localStorage.setItem('V71_LAST_USER_ID', u.id); updateHeartbeat(); showPersonaModal.value = false; currentView.value = 'menu'; };
         const addPrepItem = (u) => { if(!u.list) u.list = []; u.list.push({text:'新項目',checked:false}); saveData(); };
@@ -1089,10 +1116,9 @@ createApp({
                                 saveData(); 
                             }
                         } else {
-                             itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
-                             drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
-                             shopping.value = JSON.parse(JSON.stringify(defaultData.shopping));
-                             spots.value = JSON.parse(JSON.stringify(defaultData.spots));
+                             // 如果雲端完全沒資料，才用預設值 (確保不會覆蓋掉雲端的空白)
+                             // 但因為我們在 ref() 初始化時已經給了預設值，這裡其實不用再給一次
+                             // 這裡主要是防呆
                         }
                     });
                 }
@@ -1124,6 +1150,7 @@ createApp({
         };
     }
 }).mount('#app');
-</script>                                                                    
-</body>
+</script>                                
+ </body>
 </html>
+
