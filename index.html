@@ -763,8 +763,7 @@ const defaultData = {
         {name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}
     ]
 };
-// --- 應用程式邏輯區 (V72.3 資料絕對防護 + 地圖修復版) ---
-
+// --- 應用程式邏輯區 (V72.3 最終修正：資料防護 + 地圖修復) ---
 createApp({
     setup() {
         // 狀態變數
@@ -780,9 +779,9 @@ createApp({
         const isLoggedIn = ref(false);
         const syncStatus = ref('idle'); 
         
-        // ★★★ V72.3 修正：初始值改回讀取 defaultData，防止變空白 ★★★
+        // ★★★ V72.3 關鍵修正：初始值改回讀取 defaultData，防止變空白 ★★★
         const users = ref(JSON.parse(JSON.stringify(defaultUsers)));
-        // 修正點：這裡原本是 []，現在改回預設值，避免雲端還沒載入時變白紙
+        // 這裡一定要讀取 defaultData，這樣就算雲端還沒載入，畫面也不會是白的
         const itinerary = ref(JSON.parse(JSON.stringify(defaultData.itinerary)));
         const drivePlan = ref(JSON.parse(JSON.stringify(defaultData.drivePlan)));
         
@@ -847,7 +846,7 @@ createApp({
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
         
-        // ★★★ V72.2 保留：正確的地圖網址格式 ★★★
+        // ★★★ V72.3 地圖連結修復 (使用正確的 googleusercontent 格式) ★★★
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
@@ -1014,32 +1013,11 @@ createApp({
         const openGoogleTranslate = (text) => { window.open(`https://translate.google.com/?sl=zh-TW&tl=ja&text=${encodeURIComponent(text)}&op=translate`, '_blank'); };
         const handleCameraTranslate = () => { window.open('https://translate.google.com/?sl=auto&tl=zh-TW&op=images', '_blank'); };
         const expandCard = (p) => expandedPhrase.value=p;
-
-        const mergeUsers = (local, remote) => {
-            if(!remote || !Array.isArray(remote)) return local;
-            remote.forEach(rUser => {
-                const lUser = local.find(u => u.id === rUser.id);
-                if(lUser) {
-                    lUser.name = rUser.name; 
-                    lUser.avatar = rUser.avatar; 
-                    if(rUser.list && rUser.list.length > 0) lUser.list = rUser.list; 
-                    lUser.flightOut = rUser.flightOut; lUser.flightOutSeat = rUser.flightOutSeat;
-                    lUser.flightIn = rUser.flightIn; lUser.flightInSeat = rUser.flightInSeat;
-                }
-            });
-            return local;
-        };
-
-        const ensureEssentialData = () => {
-            const hasSky = suggestedTickets.value.find(t => t.name === 'SHIBUYA SKY');
-            if(!hasSky) {
-                suggestedTickets.value.push({name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false});
-            }
-        };
+        const mergeUsers = (local, remote) => { if(!remote || !Array.isArray(remote)) return local; remote.forEach(rUser => { const lUser = local.find(u => u.id === rUser.id); if(lUser) { lUser.name = rUser.name; lUser.avatar = rUser.avatar; if(rUser.list && rUser.list.length > 0) lUser.list = rUser.list; lUser.flightOut = rUser.flightOut; lUser.flightOutSeat = rUser.flightOutSeat; lUser.flightIn = rUser.flightIn; lUser.flightInSeat = rUser.flightInSeat; } }); return local; };
+        const ensureEssentialData = () => { const hasSky = suggestedTickets.value.find(t => t.name === 'SHIBUYA SKY'); if(!hasSky) { suggestedTickets.value.push({name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}); } };
 
         onMounted(() => {
             fetchRealWeather();
-            // 自動抓匯率
             fetchExchangeRate();
             
             if(auth) onAuthStateChanged(auth, u=>{ 
@@ -1116,9 +1094,10 @@ createApp({
                                 saveData(); 
                             }
                         } else {
-                             // 如果雲端完全沒資料，才用預設值 (確保不會覆蓋掉雲端的空白)
-                             // 但因為我們在 ref() 初始化時已經給了預設值，這裡其實不用再給一次
-                             // 這裡主要是防呆
+                             itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
+                             drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
+                             shopping.value = JSON.parse(JSON.stringify(defaultData.shopping));
+                             spots.value = JSON.parse(JSON.stringify(defaultData.spots));
                         }
                     });
                 }
@@ -1153,4 +1132,3 @@ createApp({
 </script>                                
  </body>
 </html>
-
