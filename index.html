@@ -600,7 +600,7 @@ import { createApp, ref, computed, onMounted, watch } from "https://unpkg.com/vu
 const firebaseConfig = { apiKey: "AIzaSyD3ojbkJVfDKmZQHRpZG-gp8gv7ajKdJr4", authDomain: "tokyo-trip-24b28.firebaseapp.com", projectId: "tokyo-trip-24b28", storageBucket: "tokyo-trip-24b28.firebasestorage.app", messagingSenderId: "518699705070", appId: "1:518699705070:web:56e95f603210d8d5d209ff" };
 let auth, db; try { const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); enableIndexedDbPersistence(db).catch(e=>{}); } catch (e) { console.warn("Firebase Init Fail", e); }
 
-// --- 靜態資料定義區 (這是您的資料保險箱) ---
+// --- 靜態資料定義區 ---
 
 const defaultPrepList = [{text:'護照',checked:false},{text:'日幣',checked:false},{text:'網卡/漫遊',checked:false},{text:'行動電源',checked:false}];
 const defaultUsers = [
@@ -616,7 +616,7 @@ const getImg = (p) => {
     return `./images/${p}`; 
 };
 
-// 詳細資料
+// 詳細資料 (包含正確圖片路徑)
 const foodSpots = {
     Tokyo: [
         {name:'牛かつもと村', desc:'自行煎烤軟嫩炸牛排', tag:'新宿/澀谷', img:'gyukatsu-motomura.jpg', reserve:false, link:'牛かつもと村', reserveLink:'', votes:[]},
@@ -756,7 +756,7 @@ const defaultData = {
     ]
 };
 
-// --- 應用程式邏輯區 (V75.0 終極修正) ---
+// --- 應用程式邏輯區 ---
 
 createApp({
     setup() {
@@ -838,17 +838,19 @@ createApp({
         const getCurrentItinerary = () => (itineraryMode.value === 'drive' && [2,3,4].includes(selectedDayIndex.value)) ? (drivePlan.value[selectedDayIndex.value-2] || []) : (itinerary.value[selectedDayIndex.value] || []);
         const getIconByCategory = (cat) => ({'Flight':'fa-solid fa-plane','Sightseeing':'fa-solid fa-camera','Food':'fa-solid fa-utensils','Shopping':'fa-solid fa-bag-shopping','Transport':'fa-solid fa-train-subway','Hotel':'fa-solid fa-bed'}[cat]||'fa-solid fa-location-dot');
         
-        // ★★★ V75.0 地圖連結修正 (使用最穩定的官方標準，解決404) ★★★
+        // ★★★ Google Maps 網址修正 (解決 404 錯誤) ★★★
         const getMapLink = (k,n) => { 
             const q = k || n; 
             if(!q) return ''; 
             if(q.startsWith('http')) return q; 
-            return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); 
+            // 改用 https://maps.google.com/?q=... 這是最通用的格式，手機/電腦都能開
+            return 'https://maps.google.com/?q=' + encodeURIComponent(q); 
         };
         const getDirLink = (dest) => { 
             const list = getCurrentItinerary(); 
             let origin = list.length > 0 ? list[list.length-1].mapKeyword || list[list.length-1].name : ""; 
-            return 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(dest) + '&travelmode=transit'; 
+            // 同樣修正為通用格式
+            return 'https://maps.google.com/dir/?api=1&origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(dest) + '&travelmode=transit'; 
         };
         const getSearchLink = (n) => 'https://www.google.com/search?q=' + encodeURIComponent(n);
         
@@ -931,7 +933,7 @@ createApp({
         const saveData = async () => { 
             if(isGuest.value) return; 
             
-            // 安全鎖：只有當行程表「有內容」時才允許存檔，避免空白覆蓋雲端
+            // 安全鎖：防止空白行程覆蓋雲端
             if (!itinerary.value || itinerary.value.length === 0) {
                 console.warn("Safety Lock: Itinerary is empty, save aborted.");
                 return;
@@ -961,7 +963,7 @@ createApp({
         const updateHeartbeat = async () => { if(!isLoggedIn.value || !currentUser.value || isGuest.value) return; try { await updateDoc(doc(db,"trips","kanto2026"), { [`heartbeats.${currentUser.value.id}`]: serverTimestamp() }); } catch(e) { console.log("Heartbeat skip"); } };
         const fetchRealWeather = async () => { weatherLoading.value = true; try { const locs = [ {lat: 35.6895, lon: 139.6917, key:'Tokyo'}, {lat: 35.3192, lon: 139.5467, key:'Kamakura'}, {lat: 35.4988, lon: 138.7616, key:'Fuji'} ]; for(let l of locs) { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current_weather=true`); const d = await res.json(); const target = weatherData.value.find(w => w.name === l.key); if(target && d.current_weather) { target.temp = Math.round(d.current_weather.temperature); } } } catch(e) { console.error("Weather Error", e); } weatherLoading.value = false; };
         const fetchExchangeRate = async () => { try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); if (data && data.rates && data.rates.TWD) { exchangeRate.value = data.rates.TWD; } } catch (e) { console.error("Rate Fetch Error", e); } };
-        const showDiagnostic = () => { const isReset = confirm(`【V75.0 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
+        const showDiagnostic = () => { const isReset = confirm(`【V76.0 系統診斷】\n\n連線狀態：${isLoggedIn.value?'🟢 已連線':'🔴 未連線'}\n同步狀態：${syncStatus.value}\n目前身分：${currentUser.value?.name || '未登入'}\n\n【進階】是否要強制重置資料庫？(注意：會清除所有資料)`); if(isReset) forceRestoreDefaults(); };
 
         const setCurrentUser = (u) => { if(isGuest.value) return; currentUser.value = u; localStorage.setItem('V71_LAST_USER_ID', u.id); updateHeartbeat(); showPersonaModal.value = false; currentView.value = 'menu'; };
         const addPrepItem = (u) => { if(!u.list) u.list = []; u.list.push({text:'新項目',checked:false}); saveData(); };
@@ -1002,12 +1004,12 @@ createApp({
                             const dt = d.data();
                             if (dt.users) users.value = mergeUsers(users.value, dt.users);
                             
-                            // ★★★ V75.0 關鍵修復：雲端優先邏輯 ★★★
-                            // 如果雲端有資料，使用雲端的；如果雲端空白（被誤刪），則緊急填回預設值
+                            // ★★★ V76.0 雲端優先 + 白畫面修復 ★★★
+                            // 如果雲端有資料，使用雲端的 (找回您手打的資料)
                             if (dt.itinerary_json && JSON.parse(dt.itinerary_json).length > 0) {
                                 itinerary.value = JSON.parse(dt.itinerary_json);
                             } else {
-                                // 雲端空白，啟動救援：填回 D1-D8
+                                // 如果雲端是空的 (被誤刪)，使用預設值救援
                                 itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
                             }
 
@@ -1019,7 +1021,7 @@ createApp({
 
                             if (dt.expenses) expenses.value = dt.expenses;
                             
-                            // ★★★ V72.1 自動補圖邏輯 (保留，確保新圖能上去) ★★★
+                            // ★★★ 自動補圖邏輯 (確保 hirano_beach 等圖片出現) ★★★
                             let needsFix = false;
 
                             // 1. 修復 Shopping
@@ -1030,7 +1032,6 @@ createApp({
                                     if (!remoteShop[cat]) { remoteShop[cat] = localShop[cat]; needsFix = true; continue; }
                                     localShop[cat].forEach(localItem => {
                                         const remoteItem = remoteShop[cat].find(r => r.name === localItem.name);
-                                        // 補圖：如果雲端沒圖，但程式碼有，就補上
                                         if (remoteItem && !remoteItem.img && localItem.img) {
                                             remoteItem.img = localItem.img;
                                             needsFix = true;
@@ -1042,7 +1043,7 @@ createApp({
                                 shopping.value = defaultData.shopping;
                             }
 
-                            // 2. 修復 Spots (例如平野之濱)
+                            // 2. 修復 Spots
                             if (dt.spots) {
                                 const remoteSpots = dt.spots;
                                 const localSpots = defaultData.spots;
@@ -1052,7 +1053,7 @@ createApp({
                                         if (!remoteSpots[type][loc]) { remoteSpots[type][loc] = localSpots[type][loc]; needsFix = true; continue; }
                                         localSpots[type][loc].forEach(localItem => {
                                             const remoteItem = remoteSpots[type][loc].find(r => r.name === localItem.name);
-                                            // 補圖
+                                            // 關鍵：如果雲端缺圖，從本地補上
                                             if (remoteItem && !remoteItem.img && localItem.img) {
                                                 remoteItem.img = localItem.img;
                                                 needsFix = true;
@@ -1076,11 +1077,11 @@ createApp({
                             ensureEssentialData();
 
                             if(needsFix && !isGuest.value) {
-                                console.log("V75.0 Auto-healing images...");
+                                console.log("V76.0 Auto-healing images...");
                                 saveData(); 
                             }
                         } else {
-                             // 如果雲端完全沒資料，使用預設值
+                             // 完全新 App，使用預設值
                              itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
                              drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
                              shopping.value = JSON.parse(JSON.stringify(defaultData.shopping));
@@ -1116,6 +1117,6 @@ createApp({
         };
     }
 }).mount('#app');
-</script>                                                                                                                            
+</script>                                                                                                                                                                                          
 </body>
 </html>
