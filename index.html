@@ -589,13 +589,14 @@ const foodSpots = {
         {name:'HARBS', desc:'必吃水果千層蛋糕', tag:'六本木/新宿', img:'harbs-fruit-crepe.jpg', reserve:false, link:'HARBS', reserveLink:'', votes:[]},
         {name:'今半', desc:'百年老店壽喜燒', tag:'人形町', img:'asakusa-imahan.jpg', reserve:true, link:'人形町今半', reserveLink:'https://www.asakusaimahan.co.jp/english/guide', votes:[]},
         {name:'AFURI', desc:'清爽柚子鹽拉麵', tag:'原宿', img:'afuri-ramen.jpg', reserve:false, link:'AFURI 原宿', reserveLink:'', votes:[]},
-        {name:'叙叙苑', desc:'高級燒肉', tag:'晴空塔', img:'jojoen-yakiniku.jpg', reserve:true, link:'叙叙苑', reserveLink:'', votes:[]}
-        {name:'GARIGUETTE', desc:'現烤法式千層酥', tag:'表參道', img:'gariguette.jpg', reserve:false, link:'GARIGUETTE', reserveLink:'', votes:[]}
-        {name:'しゃぶしゃぶ ステーキ にいむら本店', desc:'壽喜燒與日式火鍋', tag:'歌舞伎町', img:'shabushabu-niimura.jpg', reserve:true, link:'しゃぶしゃぶ ステーキ にいむら本店', reserveLink:'https://maps.app.goo.gl/wD39uZW2FKqsAiEV8', votes:[]}
-        {name:'ショーグンバーガー 新宿', desc:'和牛漢堡店', tag:'歌舞伎町', img:'gshogun-burger.jpg', reserve:false, link:'ショーグンバーガー 新宿', reserveLink:'', votes:[]}
-        {name:'らぁ麺 はやし田 新宿本店', desc:'雞白湯與醬油拉麵', tag:'新宿三丁目', img:'lintian-ramen.jpg', reserve:false, link:'らぁ麺 はやし田 新宿本店', reserveLink:'', votes:[]}
-        {name:'Yoroniku', desc:'日式燒肉餐廳', tag:'南青山', img:'yoroniku.jpg', reserve:true, link:'Yoroniku', reserveLink:'https://maps.app.goo.gl/9RG3vcmhKGG45aC4A?g_st=al', votes:[]}
+        {name:'叙叙苑', desc:'高級燒肉', tag:'晴空塔', img:'jojoen-yakiniku.jpg', reserve:true, link:'叙叙苑', reserveLink:'', votes:[]},
+        {name:'GARIGUETTE', desc:'現烤法式千層酥', tag:'表參道', img:'gariguette.jpg', reserve:false, link:'GARIGUETTE', reserveLink:'', votes:[]},
+        {name:'しゃぶしゃぶ ステーキ にいむら本店', desc:'壽喜燒與日式火鍋', tag:'歌舞伎町', img:'shabushabu-niimura.jpg', reserve:true, link:'しゃぶしゃぶ ステーキ にいむら本店', reserveLink:'https://maps.app.goo.gl/wD39uZW2FKqsAiEV8', votes:[]},
+        {name:'ショーグンバーガー 新宿', desc:'和牛漢堡店', tag:'歌舞伎町', img:'gshogun-burger.jpg', reserve:false, link:'ショーグンバーガー 新宿', reserveLink:'', votes:[]},
+        {name:'らぁ麺 はやし田 新宿本店', desc:'雞白湯與醬油拉麵', tag:'新宿三丁目', img:'lintian-ramen.jpg', reserve:false, link:'らぁ麺 はやし田 新宿本店', reserveLink:'', votes:[]},
+        {name:'Yoroniku', desc:'日式燒肉餐廳', tag:'南青山', img:'yoroniku.jpg', reserve:true, link:'Yoroniku', reserveLink:'https://maps.app.goo.gl/9RG3vcmhKGG45aC4A?g_st=al', votes:[]},
         {name:'Sasamoto', desc:'居酒屋', tag:'西新宿', img:'sasamoto.jpg', reserve:false, link:'Sasamoto', reserveLink:'', votes:[]}
+    ], 
     Kamakura: [
         {name:'Bills', desc:'世界第一早餐鬆餅', tag:'七里濱', img:'bills-pancakes.jpg', reserve:true, link:'Bills 七里ヶ浜', reserveLink:'https://billsjapan.com/en/shichirigahama', votes:[]},
         {name:'Pacific Drive-in',desc:'海景咖啡與蒜蓉蝦', tag:'七里濱', img:'pacific-drive-in.jpg', reserve:false, link:'Pacific Drive-in', reserveLink:'', votes:[]},
@@ -652,52 +653,52 @@ const defaultData = {
         [{hours:"05:00",category:"Sightseeing",name:"平野之濱",note:"看日出",travelTime:"🚗 30min",parkingLink:"平野の浜 駐車場"}, {hours:"09:00",category:"Sightseeing",name:"長池親水公園/白鳥濱",note:"山中湖租自行車",travelTime:"🚗 15min",parkingLink:"長池親水公園 駐車場"}, {hours:"12:00",category:"Food",name:"山中湖餐廳",note:"午餐",travelTime:"🚗 20min"}, {hours:"14:00",category:"Sightseeing",name:"KABA 水陸巴士",note:"旭日丘湖畔綠地公園",travelTime:"🚗 30min",parkingLink:"旭日丘湖畔緑地公園 駐車場"}, {hours:"18:00",category:"Food",name:"晚餐",note:"自行烹飪 (Ogino超市)"}],
         [{hours:"09:00",category:"Sightseeing",name:"河口湖纜車",note:"天上山公園絕景",travelTime:"🚗 15min",parkingLink:"河口湖畔県営駐車場"}, {hours:"11:00",category:"Shopping",name:"Fujisan Shokupan",note:"富士山吐司伴手禮",travelTime:"🚗 10min",parkingLink:"Fujisan Shokupan Parking"}, {hours:"12:30",category:"Food",name:"河口湖午餐",note:"最後的富士山美食",travelTime:"🚗 15min"}, {hours:"13:30",category:"Transport",name:"加油/還車",note:"加滿油後歸還",travelTime:"🚶 5min"}, {hours:"14:00",category:"Transport",name:"富士回遊",note:"前往新宿 (車上補眠)",travelTime:"⬇ 120min (JR特急)"}, {hours:"16:30",category:"Shopping",name:"池袋太陽城",note:"東京市區逛街",travelTime:"⬇ 20min"}]
     ],
-    shopping: {
-        cosme: [
-            {name:'Canmake 臥蠶盤', link:'https://www.canmake.com/', img:'canmake.jpg'},
-            {name:'Kate 怪獸唇膏', link:'https://www.nomorerules.net/', img:'kate.jpg'},
-            {name:'Tirtir 氣墊粉餅', link:'', img:'tirtir.jpg'},
-            {name:'Cezanne 珠光修容', link:'https://www.cezanne.co.jp/', img:'cezanne.jpg'},
-            {name:'Excel 眼影', link:'https://noevirgroup.jp/excel/', img:'excel.jpg'}
-        ],
-        ldk: [
-            {name:'MINON 胺基酸面膜', link:'https://www.daiichisankyo-hc.co.jp/site_minon/', img:'minon.jpg'},
-            {name:'Quality 1st 面膜', link:'', img:'quality1st.jpg'},
-            {name:'IHADA 化妝水', link:'', img:'ihada.jpg'},
-            {name:'Elixir 小金管', link:'', img:'elixir.jpg'},
-            {name:'Fino 髮膜', link:'', img:'fino.jpg'}
-        ],
-        souvenir: [
-            {name:'NY Perfect Cheese', link:'', img:'ny_cheese.jpg'},
-            {name:'Press Butter Sand', link:'https://buttersand.com/', img:'pbs.jpg'},
-            {name:'Sugar Butter Tree', link:'', img:'sbt.jpg'},
-            {name:'Tokyo Banana', link:'https://www.tokyobanana.jp/', img:'banana.jpg'},
-            {name:'白色戀人', link:'https://www.ishiya.co.jp/', img:'shiroi.jpg'}
-            {name:'number suger', link:'https://maps.app.goo.gl/gt62B5Pa1T41Tb8f8?g_st=al', img:'ns.jpg'}
-        ],
-        fashion: [
-            {name:'GU (比台灣便宜)', link:'https://www.gu-global.com/jp/ja/', img:'gu.jpg'},
-            {name:'UNIQLO 旗艦店', link:'https://www.uniqlo.com/jp/ja/', img:'uniqlo.jpg'},
-            {name:'ABC-MART Grand Stage', link:'https://gs.abc-mart.net/', img:'abc_mart.jpg'},
-            {name:'Workman Girl', link:'https://www.workman.co.jp/', img:'workman.jpg'},
-            {name:'WEGO 原宿', link:'https://wego.jp/', img:'wego.jpg'}
-        ],
-        toy: [
-            {name:'池袋 扭蛋百貨店 (太陽城)', link:'https://bandainamco-am.co.jp/others/gashapon-dept/', img:'gachapon.jpg'},
-            {name:'Nintendo Tokyo (澀谷)', link:'https://www.nintendo.co.jp/officialstore/', img:'nintendo.jpg'},
-            {name:'Kiddy Land (原宿)', link:'https://www.kiddyland.co.jp/harajuku/', img:'kiddyland.jpg'},
-            {name:'Pokemon Center', link:'https://www.pokemon.co.jp/shop/', img:'pokemon.jpg'},
-            {name:'駿河屋 (二手動漫)', link:'https://www.suruga-ya.jp/', img:'surugaya.jpg'}
-        ],
-        other: [
-            {name:'Standard Products', link:'https://standardproducts.jp/', img:'standard.jpg'},
-            {name:'3COINS', link:'https://www.3coins.jp/', img:'3coins.jpg'},
-            {name:'LOFT 文具雜貨', link:'https://www.loft.co.jp/', img:'loft.jpg'},
-            {name:'Seria (100圓店)', link:'https://www.seria-group.com/', img:'seria.jpg'},
-            {name:'Donki 唐吉訶德', link:'https://www.donki.com/', img:'donki.jpg'}
-            {name:'AUX PARADIS', link:'https://www.google.com/maps/place/AUX+PARADIS%E3%80%94%E3%82%AA%E3%82%A5%E3%83%91%E3%83%A9%E3%83%87%E3%82%A3%E3%80%95%E3%83%AB%E3%83%9F%E3%83%8D%E6%B1%A0%E8%A2%8B%E5%BA%97/@35.7289317,139.7095043,17z/data=!3m1!5s0x60188d5d0a479275:0xcc6bc8928c1974d8!4m6!3m5!1s0x60188d937039e55b:0x10d10d94be0e46d3!8m2!3d35.7289317!4d139.7095043!16s%2Fg%2F11j20ky81c?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3MUgBUAM%3D', img:'aux-paradis.jpg'}
-        ]
-    },
+    const shopping = {
+    cosme: [
+        {name:'Canmake 臥蠶盤', link:'https://www.canmake.com/', img:'canmake.jpg'},
+        {name:'Kate 怪獸唇膏', link:'https://www.nomorerules.net/', img:'kate.jpg'},
+        {name:'Tirtir 氣墊粉餅', link:'', img:'tirtir.jpg'},
+        {name:'Cezanne 珠光修容', link:'https://www.cezanne.co.jp/', img:'cezanne.jpg'},
+        {name:'Excel 眼影', link:'https://noevirgroup.jp/excel/', img:'excel.jpg'}
+    ],
+    ldk: [
+        {name:'MINON 胺基酸面膜', link:'https://www.daiichisankyo-hc.co.jp/site_minon/', img:'minon.jpg'},
+        {name:'Quality 1st 面膜', link:'', img:'quality1st.jpg'},
+        {name:'IHADA 化妝水', link:'', img:'ihada.jpg'},
+        {name:'Elixir 小金管', link:'', img:'elixir.jpg'},
+        {name:'Fino 髮膜', link:'', img:'fino.jpg'}
+    ],
+    souvenir: [
+        {name:'NY Perfect Cheese', link:'', img:'ny_cheese.jpg'},
+        {name:'Press Butter Sand', link:'https://buttersand.com/', img:'pbs.jpg'},
+        {name:'Sugar Butter Tree', link:'', img:'sbt.jpg'},
+        {name:'Tokyo Banana', link:'https://www.tokyobanana.jp/', img:'banana.jpg'},
+        {name:'白色戀人', link:'https://www.ishiya.co.jp/', img:'shiroi.jpg'}, 
+        {name:'number suger', link:'https://maps.app.goo.gl/gt62B5Pa1T41Tb8f8?g_st=al', img:'ns.jpg'}
+    ],
+    fashion: [
+        {name:'GU (比台灣便宜)', link:'https://www.gu-global.com/jp/ja/', img:'gu.jpg'},
+        {name:'UNIQLO 旗艦店', link:'https://www.uniqlo.com/jp/ja/', img:'uniqlo.jpg'},
+        {name:'ABC-MART Grand Stage', link:'https://gs.abc-mart.net/', img:'abc_mart.jpg'},
+        {name:'Workman Girl', link:'https://www.workman.co.jp/', img:'workman.jpg'},
+        {name:'WEGO 原宿', link:'https://wego.jp/', img:'wego.jpg'}
+    ],
+    toy: [
+        {name:'池袋 扭蛋百貨店 (太陽城)', link:'https://bandainamco-am.co.jp/others/gashapon-dept/', img:'gachapon.jpg'},
+        {name:'Nintendo Tokyo (澀谷)', link:'https://www.nintendo.co.jp/officialstore/', img:'nintendo.jpg'},
+        {name:'Kiddy Land (原宿)', link:'https://www.kiddyland.co.jp/harajuku/', img:'kiddyland.jpg'},
+        {name:'Pokemon Center', link:'https://www.pokemon.co.jp/shop/', img:'pokemon.jpg'},
+        {name:'駿河屋 (二手動漫)', link:'https://www.suruga-ya.jp/', img:'surugaya.jpg'}
+    ],
+    other: [
+        {name:'Standard Products', link:'https://standardproducts.jp/', img:'standard.jpg'},
+        {name:'3COINS', link:'https://www.3coins.jp/', img:'3coins.jpg'},
+        {name:'LOFT 文具雜貨', link:'https://www.loft.co.jp/', img:'loft.jpg'},
+        {name:'Seria (100圓店)', link:'https://www.seria-group.com/', img:'seria.jpg'},
+        {name:'Donki 唐吉訶德', link:'https://www.donki.com/', img:'donki.jpg'}, 
+        {name:'AUX PARADIS', link:'https://www.google.com/maps/place/AUX+PARADIS%E3%80%94%E3%82%AA%E3%82%A5%E3%83%91%E3%83%A9%E3%83%87%E3%82%A3%E3%80%95%E3%83%AB%E3%83%9F%E3%83%8D%E6%B1%A0%E8%A2%8B%E5%BA%97/@35.7289317,139.7095043,17z/data=!3m1!5s0x60188d5d0a479275:0xcc6bc8928c1974d8!4m6!3m5!1s0x60188d937039e55b:0x10d10d94be0e46d3!8m2!3d35.7289317!4d139.7095043!16s%2Fg%2F11j20ky81c?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA3MUgBUAM%3D', img:'aux-paradis.jpg'}
+    ]
+};
     coupons: [
         {name: '唐吉訶德', discount: '10% (免稅) + 5%', link: 'https://japanportal.donki-global.com/coupon/cp001_zhtw.html', note: '未稅滿 1萬日圓'},
         {name: 'Bic Camera', discount: '10% (免稅) + 7%', link: 'https://www.taxfreeshops.jp/zhtw/tieup/2?gad_source=1&gad_campaignid=21560943536&gbraid=0AAAAADydLMoFDoHE1gx2Kx7xefmMGF_Fp&gclid=Cj0KCQiApL7KBhC7ARIsAD2Xq3BIwGiHHexSF87uSsx2OrMSTAVwAHuZ-7EGk1agZJImiu8Nr0dTi1waApA7EALw_wcB', note: '出示護照'},
@@ -1061,4 +1062,5 @@ createApp({
 </script>
 </body>
 </html>
+
 
