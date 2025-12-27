@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -970,23 +971,48 @@ createApp({
                             
                             let needsFix = false;
 
-                            if (dt.shopping) {
-                                const remoteShop = dt.shopping;
-                                const localShop = defaultData.shopping;
-                                for (const cat in localShop) {
-                                    if (!remoteShop[cat]) { remoteShop[cat] = localShop[cat]; needsFix = true; continue; }
-                                    localShop[cat].forEach(localItem => {
-                                        const remoteItem = remoteShop[cat].find(r => r.name === localItem.name);
-                                        if (remoteItem && !remoteItem.img && localItem.img) {
-                                            remoteItem.img = localItem.img;
-                                            needsFix = true;
-                                        }
-                                    });
-                                }
-                                shopping.value = remoteShop;
-                            } else {
-                                shopping.value = defaultData.shopping;
-                            }
+                           // ✅ 貼上這段新的
+if (dt.shopping) {
+    const remoteShop = dt.shopping;
+    const localShop = defaultData.shopping;
+
+    // 遍歷本地端的所有分類
+    for (const cat in localShop) {
+        // 1. 如果雲端完全沒有這個分類，直接補上整個分類
+        if (!remoteShop[cat]) {
+            remoteShop[cat] = localShop[cat];
+            needsFix = true;
+            continue;
+        }
+
+        // 2. 如果雲端有這個分類，檢查有沒有漏掉的項目
+        localShop[cat].forEach(localItem => {
+            // 檢查雲端是否已經有這個名字的商品
+            const exists = remoteShop[cat].find(r => r.name === localItem.name);
+
+            if (!exists) {
+                // ★ 關鍵：發現雲端沒有這個商品，把它加進去
+                remoteShop[cat].push(localItem);
+                needsFix = true;
+                console.log(`自動補入新商品: ${localItem.name}`);
+            } else {
+                // (選用) 如果商品存在，但本地有圖片而雲端沒有，順便補圖
+                if (localItem.img && !exists.img) {
+                    exists.img = localItem.img;
+                    needsFix = true;
+                }
+                // (選用) 強制更新連結：如果本地程式碼的連結變了，就更新雲端的
+                if (localItem.link && exists.link !== localItem.link) {
+                     exists.link = localItem.link;
+                     needsFix = true;
+                }
+            }
+        });
+    }
+    shopping.value = remoteShop;
+} else {
+    shopping.value = defaultData.shopping;
+}
 
                             if (dt.spots) {
                                 const remoteSpots = dt.spots;
@@ -1062,7 +1088,3 @@ createApp({
 </script>
 </body>
 </html>
-
-
-
-
