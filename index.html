@@ -1018,25 +1018,59 @@ if (dt.shopping) {
 }
 
                             if (dt.spots) {
-                                const remoteSpots = dt.spots;
-                                const localSpots = defaultData.spots;
-                                for (const type in localSpots) { 
-                                    if (!remoteSpots[type]) { remoteSpots[type] = localSpots[type]; needsFix = true; continue; }
-                                    for (const loc in localSpots[type]) { 
-                                        if (!remoteSpots[type][loc]) { remoteSpots[type][loc] = localSpots[type][loc]; needsFix = true; continue; }
-                                        localSpots[type][loc].forEach(localItem => {
-                                            const remoteItem = remoteSpots[type][loc].find(r => r.name === localItem.name);
-                                            if (remoteItem && !remoteItem.img && localItem.img) {
-                                                remoteItem.img = localItem.img;
-                                                needsFix = true;
-                                            }
-                                        });
-                                    }
-                                }
-                                spots.value = remoteSpots;
-                            } else {
-                                spots.value = defaultData.spots;
-                            }
+    const remoteSpots = dt.spots;
+    const localSpots = defaultData.spots;
+    
+    for (const type in localSpots) { 
+        // 1. 如果雲端連這個分類(food/photo)都沒有，直接整個補上
+        if (!remoteSpots[type]) { 
+            remoteSpots[type] = localSpots[type]; 
+            needsFix = true; 
+            continue; 
+        }
+
+        for (const loc in localSpots[type]) { 
+            // 2. 如果雲端連這個地區(Tokyo/Kamakura)都沒有，直接整個補上
+            if (!remoteSpots[type][loc]) { 
+                remoteSpots[type][loc] = localSpots[type][loc]; 
+                needsFix = true; 
+                continue; 
+            }
+
+            // 3. 比對每一間餐廳/景點
+            localSpots[type][loc].forEach(localItem => {
+                const remoteItem = remoteSpots[type][loc].find(r => r.name === localItem.name);
+                
+                // ★★★ 關鍵修改在這裡 ★★★
+                if (!remoteItem) {
+                    // 狀況 A: 雲端找不到這間餐廳 -> 自動補入
+                    console.log(`✨ 自動補入新地點: ${localItem.name}`);
+                    remoteSpots[type][loc].push(localItem);
+                    needsFix = true;
+                } else {
+                    // 狀況 B: 雲端有，但程式碼裡的圖片更新了 -> 幫忙補圖
+                    if (localItem.img && !remoteItem.img) {
+                        remoteItem.img = localItem.img;
+                        needsFix = true;
+                    }
+                    // 加強：如果程式碼裡的連結變了，也更新雲端
+                    if (localItem.link && remoteItem.link !== localItem.link) {
+                        remoteItem.link = localItem.link;
+                        needsFix = true;
+                    }
+                     // 加強：更新預約連結
+                    if (localItem.reserveLink && remoteItem.reserveLink !== localItem.reserveLink) {
+                        remoteItem.reserveLink = localItem.reserveLink;
+                        needsFix = true;
+                    }
+                }
+            });
+        }
+    }
+    spots.value = remoteSpots;
+} else {
+    spots.value = defaultData.spots;
+}
 
                             if (dt.coupons) coupons.value = dt.coupons;
                             if (dt.phrases) japanesePhrases.value = dt.phrases;
@@ -1091,6 +1125,7 @@ if (dt.shopping) {
 </script>
 </body>
 </html>
+
 
 
 
