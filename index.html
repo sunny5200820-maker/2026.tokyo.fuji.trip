@@ -979,7 +979,7 @@ createApp({
         const mergeUsers = (local, remote) => { if(!remote || !Array.isArray(remote)) return local; remote.forEach(rUser => { const lUser = local.find(u => u.id === rUser.id); if(lUser) { lUser.name = rUser.name; lUser.avatar = rUser.avatar; if(rUser.list && rUser.list.length > 0) lUser.list = rUser.list; lUser.flightOut = rUser.flightOut; lUser.flightOutSeat = rUser.flightOutSeat; lUser.flightIn = rUser.flightIn; lUser.flightInSeat = rUser.flightInSeat; } }); return local; };
         const ensureEssentialData = () => { const hasSky = suggestedTickets.value.find(t => t.name === 'SHIBUYA SKY'); if(!hasSky) { suggestedTickets.value.push({name: 'SHIBUYA SKY', url: 'https://www.shibuya-scramble-square.com/sky/ticket/', custom: false}); } };
 
-        onMounted(() => {
+               onMounted(() => {
             fetchRealWeather();
             fetchExchangeRate();
             
@@ -989,113 +989,81 @@ createApp({
                     onSnapshot(doc(db,"trips","kanto2026"), d=>{
                         if(d.exists()){
                             const dt = d.data();
-                            if (dt.users) users.value = mergeUsers(users.value, dt.users);
-                            if (dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
-                            else if(dt.itinerary && dt.itinerary.length > 0) itinerary.value = dt.itinerary; 
-                            if (dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
-                            else if(dt.drivePlan && dt.drivePlan.length > 0) drivePlan.value = dt.drivePlan; 
-                            if (dt.expenses) expenses.value = dt.expenses;
-                            
                             let needsFix = false;
 
-                           // ✅ 貼上這段新的
-if (dt.shopping) {
-    const remoteShop = dt.shopping;
-    const localShop = defaultData.shopping;
+                            // 1. 基本資料同步
+                            if (dt.users) users.value = mergeUsers(users.value, dt.users);
+                            if (dt.itinerary_json) itinerary.value = JSON.parse(dt.itinerary_json);
+                            else if(dt.itinerary) itinerary.value = dt.itinerary; 
+                            if (dt.drivePlan_json) drivePlan.value = JSON.parse(dt.drivePlan_json);
+                            else if(dt.drivePlan) drivePlan.value = dt.drivePlan; 
+                            if (dt.expenses) expenses.value = dt.expenses;
+                            
+                            // 2. 購物清單同步邏輯 (🔥 安全修復版)
+                            if (dt.shopping && typeof dt.shopping === 'object') {
+                                const remoteShop = dt.shopping;
+                                const localShop = defaultData.shopping;
+                                for (const cat in localShop) {
+                                    // 狀況一：雲端完全沒這個分類 -> 補上
+                                    if (!remoteShop[cat]) {
+                                        remoteShop[cat] = localShop[cat];
+                                        needsFix = true;
+                                    } 
+                                    // 狀況二：有分類，確認它是陣列才執行比對 (這行是救命關鍵!)
+                                    else if (Array.isArray(remoteShop[cat])) {
+                                        localShop[cat].forEach(localItem => {
+                                            const exists = remoteShop[cat].find(r => r.name === localItem.name);
+                                            if (!exists) {
+                                                remoteShop[cat].push(localItem);
+                                                needsFix = true;
+                                            } else {
+                                                if (localItem.img && !exists.img) { exists.img = localItem.img; needsFix = true; }
+                                                if (localItem.link && exists.link !== localItem.link) { exists.link = localItem.link; needsFix = true; }
+                                            }
+                                        });
+                                    }
+                                }
+                                shopping.value = remoteShop;
+                            } else {
+                                shopping.value = JSON.parse(JSON.stringify(defaultData.shopping));
+                            }
 
-    // 遍歷本地端的所有分類
-    for (const cat in localShop) {
-        // 1. 如果雲端完全沒有這個分類，直接補上整個分類
-        if (!remoteShop[cat]) {
-            remoteShop[cat] = localShop[cat];
-            needsFix = true;
-            continue;
-        }
+                            // 3. 景點與美食同步邏輯 (🔥 安全修復版)
+                            if (dt.spots && typeof dt.spots === 'object') {
+                                const remoteSpots = dt.spots;
+                                const localSpots = defaultData.spots;
+                                
+                                for (const type in localSpots) { 
+                                    if (!remoteSpots[type]) { remoteSpots[type] = localSpots[type]; needsFix = true; continue; }
+                                    
+                                    for (const loc in localSpots[type]) { 
+                                        if (!remoteSpots[type][loc]) { remoteSpots[type][loc] = localSpots[type][loc]; needsFix = true; continue; }
+                                        
+                                        // 確認它是陣列才執行比對 (這行是救命關鍵!)
+                                        if (Array.isArray(remoteSpots[type][loc])) {
+                                            localSpots[type][loc].forEach(localItem => {
+                                                // 再次確認雲端資料是陣列
+                                                if (Array.isArray(remoteSpots[type][loc])) {
+                                                    const remoteItem = remoteSpots[type][loc].find(r => r.name === localItem.name);
+                                                    if (!remoteItem) {
+                                                        remoteSpots[type][loc].push(localItem);
+                                                        needsFix = true;
+                                                    } else {
+                                                        if (localItem.img && !remoteItem.img) { remoteItem.img = localItem.img; needsFix = true; }
+                                                        if (localItem.link && remoteItem.link !== localItem.link) { remoteItem.link = localItem.link; needsFix = true; }
+                                                        if (localItem.reserveLink && remoteItem.reserveLink !== localItem.reserveLink) { remoteItem.reserveLink = localItem.reserveLink; needsFix = true; }
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                                spots.value = remoteSpots;
+                            } else {
+                                spots.value = JSON.parse(JSON.stringify(defaultData.spots));
+                            }
 
-        // 2. 如果雲端有這個分類，檢查有沒有漏掉的項目
-        localShop[cat].forEach(localItem => {
-            // 檢查雲端是否已經有這個名字的商品
-            const exists = remoteShop[cat].find(r => r.name === localItem.name);
-
-            if (!exists) {
-                // ★ 關鍵：發現雲端沒有這個商品，把它加進去
-                remoteShop[cat].push(localItem);
-                needsFix = true;
-                console.log(`自動補入新商品: ${localItem.name}`);
-            } else {
-                // (選用) 如果商品存在，但本地有圖片而雲端沒有，順便補圖
-                if (localItem.img && !exists.img) {
-                    exists.img = localItem.img;
-                    needsFix = true;
-                }
-                // (選用) 強制更新連結：如果本地程式碼的連結變了，就更新雲端的
-                if (localItem.link && exists.link !== localItem.link) {
-                     exists.link = localItem.link;
-                     needsFix = true;
-                }
-            }
-        });
-    }
-    shopping.value = remoteShop;
-} else {
-    shopping.value = defaultData.shopping;
-}
-
-                            if (dt.spots) {
-    const remoteSpots = dt.spots;
-    const localSpots = defaultData.spots;
-    
-    for (const type in localSpots) { 
-        // 1. 如果雲端連這個分類(food/photo)都沒有，直接整個補上
-        if (!remoteSpots[type]) { 
-            remoteSpots[type] = localSpots[type]; 
-            needsFix = true; 
-            continue; 
-        }
-
-        for (const loc in localSpots[type]) { 
-            // 2. 如果雲端連這個地區(Tokyo/Kamakura)都沒有，直接整個補上
-            if (!remoteSpots[type][loc]) { 
-                remoteSpots[type][loc] = localSpots[type][loc]; 
-                needsFix = true; 
-                continue; 
-            }
-
-            // 3. 比對每一間餐廳/景點
-            localSpots[type][loc].forEach(localItem => {
-                const remoteItem = remoteSpots[type][loc].find(r => r.name === localItem.name);
-                
-                // ★★★ 關鍵修改在這裡 ★★★
-                if (!remoteItem) {
-                    // 狀況 A: 雲端找不到這間餐廳 -> 自動補入
-                    console.log(`✨ 自動補入新地點: ${localItem.name}`);
-                    remoteSpots[type][loc].push(localItem);
-                    needsFix = true;
-                } else {
-                    // 狀況 B: 雲端有，但程式碼裡的圖片更新了 -> 幫忙補圖
-                    if (localItem.img && !remoteItem.img) {
-                        remoteItem.img = localItem.img;
-                        needsFix = true;
-                    }
-                    // 加強：如果程式碼裡的連結變了，也更新雲端
-                    if (localItem.link && remoteItem.link !== localItem.link) {
-                        remoteItem.link = localItem.link;
-                        needsFix = true;
-                    }
-                     // 加強：更新預約連結
-                    if (localItem.reserveLink && remoteItem.reserveLink !== localItem.reserveLink) {
-                        remoteItem.reserveLink = localItem.reserveLink;
-                        needsFix = true;
-                    }
-                }
-            });
-        }
-    }
-    spots.value = remoteSpots;
-} else {
-    spots.value = defaultData.spots;
-}
-
+                            // 4. 其他資料
                             if (dt.coupons) coupons.value = dt.coupons;
                             if (dt.phrases) japanesePhrases.value = dt.phrases;
                             if (dt.tickets) suggestedTickets.value = dt.tickets;
@@ -1107,10 +1075,11 @@ if (dt.shopping) {
                             ensureEssentialData();
 
                             if(needsFix && !isGuest.value) {
-                                console.log("V72.2 Auto-healing images...");
+                                console.log("System Auto-healing data structure...");
                                 saveData(); 
                             }
                         } else {
+                             // 初始化預設值
                              itinerary.value = JSON.parse(JSON.stringify(defaultData.itinerary));
                              drivePlan.value = JSON.parse(JSON.stringify(defaultData.drivePlan));
                              shopping.value = JSON.parse(JSON.stringify(defaultData.shopping));
@@ -1125,7 +1094,6 @@ if (dt.shopping) {
             const lastId = localStorage.getItem('V71_LAST_USER_ID');
             if(lastId) { const u = users.value.find(user => user.id === parseInt(lastId)); if(u) currentUser.value = u; }
         });
-
         return {
             users, currentView, isWelcomeClosed, enterSite, enterAsGuest, isGuest, apps, getPageTitle,
             daysUntilTrip, smartReminders, tripDays, selectedDayIndex, getCurrentItinerary,
@@ -1149,16 +1117,3 @@ if (dt.shopping) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
